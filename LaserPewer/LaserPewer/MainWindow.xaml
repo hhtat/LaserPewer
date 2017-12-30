@@ -5,8 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="LaserPewer" Height="600" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         
+        <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="X" FontSize="32" TextAlignment="Left" Grid.Row="0" Grid.Column="0" />
+                <TextBlock Name="xTextBlock" Text="???.???" FontSize="32" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
+
+                <TextBlock Text="Y" FontSize="32" TextAlignment="Left" Grid.Row="1" Grid.Column="0" />
+                <TextBlock Name="yTextBlock" Text="???.???" FontSize="32" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
+
+                <TextBlock Text="Status" FontSize="14" TextAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                <TextBlock Name="statusTextBlock" Text="???" FontSize="32" TextAlignment="Center" Grid.Row="2" Grid.Column="1" />
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Name="resetButton" Click="resetButton_Click" Content="RESET" Grid.Column="0" />
+                <Button Name="homeButton" Click="homeButton_Click" Content="HOME" Grid.Column="1" />
+                <Button Name="unlockButton" Click="unlockButton_Click" Content="UNLOCK" Grid.Column="2" />
+            </Grid>
+        </StackPanel>
     </Grid>
 </Window>
