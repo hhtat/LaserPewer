@@ -49,5 +49,15 @@ namespace LaserPewer
         {
             machine.Unlock();
         }
+
+        private void goButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void holdButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
