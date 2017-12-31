@@ -58,6 +58,6 @@
             </Grid>
         </StackPanel>
 
-        <local:Workbench x:Name="workbench" Background="DarkGray" Grid.Column="1" />
+        <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" Background="DarkGray" Grid.Column="1" />
     </Grid>
 </Window>

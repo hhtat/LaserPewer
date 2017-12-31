@@ -68,6 +68,18 @@ namespace LaserPewer
             return trySendCommand("$X");
         }
 
+        public void SendHoldRequest()
+        {
+            Debug.WriteLine("SENT: !");
+            writer.Write('!');
+            writer.Flush();
+        }
+
+        public bool TrySendCommand(string line)
+        {
+            return trySendCommand(line);
+        }
+
         private bool trySendCommand(string line)
         {
             if (!readyToSend(line.Length + 1)) return false;

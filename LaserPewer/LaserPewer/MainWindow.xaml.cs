@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace LaserPewer
@@ -28,11 +30,11 @@ namespace LaserPewer
 
         private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)
         {
-            xTextBlock.Text = status.X.ToString("F3");
-            yTextBlock.Text = status.Y.ToString("F3");
+            xTextBlock.Text = status.X.ToString("F3", CultureInfo.InvariantCulture);
+            yTextBlock.Text = status.Y.ToString("F3", CultureInfo.InvariantCulture);
             statusTextBlock.Text = status.Status;
 
-            workbench.PointerMM = new Point(status.X, status.Y);
+            workbench.PointerMM = new Point(status.X, -status.Y);
         }
 
         private void StatusRequestTimer_Tick(object sender, EventArgs e)
@@ -62,7 +64,13 @@ namespace LaserPewer
 
         private void holdButton_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            machine.Hold();
+        }
+
+        private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Point pointMM = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
+            machine.Jog(pointMM.X, -pointMM.Y);
         }
     }
 }

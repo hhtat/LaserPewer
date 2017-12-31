@@ -36,6 +36,17 @@ namespace LaserPewer
             streamer.TrySendUnlockRequest();
         }
 
+        public void Hold()
+        {
+            streamer.SendHoldRequest();
+        }
+
+        public void Jog(double x, double y)
+        {
+            string line = "$J=G21 G90 X" + x.ToString("F", CultureInfo.InvariantCulture) + " Y" + y.ToString("F", CultureInfo.InvariantCulture) + " F10000";
+            streamer.TrySendCommand(line);
+        }
+
         public void PollStatus()
         {
             streamer.TrySendStatusRequest();
