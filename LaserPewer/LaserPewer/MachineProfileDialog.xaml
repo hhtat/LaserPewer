@@ -6,6 +6,40 @@
         mc:Ignorable="d"
         Title="Machine Profile" WindowStartupLocation="CenterOwner" Height="200" Width="300" ResizeMode="NoResize">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Name="formGrid" KeyDown="formGrid_KeyDown">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Name" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
+            <TextBox Name="nameTextBox" Grid.Row="0" Grid.Column="1" />
+
+            <TextBlock Text="Table width (mm)" TextAlignment="Right" Grid.Row="1" Grid.Column="0" />
+            <TextBox Name="widthTextBox" Grid.Row="1" Grid.Column="1" />
+
+            <TextBlock Text="Table height (mm)" TextAlignment="Right" Grid.Row="2" Grid.Column="0" />
+            <TextBox Name="heightTextBox" Grid.Row="2" Grid.Column="1" />
+
+            <TextBlock Text="Max feed rate (mm/min)" TextAlignment="Right" Grid.Row="3" Grid.Column="0" />
+            <TextBox Name="maxFeedTextBox" Grid.Row="3" Grid.Column="1" />
+        </Grid>
+
+        <StackPanel Grid.Row="1">
+            <Button Name="saveButton" Click="saveButton_Click" Content="Save" />
+            <Button Name="duplicateButton" Click="duplicateButton_Click" Content="Duplicate" />
+            <Button Name="deleteButton" Click="deleteButton_Click" Content="Delete" />
+        </StackPanel>
     </Grid>
 </Window>

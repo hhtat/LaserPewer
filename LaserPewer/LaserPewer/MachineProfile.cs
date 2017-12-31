@@ -2,9 +2,9 @@
 {
     public class MachineProfile
     {
-        public string FriendlyName;
-        public double TableWidth;
-        public double TableHeight;
-        public double MaxFeedRate;
+        public string FriendlyName { get; set; }
+        public double TableWidth { get; set; }
+        public double TableHeight { get; set; }
+        public double MaxFeedRate { get; set; }
     }
 }

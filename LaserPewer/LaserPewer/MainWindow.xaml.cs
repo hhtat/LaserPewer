@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace LaserPewer
@@ -20,11 +20,7 @@ namespace LaserPewer
         {
             InitializeComponent();
 
-            foreach (MachineProfile profile in AppCore.Instance.Profiles)
-            {
-                machineListComboBox.Items.Add(profile.FriendlyName);
-            }
-            machineListComboBox.SelectedIndex = 0;
+            refreshProfiles(AppCore.Instance.Profiles[0]);
 
             machine = new GrblMachine();
             machine.MachineReset += Machine_MachineReset;
@@ -38,6 +34,22 @@ namespace LaserPewer
             statusRequestTimer.Interval = TimeSpan.FromMilliseconds(500);
             statusRequestTimer.Tick += StatusRequestTimer_Tick;
             statusRequestTimer.Start();
+        }
+
+        private void refreshProfiles(MachineProfile selectedProfile)
+        {
+            if (selectedProfile == null)
+            {
+                selectedProfile = AppCore.Instance.Profiles[0];
+            }
+
+            machineListComboBox.Items.Clear();
+            foreach (MachineProfile profile in AppCore.Instance.Profiles)
+            {
+                machineListComboBox.Items.Add(profile.FriendlyName);
+            }
+
+            machineListComboBox.SelectedIndex = AppCore.Instance.ProfileIndex(selectedProfile);
         }
 
         private void loadProfile(MachineProfile profile)
@@ -87,9 +99,10 @@ namespace LaserPewer
 
         private void machineListComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (machineListComboBox.SelectedIndex < 0 || machineListComboBox.SelectedIndex > AppCore.Instance.Profiles.Count)
+            if (machineListComboBox.SelectedIndex < 0 ||
+                machineListComboBox.SelectedIndex > AppCore.Instance.Profiles.Count)
             {
-                machineListComboBox.SelectedIndex = 0;
+                return;
             }
 
             loadProfile(AppCore.Instance.Profiles[machineListComboBox.SelectedIndex]);
@@ -97,10 +110,11 @@ namespace LaserPewer
 
         private void machineManageButton_Click(object sender, RoutedEventArgs e)
         {
-            MachineProfileDialog dialog = new MachineProfileDialog();
+            MachineProfileDialog dialog = new MachineProfileDialog(currentProfile);
             Opacity = 0.8;
             dialog.Owner = this;
             dialog.ShowDialog();
+            refreshProfiles(dialog.Profile);
             Opacity = 1.0;
         }
 

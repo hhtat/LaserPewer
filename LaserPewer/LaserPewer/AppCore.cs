@@ -57,6 +57,7 @@ namespace LaserPewer
                         profile.TableWidth = decodeDouble(tokens[2]);
                         profile.TableHeight = decodeDouble(tokens[3]);
                         profile.MaxFeedRate = decodeDouble(tokens[4]);
+                        profiles.Add(profile);
                     }
                 }
             }
@@ -80,6 +81,22 @@ namespace LaserPewer
                     writer.WriteLine();
                 }
             }
+        }
+
+        public int ProfileIndex(MachineProfile profile)
+        {
+            return profiles.IndexOf(profile);
+        }
+
+        public void AddProfile(MachineProfile profile)
+        {
+            profiles.Add(profile);
+        }
+
+        public bool TryDeleteProfile(MachineProfile profile)
+        {
+            if (profiles.Count == 1) return false;
+            return profiles.Remove(profile);
         }
 
         private static string getConfigPath()
