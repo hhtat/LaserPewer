@@ -12,7 +12,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel>
+        <StackPanel Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -57,5 +57,7 @@
                 <Button Name="holdButton" Click="holdButton_Click" Content="HOLD" Grid.Column="1" />
             </Grid>
         </StackPanel>
+
+        <local:Workbench x:Name="workbench" Background="DarkGray" Grid.Column="1" />
     </Grid>
 </Window>

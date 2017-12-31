@@ -13,6 +13,9 @@ namespace LaserPewer
         {
             InitializeComponent();
 
+            workbench.TableSizeMM = new Size(370, 230);
+            workbench.CenterMM = new Point(workbench.TableSizeMM.Width / 2.0, workbench.TableSizeMM.Height / 2.0);
+
             machine = new GrblMachine();
             machine.StatusUpdated += Machine_StatusUpdated;
             machine.Connect("COM4");
@@ -28,6 +31,8 @@ namespace LaserPewer
             xTextBlock.Text = status.X.ToString("F3");
             yTextBlock.Text = status.Y.ToString("F3");
             statusTextBlock.Text = status.Status;
+
+            workbench.PointerMM = new Point(status.X, status.Y);
         }
 
         private void StatusRequestTimer_Tick(object sender, EventArgs e)
