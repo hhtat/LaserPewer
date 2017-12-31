@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace LaserPewer
@@ -7,8 +8,16 @@ namespace LaserPewer
     {
         private readonly GrblStreamer streamer;
 
+        public event EventHandler MachineReset;
+
         public delegate void StatusUpdatedEventHandler(object sender, MachineStatus status);
         public event StatusUpdatedEventHandler StatusUpdated;
+
+        public delegate void AlarmRaisedEventHandler(object sender, int alarm);
+        public event AlarmRaisedEventHandler AlarmRaised;
+
+        public delegate void MessageFeedbackEventHandler(object sender, string message);
+        public event MessageFeedbackEventHandler MessageFeedback;
 
         public GrblMachine()
         {
@@ -81,6 +90,22 @@ namespace LaserPewer
                 }
 
                 StatusUpdated?.Invoke(this, status);
+            }
+            else if (message.StartsWith("ALARM:"))
+            {
+                int alarm;
+                if (int.TryParse(message.Substring(6), NumberStyles.Any, CultureInfo.InvariantCulture, out alarm))
+                {
+                    AlarmRaised?.Invoke(this, alarm);
+                }
+            }
+            else if (message.StartsWith("[MSG:") && message.EndsWith("]"))
+            {
+                MessageFeedback?.Invoke(this, message.Substring(5, message.Length - 6));
+            }
+            else if (message.StartsWith("Grbl "))
+            {
+                MachineReset?.Invoke(this, null);
             }
         }
 

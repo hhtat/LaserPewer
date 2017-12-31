@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
@@ -126,6 +127,7 @@ namespace LaserPewer
                 else if (line.StartsWith("Grbl "))
                 {
                     pendingStatusRequests = 0;
+                    pendingHomingRequest = false;
                     pendingCommands.Clear();
                     pendingCommandsBytes = 0;
                 }

@@ -18,6 +18,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -33,6 +35,12 @@
 
                 <TextBlock Text="Status" FontSize="18" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
                 <TextBlock Name="statusTextBlock" Text="None" FontSize="24" TextAlignment="Center" Grid.Row="2" Grid.Column="1" />
+
+                <TextBlock Text="Alarm" FontSize="18" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                <TextBlock Name="alarmTextBlock" Text="None" FontSize="24" TextAlignment="Center" Grid.Row="3" Grid.Column="1" />
+
+                <TextBlock Text="Message" FontSize="14" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" />
+                <TextBlock Name="messageTextBlock" Text="None" TextWrapping="Wrap" FontSize="14" TextAlignment="Center" Grid.Row="4" Grid.Column="1" />
             </Grid>
 
             <Grid Height="50">

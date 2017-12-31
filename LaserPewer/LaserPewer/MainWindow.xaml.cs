@@ -8,6 +8,8 @@ namespace LaserPewer
 {
     public partial class MainWindow : Window
     {
+        private const string FIELD_PLACEHOLDER = "-";
+
         private GrblMachine machine;
         private DispatcherTimer statusRequestTimer;
 
@@ -19,13 +21,25 @@ namespace LaserPewer
             workbench.CenterMM = new Point(workbench.TableSizeMM.Width / 2.0, workbench.TableSizeMM.Height / 2.0);
 
             machine = new GrblMachine();
+            machine.MachineReset += Machine_MachineReset;
             machine.StatusUpdated += Machine_StatusUpdated;
+            machine.AlarmRaised += Machine_AlarmRaised;
+            machine.MessageFeedback += Machine_MessageFeedback;
             machine.Connect("COM4");
+            machine.Reset();
 
             statusRequestTimer = new DispatcherTimer();
             statusRequestTimer.Interval = TimeSpan.FromMilliseconds(500);
             statusRequestTimer.Tick += StatusRequestTimer_Tick;
             statusRequestTimer.Start();
+        }
+
+        private void Machine_MachineReset(object sender, EventArgs e)
+        {
+            xTextBlock.Text = "0";
+            yTextBlock.Text = "0";
+            statusTextBlock.Text = FIELD_PLACEHOLDER;
+            messageTextBlock.Text = FIELD_PLACEHOLDER;
         }
 
         private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)
@@ -34,7 +48,22 @@ namespace LaserPewer
             yTextBlock.Text = status.Y.ToString("F3", CultureInfo.InvariantCulture);
             statusTextBlock.Text = status.Status;
 
+            if (alarmTextBlock.Text != FIELD_PLACEHOLDER && status.Status != "Alarm")
+            {
+                alarmTextBlock.Text = FIELD_PLACEHOLDER;
+            }
+
             workbench.PointerMM = new Point(status.X, -status.Y);
+        }
+
+        private void Machine_AlarmRaised(object sender, int alarm)
+        {
+            alarmTextBlock.Text = alarm.ToString();
+        }
+
+        private void Machine_MessageFeedback(object sender, string message)
+        {
+            messageTextBlock.Text = message;
         }
 
         private void StatusRequestTimer_Tick(object sender, EventArgs e)
