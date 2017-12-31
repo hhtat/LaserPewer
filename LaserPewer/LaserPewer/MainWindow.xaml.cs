@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -10,6 +11,7 @@ namespace LaserPewer
     {
         private const string FIELD_PLACEHOLDER = "-";
 
+        private MachineProfile currentProfile;
         private GrblMachine machine;
         private DispatcherTimer statusRequestTimer;
 
@@ -17,8 +19,11 @@ namespace LaserPewer
         {
             InitializeComponent();
 
-            workbench.TableSizeMM = new Size(370, 230);
-            workbench.CenterMM = new Point(workbench.TableSizeMM.Width / 2.0, workbench.TableSizeMM.Height / 2.0);
+            foreach (MachineProfile profile in AppCore.Instance.Profiles)
+            {
+                machineListComboBox.Items.Add(profile.FriendlyName);
+            }
+            machineListComboBox.SelectedIndex = 0;
 
             machine = new GrblMachine();
             machine.MachineReset += Machine_MachineReset;
@@ -32,6 +37,14 @@ namespace LaserPewer
             statusRequestTimer.Interval = TimeSpan.FromMilliseconds(500);
             statusRequestTimer.Tick += StatusRequestTimer_Tick;
             statusRequestTimer.Start();
+        }
+
+        private void loadProfile(MachineProfile profile)
+        {
+            currentProfile = profile;
+
+            workbench.TableSizeMM = new Size(currentProfile.TableWidth, currentProfile.TableHeight);
+            workbench.CenterMM = new Point(currentProfile.TableWidth / 2.0, currentProfile.TableHeight / 2.0);
         }
 
         private void Machine_MachineReset(object sender, EventArgs e)
@@ -71,6 +84,16 @@ namespace LaserPewer
             machine.PollStatus();
         }
 
+        private void machineListComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (machineListComboBox.SelectedIndex < 0 || machineListComboBox.SelectedIndex > AppCore.Instance.Profiles.Count)
+            {
+                machineListComboBox.SelectedIndex = 0;
+            }
+
+            loadProfile(AppCore.Instance.Profiles[machineListComboBox.SelectedIndex]);
+        }
+
         private void resetButton_Click(object sender, RoutedEventArgs e)
         {
             machine.Reset();
@@ -99,7 +122,7 @@ namespace LaserPewer
         private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Point pointMM = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
-            machine.Jog(pointMM.X, -pointMM.Y);
+            machine.Jog(pointMM.X, -pointMM.Y, currentProfile.MaxFeedRate);
         }
     }
 }

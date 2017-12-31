@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 
 namespace LaserPewer
@@ -50,15 +49,44 @@ namespace LaserPewer
             streamer.SendHoldRequest();
         }
 
-        public void Jog(double x, double y)
+        public void Jog(double x, double y, double rate)
         {
-            string line = "$J=G21 G90 X" + x.ToString("F", CultureInfo.InvariantCulture) + " Y" + y.ToString("F", CultureInfo.InvariantCulture) + " F10000";
+            string line = "$J=G21 G90 X" + ToGcode(x) + " Y" + ToGcode(y) + " F" + ToGcode(rate);
             streamer.TrySendCommand(line);
         }
 
         public void PollStatus()
         {
             streamer.TrySendStatusRequest();
+        }
+
+        public static string ToGcode(double number)
+        {
+            return number.ToString("F", CultureInfo.InvariantCulture);
+        }
+
+        private static double parseNumber(string s)
+        {
+            double number;
+
+            if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out number))
+            {
+                return number;
+            }
+
+            return double.NaN;
+        }
+
+        private static int parseInt(string s)
+        {
+            int n;
+
+            if (int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out n))
+            {
+                return n;
+            }
+
+            return -1;
         }
 
         private void Streamer_MessageReceived(object sender, string message)
@@ -83,9 +111,8 @@ namespace LaserPewer
                     {
                         string[] wPosTokens = token.Substring(5).Split(',');
                         if (wPosTokens.Length != 3) continue;
-                        double parsed;
-                        if (double.TryParse(wPosTokens[0], NumberStyles.Any, CultureInfo.InvariantCulture, out parsed)) status.X = parsed; else Debugger.Break();
-                        if (double.TryParse(wPosTokens[1], NumberStyles.Any, CultureInfo.InvariantCulture, out parsed)) status.Y = parsed; else Debugger.Break();
+                        status.X = parseNumber(wPosTokens[0]);
+                        status.Y = parseNumber(wPosTokens[1]);
                     }
                 }
 
@@ -93,11 +120,7 @@ namespace LaserPewer
             }
             else if (message.StartsWith("ALARM:"))
             {
-                int alarm;
-                if (int.TryParse(message.Substring(6), NumberStyles.Any, CultureInfo.InvariantCulture, out alarm))
-                {
-                    AlarmRaised?.Invoke(this, alarm);
-                }
+                AlarmRaised?.Invoke(this, parseInt(message.Substring(6)));
             }
             else if (message.StartsWith("[MSG:") && message.EndsWith("]"))
             {

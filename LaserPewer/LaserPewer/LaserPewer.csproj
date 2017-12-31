@@ -57,6 +57,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppCore.cs" />
+    <Compile Include="MachineProfile.cs" />
     <Compile Include="Workbench.cs" />
     <Compile Include="WorkbenchInput.cs" />
     <Page Include="MainWindow.xaml">

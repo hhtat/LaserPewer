@@ -64,6 +64,16 @@
                 <Button Name="goButton" Click="goButton_Click" Content="GO" Grid.Column="0" />
                 <Button Name="holdButton" Click="holdButton_Click" Content="HOLD" Grid.Column="1" />
             </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <ComboBox Name="machineListComboBox" SelectionChanged="machineListComboBox_SelectionChanged" Grid.Column="0" />
+                <Button Name="machineManageButton" Content="Manage" Grid.Column="1" />
+            </Grid>
         </StackPanel>
 
         <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" Background="DarkGray" Grid.Column="1" />
