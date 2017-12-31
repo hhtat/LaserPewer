@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace LaserPewer
@@ -92,6 +93,15 @@ namespace LaserPewer
             }
 
             loadProfile(AppCore.Instance.Profiles[machineListComboBox.SelectedIndex]);
+        }
+
+        private void machineManageButton_Click(object sender, RoutedEventArgs e)
+        {
+            MachineProfileDialog dialog = new MachineProfileDialog();
+            Opacity = 0.8;
+            dialog.Owner = this;
+            dialog.ShowDialog();
+            Opacity = 1.0;
         }
 
         private void resetButton_Click(object sender, RoutedEventArgs e)

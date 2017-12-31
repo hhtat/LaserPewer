@@ -72,7 +72,7 @@
                 </Grid.ColumnDefinitions>
                 
                 <ComboBox Name="machineListComboBox" SelectionChanged="machineListComboBox_SelectionChanged" Grid.Column="0" />
-                <Button Name="machineManageButton" Content="Manage" Grid.Column="1" />
+                <Button Name="machineManageButton" Click="machineManageButton_Click" Content="Manage" Grid.Column="1" />
             </Grid>
         </StackPanel>
 
