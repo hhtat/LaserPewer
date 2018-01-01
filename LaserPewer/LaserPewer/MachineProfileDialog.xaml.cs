@@ -48,7 +48,7 @@ namespace LaserPewer
             if (apply(Profile))
             {
                 AppCore.Instance.SaveSettings();
-                Close();
+                DialogResult = true;
             }
             else
             {
@@ -84,7 +84,7 @@ namespace LaserPewer
                 AppCore.Instance.SaveSettings();
                 Profile = null;
             }
-            Close();
+            DialogResult = true;
         }
 
         private void formGrid_KeyDown(object sender, KeyEventArgs e)

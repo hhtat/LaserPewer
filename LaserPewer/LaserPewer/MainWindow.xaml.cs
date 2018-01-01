@@ -30,7 +30,6 @@ namespace LaserPewer
             statusRequestTimer = new DispatcherTimer();
             statusRequestTimer.Interval = TimeSpan.FromMilliseconds(500);
             statusRequestTimer.Tick += StatusRequestTimer_Tick;
-            statusRequestTimer.Start();
         }
 
         private void refreshProfiles(MachineProfile selectedProfile)
@@ -59,6 +58,7 @@ namespace LaserPewer
 
         private void Machine_MachineDisconnected(object sender, EventArgs e)
         {
+            statusRequestTimer.Stop();
             statusTextBlock.Text = "Disconnected";
         }
 
@@ -112,18 +112,43 @@ namespace LaserPewer
 
         private void machineManageButton_Click(object sender, RoutedEventArgs e)
         {
-            MachineProfileDialog dialog = new MachineProfileDialog(currentProfile);
+            MachineProfileDialog dialog = new MachineProfileDialog(currentProfile) { Owner = this };
             Opacity = 0.8;
-            dialog.Owner = this;
-            dialog.ShowDialog();
-            refreshProfiles(dialog.Profile);
+
+            if (dialog.ShowDialog() ?? false)
+            {
+                refreshProfiles(dialog.Profile);
+            }
+
             Opacity = 1.0;
         }
 
         private void connectionButton_Click(object sender, RoutedEventArgs e)
         {
-            AppCore.Machine.Connect("COM4");
-            AppCore.Machine.Reset();
+            ConnectionDialog dialog = new ConnectionDialog() { Owner = this };
+            Opacity = 0.8;
+
+            if (dialog.ShowDialog() ?? false)
+            {
+                if (dialog.SelectedPortName != null)
+                {
+                    if (AppCore.Machine.Connect(dialog.SelectedPortName))
+                    {
+                        statusRequestTimer.Start();
+                        statusTextBlock.Text = "Unknown";
+                    }
+                    else
+                    {
+                        statusTextBlock.Text = "Connection Error";
+                    }
+                }
+                else
+                {
+                    AppCore.Machine.Disconnect();
+                }
+            }
+
+            Opacity = 1.0;
         }
 
         private void resetButton_Click(object sender, RoutedEventArgs e)

@@ -58,12 +58,19 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppCore.cs" />
+    <Compile Include="ConnectionDialog.xaml.cs">
+      <DependentUpon>ConnectionDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MachineProfile.cs" />
     <Compile Include="MachineProfileDialog.xaml.cs">
       <DependentUpon>MachineProfileDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Workbench.cs" />
     <Compile Include="WorkbenchInput.cs" />
+    <Page Include="ConnectionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MachineProfileDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

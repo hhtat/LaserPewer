@@ -26,7 +26,7 @@ namespace LaserPewer
         {
         }
 
-        public void Connect(string portName)
+        public bool Connect(string portName)
         {
             if (streamer != null) streamer.Disconnect();
 
@@ -40,8 +40,15 @@ namespace LaserPewer
             catch (Exception e)
             {
                 Debug.WriteLine(e);
-                MachineDisconnected?.Invoke(this, null);
+                return false;
             }
+
+            return true;
+        }
+
+        public void Disconnect()
+        {
+            if (streamer != null) streamer.Disconnect();
         }
 
         public void Reset()
