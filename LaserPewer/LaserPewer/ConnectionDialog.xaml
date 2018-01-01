@@ -12,18 +12,10 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Text="Port" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="COM Ports" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
             <ComboBox Name="portListComboBox" Grid.Row="0" Grid.Column="1" />
-        </Grid>
+        </StackPanel>
 
         <StackPanel Grid.Row="1">
             <Button Name="connectButton" Click="connectButton_Click" Content="Connect" />
