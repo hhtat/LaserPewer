@@ -14,6 +14,8 @@ namespace LaserPewer
         public delegate void MessageReceivedEventHandler(object sender, string message);
         public event MessageReceivedEventHandler MessageReceived;
 
+        public bool Connected { get { return serialPort != null && serialPort.IsOpen; } }
+
         private SerialPort serialPort;
         private StreamReader reader;
         private StreamWriter writer;
@@ -36,6 +38,14 @@ namespace LaserPewer
             writer = new StreamWriter(serialPort.BaseStream, Encoding.ASCII);
 
             receiveLoop();
+        }
+
+        public void Disconnect()
+        {
+            if (serialPort != null && serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
         }
 
         public void SendReset()
@@ -107,32 +117,39 @@ namespace LaserPewer
 
         private async void receiveLoop()
         {
-            while (true)
+            try
             {
-                string line = await reader.ReadLineAsync();
-
-                Debug.WriteLine("RECV: " + line);
-
-                if (line.Length == 0) continue;
-
-                if (line == "ok" || line.StartsWith("error:"))
+                while (true)
                 {
-                    if (pendingCommands.Count > 0) pendingCommandsBytes -= pendingCommands.Dequeue();
-                    if (pendingCommands.Count == 0) pendingHomingRequest = false;
-                }
-                else if (line.StartsWith("<"))
-                {
-                    if (pendingStatusRequests > 0) pendingStatusRequests--;
-                }
-                else if (line.StartsWith("Grbl "))
-                {
-                    pendingStatusRequests = 0;
-                    pendingHomingRequest = false;
-                    pendingCommands.Clear();
-                    pendingCommandsBytes = 0;
-                }
+                    string line = await reader.ReadLineAsync();
 
-                MessageReceived?.Invoke(this, line);
+                    Debug.WriteLine("RECV: " + line);
+
+                    if (line.Length == 0) continue;
+
+                    if (line == "ok" || line.StartsWith("error:"))
+                    {
+                        if (pendingCommands.Count > 0) pendingCommandsBytes -= pendingCommands.Dequeue();
+                        if (pendingCommands.Count == 0) pendingHomingRequest = false;
+                    }
+                    else if (line.StartsWith("<"))
+                    {
+                        if (pendingStatusRequests > 0) pendingStatusRequests--;
+                    }
+                    else if (line.StartsWith("Grbl "))
+                    {
+                        pendingStatusRequests = 0;
+                        pendingHomingRequest = false;
+                        pendingCommands.Clear();
+                        pendingCommandsBytes = 0;
+                    }
+
+                    MessageReceived?.Invoke(this, line);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
             }
         }
     }

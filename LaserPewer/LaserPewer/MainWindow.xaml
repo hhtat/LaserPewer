@@ -8,7 +8,7 @@
         Title="LaserPewer" Height="600" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="240" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -28,20 +28,32 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="X:" FontSize="32" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
-                <TextBlock Name="xTextBlock" Text="000.000" FontSize="32" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
+                <TextBlock Name="xTextBlock" Text="0.000" FontSize="32" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
 
                 <TextBlock Text="Y:" FontSize="32" TextAlignment="Right" Grid.Row="1" Grid.Column="0" />
-                <TextBlock Name="yTextBlock" Text="000.000" FontSize="32" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
+                <TextBlock Name="yTextBlock" Text="0.000" FontSize="32" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
 
                 <TextBlock Text="Status" FontSize="18" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                <TextBlock Name="statusTextBlock" Text="None" FontSize="24" TextAlignment="Center" Grid.Row="2" Grid.Column="1" />
+                <TextBlock Name="statusTextBlock" Text="Disconnected" FontSize="24" TextAlignment="Center" Grid.Row="2" Grid.Column="1" />
 
                 <TextBlock Text="Alarm" FontSize="18" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
-                <TextBlock Name="alarmTextBlock" Text="None" FontSize="24" TextAlignment="Center" Grid.Row="3" Grid.Column="1" />
+                <TextBlock Name="alarmTextBlock" Text="-" FontSize="24" TextAlignment="Center" Grid.Row="3" Grid.Column="1" />
 
                 <TextBlock Text="Message" FontSize="14" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" />
-                <TextBlock Name="messageTextBlock" Text="None" TextWrapping="Wrap" FontSize="14" TextAlignment="Center" Grid.Row="4" Grid.Column="1" />
+                <TextBlock Name="messageTextBlock" Text="-" TextWrapping="Wrap" FontSize="14" TextAlignment="Center" Grid.Row="4" Grid.Column="1" />
             </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Name="machineListComboBox" SelectionChanged="machineListComboBox_SelectionChanged" Grid.Column="0" />
+                <Button Name="machineManageButton" Click="machineManageButton_Click" Content="Manage" Grid.Column="1" />
+            </Grid>
+
+            <Button Name="connectionButton" Click="connectionButton_Click" Content="Connection" />
 
             <Grid Height="50">
                 <Grid.ColumnDefinitions>
@@ -63,16 +75,6 @@
 
                 <Button Name="goButton" Click="goButton_Click" Content="GO" Grid.Column="0" />
                 <Button Name="holdButton" Click="holdButton_Click" Content="HOLD" Grid.Column="1" />
-            </Grid>
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                
-                <ComboBox Name="machineListComboBox" SelectionChanged="machineListComboBox_SelectionChanged" Grid.Column="0" />
-                <Button Name="machineManageButton" Click="machineManageButton_Click" Content="Manage" Grid.Column="1" />
             </Grid>
         </StackPanel>
 

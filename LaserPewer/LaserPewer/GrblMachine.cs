@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace LaserPewer
 {
     public class GrblMachine
     {
-        private readonly GrblStreamer streamer;
+        private GrblStreamer streamer;
 
+        public bool Connected { get { return streamer != null && streamer.Connected; } }
+
+        public event EventHandler MachineDisconnected;
         public event EventHandler MachineReset;
 
         public delegate void StatusUpdatedEventHandler(object sender, MachineStatus status);
@@ -20,44 +24,55 @@ namespace LaserPewer
 
         public GrblMachine()
         {
-            streamer = new GrblStreamer();
-            streamer.MessageReceived += Streamer_MessageReceived;
         }
 
         public void Connect(string portName)
         {
-            streamer.Connect(portName);
+            if (streamer != null) streamer.Disconnect();
+
+            streamer = new GrblStreamer();
+
+            try
+            {
+                streamer.MessageReceived += Streamer_MessageReceived;
+                streamer.Connect(portName);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                MachineDisconnected?.Invoke(this, null);
+            }
         }
 
         public void Reset()
         {
-            streamer.SendReset();
+            wrapStreamerCall(() => streamer.SendReset());
         }
 
         public void Home()
         {
-            streamer.TrySendHomeRequest();
+            wrapStreamerCall(() => streamer.TrySendHomeRequest());
         }
 
         public void Unlock()
         {
-            streamer.TrySendUnlockRequest();
+            wrapStreamerCall(() => streamer.TrySendUnlockRequest());
         }
 
         public void Hold()
         {
-            streamer.SendHoldRequest();
+            wrapStreamerCall(() => streamer.SendHoldRequest());
         }
 
         public void Jog(double x, double y, double rate)
         {
             string line = "$J=G21 G90 X" + ToGcode(x) + " Y" + ToGcode(y) + " F" + ToGcode(rate);
-            streamer.TrySendCommand(line);
+            wrapStreamerCall(() => streamer.TrySendCommand(line));
         }
 
         public void PollStatus()
         {
-            streamer.TrySendStatusRequest();
+            wrapStreamerCall(() => streamer.TrySendStatusRequest());
         }
 
         public static string ToGcode(double number)
@@ -65,28 +80,30 @@ namespace LaserPewer
             return number.ToString("F", CultureInfo.InvariantCulture);
         }
 
-        private static double parseNumber(string s)
+        private bool checkConnection()
         {
-            double number;
-
-            if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out number))
+            if (!Connected)
             {
-                return number;
+                MachineDisconnected?.Invoke(this, null);
+                return false;
             }
 
-            return double.NaN;
+            return true;
         }
 
-        private static int parseInt(string s)
+        private void wrapStreamerCall(Action call)
         {
-            int n;
+            if (!checkConnection()) return;
 
-            if (int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out n))
+            try
             {
-                return n;
+                call();
             }
-
-            return -1;
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                checkConnection();
+            }
         }
 
         private void Streamer_MessageReceived(object sender, string message)
@@ -130,6 +147,30 @@ namespace LaserPewer
             {
                 MachineReset?.Invoke(this, null);
             }
+        }
+
+        private static double parseNumber(string s)
+        {
+            double number;
+
+            if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out number))
+            {
+                return number;
+            }
+
+            return double.NaN;
+        }
+
+        private static int parseInt(string s)
+        {
+            int n;
+
+            if (int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out n))
+            {
+                return n;
+            }
+
+            return -1;
         }
 
         public class MachineStatus

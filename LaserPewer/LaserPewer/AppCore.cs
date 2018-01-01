@@ -20,12 +20,29 @@ namespace LaserPewer
             }
         }
 
-        private List<MachineProfile> profiles;
-        public IReadOnlyList<MachineProfile> Profiles { get { return profiles.AsReadOnly(); } }
+        public static IReadOnlyList<MachineProfile> Profiles
+        {
+            get
+            {
+                return Instance.profiles.AsReadOnly();
+            }
+        }
+
+        public static GrblMachine Machine
+        {
+            get
+            {
+                return Instance.machine;
+            }
+        }
+
+        private readonly List<MachineProfile> profiles;
+        private readonly GrblMachine machine;
 
         private AppCore()
         {
             profiles = new List<MachineProfile>();
+            machine = new GrblMachine();
         }
 
         public void Initialize()

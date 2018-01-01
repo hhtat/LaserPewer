@@ -13,22 +13,19 @@ namespace LaserPewer
         private const string FIELD_PLACEHOLDER = "-";
 
         private MachineProfile currentProfile;
-        private GrblMachine machine;
         private DispatcherTimer statusRequestTimer;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            refreshProfiles(AppCore.Instance.Profiles[0]);
+            refreshProfiles(AppCore.Profiles[0]);
 
-            machine = new GrblMachine();
-            machine.MachineReset += Machine_MachineReset;
-            machine.StatusUpdated += Machine_StatusUpdated;
-            machine.AlarmRaised += Machine_AlarmRaised;
-            machine.MessageFeedback += Machine_MessageFeedback;
-            machine.Connect("COM4");
-            machine.Reset();
+            AppCore.Machine.MachineDisconnected += Machine_MachineDisconnected;
+            AppCore.Machine.MachineReset += Machine_MachineReset;
+            AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
+            AppCore.Machine.AlarmRaised += Machine_AlarmRaised;
+            AppCore.Machine.MessageFeedback += Machine_MessageFeedback;
 
             statusRequestTimer = new DispatcherTimer();
             statusRequestTimer.Interval = TimeSpan.FromMilliseconds(500);
@@ -40,11 +37,11 @@ namespace LaserPewer
         {
             if (selectedProfile == null)
             {
-                selectedProfile = AppCore.Instance.Profiles[0];
+                selectedProfile = AppCore.Profiles[0];
             }
 
             machineListComboBox.Items.Clear();
-            foreach (MachineProfile profile in AppCore.Instance.Profiles)
+            foreach (MachineProfile profile in AppCore.Profiles)
             {
                 machineListComboBox.Items.Add(profile.FriendlyName);
             }
@@ -58,6 +55,11 @@ namespace LaserPewer
 
             workbench.TableSizeMM = new Size(currentProfile.TableWidth, currentProfile.TableHeight);
             workbench.CenterMM = new Point(currentProfile.TableWidth / 2.0, currentProfile.TableHeight / 2.0);
+        }
+
+        private void Machine_MachineDisconnected(object sender, EventArgs e)
+        {
+            statusTextBlock.Text = "Disconnected";
         }
 
         private void Machine_MachineReset(object sender, EventArgs e)
@@ -94,18 +96,18 @@ namespace LaserPewer
 
         private void StatusRequestTimer_Tick(object sender, EventArgs e)
         {
-            machine.PollStatus();
+            AppCore.Machine.PollStatus();
         }
 
         private void machineListComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (machineListComboBox.SelectedIndex < 0 ||
-                machineListComboBox.SelectedIndex > AppCore.Instance.Profiles.Count)
+                machineListComboBox.SelectedIndex > AppCore.Profiles.Count)
             {
                 return;
             }
 
-            loadProfile(AppCore.Instance.Profiles[machineListComboBox.SelectedIndex]);
+            loadProfile(AppCore.Profiles[machineListComboBox.SelectedIndex]);
         }
 
         private void machineManageButton_Click(object sender, RoutedEventArgs e)
@@ -118,19 +120,25 @@ namespace LaserPewer
             Opacity = 1.0;
         }
 
+        private void connectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            AppCore.Machine.Connect("COM4");
+            AppCore.Machine.Reset();
+        }
+
         private void resetButton_Click(object sender, RoutedEventArgs e)
         {
-            machine.Reset();
+            AppCore.Machine.Reset();
         }
 
         private void homeButton_Click(object sender, RoutedEventArgs e)
         {
-            machine.Home();
+            AppCore.Machine.Home();
         }
 
         private void unlockButton_Click(object sender, RoutedEventArgs e)
         {
-            machine.Unlock();
+            AppCore.Machine.Unlock();
         }
 
         private void goButton_Click(object sender, RoutedEventArgs e)
@@ -140,13 +148,13 @@ namespace LaserPewer
 
         private void holdButton_Click(object sender, RoutedEventArgs e)
         {
-            machine.Hold();
+            AppCore.Machine.Hold();
         }
 
         private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Point pointMM = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
-            machine.Jog(pointMM.X, -pointMM.Y, currentProfile.MaxFeedRate);
+            AppCore.Machine.Jog(pointMM.X, -pointMM.Y, currentProfile.MaxFeedRate);
         }
     }
 }
