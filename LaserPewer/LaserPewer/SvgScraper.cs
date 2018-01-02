@@ -15,7 +15,8 @@ namespace LaserPewer
         private const byte POINT_TYPE_FLAG_MARKER = 0x20;
         private const byte POINT_TYPE_FLAG_CLOSE = 0x80;
 
-        private const double TOLERANCE_MM_SQ = 0.1;
+        private const double TOLERANCE_MM_SQ = 0.1 * 0.1;
+        private const int ADAPTIVE_BEZIER_MAX_DEPTH = 8;
 
         private double dpi;
         private double dpmm;
@@ -160,13 +161,12 @@ namespace LaserPewer
 
         private void traceBezier(System.Windows.Point a, System.Windows.Point b, System.Windows.Point c, System.Windows.Point d, List<System.Windows.Point> points)
         {
-            adaptiveBezier(a.X, a.Y, b.X, b.Y, c.X, c.Y, d.X, d.Y, points);
+            adaptiveBezier(a.X, a.Y, b.X, b.Y, c.X, c.Y, d.X, d.Y, points, 0);
             points.Add(d);
         }
 
-        void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, List<System.Windows.Point> points)
+        void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, List<System.Windows.Point> points, int depth)
         {
-
             double x12 = (x1 + x2) / 2;
             double y12 = (y1 + y2) / 2;
             double x23 = (x2 + x3) / 2;
@@ -186,14 +186,14 @@ namespace LaserPewer
             double d2 = Math.Abs(((x2 - x4) * dy - (y2 - y4) * dx));
             double d3 = Math.Abs(((x3 - x4) * dy - (y3 - y4) * dx));
 
-            if ((d2 + d3) * (d2 + d3) < TOLERANCE_MM_SQ * (dx * dx + dy * dy))
+            if ((d2 + d3) * (d2 + d3) < TOLERANCE_MM_SQ * (dx * dx + dy * dy) || depth >= ADAPTIVE_BEZIER_MAX_DEPTH)
             {
                 points.Add(new System.Windows.Point(x1234, y1234));
                 return;
             }
 
-            adaptiveBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, points);
-            adaptiveBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, points);
+            adaptiveBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, points, depth + 1);
+            adaptiveBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, points, depth + 1);
         }
 
         private System.Windows.Point toMM(PointF point)

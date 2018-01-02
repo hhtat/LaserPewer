@@ -8,7 +8,9 @@ namespace LaserPewer
 {
     public class Workbench : UserControl
     {
-        private readonly int GRAPHICS_SIZE = 2048;
+        private const int GRAPHICS_SIZE = 2048;
+        private const double MIN_ZOOM = 1.0;
+        private const double MAX_ZOOM = 50.0;
 
         private Size tableSizeMM;
         public Size TableSizeMM
@@ -43,8 +45,8 @@ namespace LaserPewer
             set
             {
                 if (double.IsNaN(value)) return;
-                if (value < 1.0) value = 1.0;
-                if (value > 10.0) value = 10.0;
+                if (value < MIN_ZOOM) value = MIN_ZOOM;
+                if (value > MAX_ZOOM) value = MAX_ZOOM;
                 if (zoom != value)
                 {
                     zoom = value;
