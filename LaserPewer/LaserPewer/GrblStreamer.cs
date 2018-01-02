@@ -9,7 +9,7 @@ namespace LaserPewer
 {
     public class GrblStreamer
     {
-        private static readonly int SEND_BUFFER = 128;
+        private const int SEND_BUFFER = 128;
 
         public delegate void MessageReceivedEventHandler(object sender, string message);
         public event MessageReceivedEventHandler MessageReceived;

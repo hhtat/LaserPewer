@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Svg;
+using System;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -169,6 +169,18 @@ namespace LaserPewer
         private void holdButton_Click(object sender, RoutedEventArgs e)
         {
             AppCore.Machine.Hold();
+        }
+
+        private void importButton_Click(object sender, RoutedEventArgs e)
+        {
+            SvgDocument svgDocument = SvgDocument.Open(@"C:\Users\hhtat\Desktop\test.svg");
+            SvgScraper svgScraper = new SvgScraper();
+            svgDocument.Draw(svgScraper);
+            if (svgScraper.ScrapedPaths.Count > 0)
+            {
+                workbench.Document.Clear();
+                workbench.Document.Add(new Drawing(svgScraper.ScrapedPaths));
+            }
         }
 
         private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
