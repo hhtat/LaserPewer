@@ -191,15 +191,22 @@ namespace LaserPewer
                     {
                         foreach (Drawing.Path path in drawing.Paths)
                         {
-                            if (drawing.Paths.Length > 0)
+                            if (path.Points.Length > 0)
                             {
                                 Point last = path.Points[0];
                                 for (int i = 1; i < path.Points.Length; i++)
                                 {
                                     Point point = path.Points[i];
-                                    drawLineMM(last.X, last.Y, point.X, point.Y, Colors.Black);
+                                    drawLineMM(last.X, last.Y, point.X, point.Y, i % 2 == 0 ? Colors.Red : Colors.Green);
                                     last = point;
                                 }
+                            }
+
+                            if (path.Closed && path.Points.Length >= 2)
+                            {
+                                Point first = path.Points[0];
+                                Point last = path.Points[path.Points.Length - 1];
+                                drawLineMM(first.X, first.Y, last.X, last.Y, Colors.Blue);
                             }
                         }
                     }

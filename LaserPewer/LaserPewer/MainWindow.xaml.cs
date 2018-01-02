@@ -176,11 +176,8 @@ namespace LaserPewer
             SvgDocument svgDocument = SvgDocument.Open(@"C:\Users\hhtat\Desktop\test.svg");
             SvgScraper svgScraper = new SvgScraper();
             svgDocument.Draw(svgScraper);
-            if (svgScraper.ScrapedPaths.Count > 0)
-            {
-                workbench.Document.Clear();
-                workbench.Document.Add(new Drawing(svgScraper.ScrapedPaths));
-            }
+            workbench.Document.Clear();
+            workbench.Document.Add(svgScraper.CollectScraped());
         }
 
         private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)

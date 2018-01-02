@@ -19,15 +19,16 @@ namespace LaserPewer
         private const int ADAPTIVE_BEZIER_MAX_DEPTH = 8;
 
         private double dpi;
-        private double dpmm;
-        public float DpiY { get { return (float)dpi; } set { dpi = value; dpmm = dpi / 25.4; } }
+        private double mmpd;
+        public float DpiY { get { return (float)dpi; } set { dpi = value; mmpd = 25.4 / dpi; } }
         public SmoothingMode SmoothingMode { get; set; }
         public Matrix Transform { get; set; }
 
-        public readonly List<Drawing.Path> ScrapedPaths;
-
         private Stack<ISvgBoundable> boundables;
         private Region clip;
+
+        private DrawingBuilder drawingBuilder;
+
 
         public SvgScraper()
         {
@@ -35,10 +36,15 @@ namespace LaserPewer
             SmoothingMode = SmoothingMode.Default;
             Transform = new Matrix();
 
-            ScrapedPaths = new List<Drawing.Path>();
-
             boundables = new Stack<ISvgBoundable>();
             clip = new Region();
+
+            drawingBuilder = new DrawingBuilder();
+        }
+
+        public Drawing CollectScraped()
+        {
+            return drawingBuilder.ToDrawing();
         }
 
         public void Dispose()
@@ -49,7 +55,7 @@ namespace LaserPewer
         {
         }
 
-        public void DrawImageUnscaled(Image image, System.Drawing.Point location)
+        public void DrawImageUnscaled(Image image, Point location)
         {
         }
 
@@ -58,7 +64,7 @@ namespace LaserPewer
             GraphicsPath _path = (GraphicsPath)path.Clone();
             _path.Transform(Transform);
 
-            List<System.Windows.Point> points = new List<System.Windows.Point>();
+            PointF lastPoint = PointF.Empty;
             for (int i = 0; i < _path.PointCount; i++)
             {
                 byte pointType = _path.PathTypes[i];
@@ -67,30 +73,26 @@ namespace LaserPewer
                 switch (pointType & POINT_TYPE_MASK)
                 {
                     case POINT_TYPE_START:
-                        if (points.Count > 0)
-                        {
-                            ScrapedPaths.Add(new Drawing.Path(points));
-                            points = new List<System.Windows.Point>();
-                        }
-                        points.Add(toMM(point));
+                        drawingBuilder.StartPath();
+                        drawingBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
+                        lastPoint = point;
                         break;
                     case POINT_TYPE_LINE:
-                        points.Add(toMM(point));
+                        drawingBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
+                        lastPoint = point;
                         break;
                     case POINT_TYPE_BEZIER:
-                        traceBezier(points[points.Count - 1], toMM(point), toMM(_path.PathPoints[++i]), toMM(_path.PathPoints[++i]), points);
+                        PointF point2 = _path.PathPoints[++i];
+                        PointF point3 = _path.PathPoints[++i];
+                        traceBezier(lastPoint, point, point2, point3);
+                        lastPoint = point3;
                         break;
                     default:
                         throw new NotSupportedException();
                 }
 
-                if ((pointType & POINT_TYPE_FLAG_CLOSE) == POINT_TYPE_FLAG_CLOSE)
-                {
-                    points.Add(points[0]);
-                }
+                if ((pointType & POINT_TYPE_FLAG_CLOSE) == POINT_TYPE_FLAG_CLOSE) drawingBuilder.ClosePath();
             }
-
-            if (points.Count > 0) ScrapedPaths.Add(new Drawing.Path(points));
         }
 
         public void FillPath(Brush brush, GraphicsPath path)
@@ -159,13 +161,13 @@ namespace LaserPewer
             Transform.Scale(sx, sy, order);
         }
 
-        private void traceBezier(System.Windows.Point a, System.Windows.Point b, System.Windows.Point c, System.Windows.Point d, List<System.Windows.Point> points)
+        private void traceBezier(PointF a, PointF b, PointF c, PointF d)
         {
-            adaptiveBezier(a.X, a.Y, b.X, b.Y, c.X, c.Y, d.X, d.Y, points, 0);
-            points.Add(d);
+            adaptiveBezier(mmpd * a.X, mmpd * a.Y, mmpd * b.X, mmpd * b.Y, mmpd * c.X, mmpd * c.Y, mmpd * d.X, mmpd * d.Y, 0);
+            drawingBuilder.AddPoint(mmpd * d.X, mmpd * d.Y); ;
         }
 
-        void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, List<System.Windows.Point> points, int depth)
+        void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, int depth)
         {
             double x12 = (x1 + x2) / 2;
             double y12 = (y1 + y2) / 2;
@@ -188,17 +190,12 @@ namespace LaserPewer
 
             if ((d2 + d3) * (d2 + d3) < TOLERANCE_MM_SQ * (dx * dx + dy * dy) || depth >= ADAPTIVE_BEZIER_MAX_DEPTH)
             {
-                points.Add(new System.Windows.Point(x1234, y1234));
+                drawingBuilder.AddPoint(x1234, y1234);
                 return;
             }
 
-            adaptiveBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, points, depth + 1);
-            adaptiveBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, points, depth + 1);
-        }
-
-        private System.Windows.Point toMM(PointF point)
-        {
-            return new System.Windows.Point(point.X / dpmm, point.Y / dpmm);
+            adaptiveBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, depth + 1);
+            adaptiveBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, depth + 1);
         }
     }
 }

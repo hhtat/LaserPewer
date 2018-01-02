@@ -15,10 +15,12 @@ namespace LaserPewer
         public class Path
         {
             public readonly Point[] Points;
+            public readonly bool Closed;
 
-            public Path(List<Point> points)
+            public Path(List<Point> points, bool closed)
             {
                 Points = points.ToArray();
+                Closed = closed;
             }
         }
     }
