@@ -15,7 +15,9 @@ namespace LaserPewer
         private const byte POINT_TYPE_FLAG_MARKER = 0x20;
         private const byte POINT_TYPE_FLAG_CLOSE = 0x80;
 
-        public float DpiY { get { return 96.0f; } }
+        private double dpi;
+        private double dpmm;
+        public float DpiY { get { return (float)dpi; } set { dpi = value; dpmm = dpi / 25.4; } }
         public SmoothingMode SmoothingMode { get; set; }
         public Matrix Transform { get; set; }
 
@@ -26,6 +28,7 @@ namespace LaserPewer
 
         public SvgScraper()
         {
+            DpiY = 96.0f;
             SmoothingMode = SmoothingMode.Default;
             Transform = new Matrix();
 
@@ -52,7 +55,7 @@ namespace LaserPewer
             GraphicsPath _path = (GraphicsPath)path.Clone();
             _path.Transform(Transform);
 
-            List<System.Windows.Point> points = null;
+            List<System.Windows.Point> points = new List<System.Windows.Point>();
             for (int i = 0; i < _path.PointCount; i++)
             {
                 byte pointType = _path.PathTypes[i];
@@ -61,20 +64,22 @@ namespace LaserPewer
                 switch (pointType & POINT_TYPE_MASK)
                 {
                     case POINT_TYPE_START:
-                        if (points != null && points.Count > 1)
+                        if (points.Count > 0)
                         {
                             ScrapedPaths.Add(new Drawing.Path(points));
+                            points = new List<System.Windows.Point>();
                         }
-                        points = new List<System.Windows.Point>();
+                        points.Add(toMM(point));
                         break;
                     case POINT_TYPE_LINE:
+                        points.Add(toMM(point));
+                        break;
                     case POINT_TYPE_BEZIER:
+                        traceBezier(points[points.Count - 1], toMM(point), toMM(_path.PathPoints[++i]), toMM(_path.PathPoints[++i]), 10, points);
                         break;
                     default:
                         throw new NotSupportedException();
                 }
-
-                points.Add(new System.Windows.Point(25.4 * point.X / DpiY, 25.4 * point.Y / DpiY));
 
                 if ((pointType & POINT_TYPE_FLAG_CLOSE) == POINT_TYPE_FLAG_CLOSE)
                 {
@@ -82,10 +87,7 @@ namespace LaserPewer
                 }
             }
 
-            if (points != null && points.Count > 1)
-            {
-                ScrapedPaths.Add(new Drawing.Path(points));
-            }
+            if (points.Count > 0) ScrapedPaths.Add(new Drawing.Path(points));
         }
 
         public void FillPath(Brush brush, GraphicsPath path)
@@ -152,6 +154,39 @@ namespace LaserPewer
         public void ScaleTransform(float sx, float sy, MatrixOrder order = MatrixOrder.Append)
         {
             Transform.Scale(sx, sy, order);
+        }
+
+        private void traceBezier(System.Windows.Point a, System.Windows.Point b, System.Windows.Point c, System.Windows.Point d, int n, List<System.Windows.Point> points)
+        {
+            for (int i = n - 1; i > 0; i--)
+            {
+                points.Add(interpolateBezier(a, b, c, d, (double)i / n));
+            }
+            points.Add(d);
+        }
+
+        private System.Windows.Point interpolateBezier(System.Windows.Point a, System.Windows.Point b, System.Windows.Point c, System.Windows.Point d, double t)
+        {
+            double abX = t * a.X + (1.0 - t) * b.X;
+            double abY = t * a.Y + (1.0 - t) * b.Y;
+            double bcX = t * b.X + (1.0 - t) * c.X;
+            double bcY = t * b.Y + (1.0 - t) * c.Y;
+            double cdX = t * c.X + (1.0 - t) * d.X;
+            double cdY = t * c.Y + (1.0 - t) * d.Y;
+
+            double abbcX = t * abX + (1.0 - t) * bcX;
+            double abbcY = t * abY + (1.0 - t) * bcY;
+            double bccdX = t * bcX + (1.0 - t) * cdX;
+            double bccdY = t * bcY + (1.0 - t) * cdY;
+
+            return new System.Windows.Point(
+                t * abbcX + (1.0 - t) * bccdX,
+                t * abbcY + (1.0 - t) * bccdY);
+        }
+
+        private System.Windows.Point toMM(PointF point)
+        {
+            return new System.Windows.Point(Math.Round(point.X / dpmm, 3), Math.Round(point.Y / dpmm, 3));
         }
     }
 }
