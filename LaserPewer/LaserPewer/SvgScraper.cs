@@ -15,6 +15,8 @@ namespace LaserPewer
         private const byte POINT_TYPE_FLAG_MARKER = 0x20;
         private const byte POINT_TYPE_FLAG_CLOSE = 0x80;
 
+        private const double TOLERANCE_MM_SQ = 0.1;
+
         private double dpi;
         private double dpmm;
         public float DpiY { get { return (float)dpi; } set { dpi = value; dpmm = dpi / 25.4; } }
@@ -75,7 +77,7 @@ namespace LaserPewer
                         points.Add(toMM(point));
                         break;
                     case POINT_TYPE_BEZIER:
-                        traceBezier(points[points.Count - 1], toMM(point), toMM(_path.PathPoints[++i]), toMM(_path.PathPoints[++i]), 10, points);
+                        traceBezier(points[points.Count - 1], toMM(point), toMM(_path.PathPoints[++i]), toMM(_path.PathPoints[++i]), points);
                         break;
                     default:
                         throw new NotSupportedException();
@@ -156,37 +158,47 @@ namespace LaserPewer
             Transform.Scale(sx, sy, order);
         }
 
-        private void traceBezier(System.Windows.Point a, System.Windows.Point b, System.Windows.Point c, System.Windows.Point d, int n, List<System.Windows.Point> points)
+        private void traceBezier(System.Windows.Point a, System.Windows.Point b, System.Windows.Point c, System.Windows.Point d, List<System.Windows.Point> points)
         {
-            for (int i = n - 1; i > 0; i--)
-            {
-                points.Add(interpolateBezier(a, b, c, d, (double)i / n));
-            }
+            adaptiveBezier(a.X, a.Y, b.X, b.Y, c.X, c.Y, d.X, d.Y, points);
             points.Add(d);
         }
 
-        private System.Windows.Point interpolateBezier(System.Windows.Point a, System.Windows.Point b, System.Windows.Point c, System.Windows.Point d, double t)
+        void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, List<System.Windows.Point> points)
         {
-            double abX = t * a.X + (1.0 - t) * b.X;
-            double abY = t * a.Y + (1.0 - t) * b.Y;
-            double bcX = t * b.X + (1.0 - t) * c.X;
-            double bcY = t * b.Y + (1.0 - t) * c.Y;
-            double cdX = t * c.X + (1.0 - t) * d.X;
-            double cdY = t * c.Y + (1.0 - t) * d.Y;
 
-            double abbcX = t * abX + (1.0 - t) * bcX;
-            double abbcY = t * abY + (1.0 - t) * bcY;
-            double bccdX = t * bcX + (1.0 - t) * cdX;
-            double bccdY = t * bcY + (1.0 - t) * cdY;
+            double x12 = (x1 + x2) / 2;
+            double y12 = (y1 + y2) / 2;
+            double x23 = (x2 + x3) / 2;
+            double y23 = (y2 + y3) / 2;
+            double x34 = (x3 + x4) / 2;
+            double y34 = (y3 + y4) / 2;
+            double x123 = (x12 + x23) / 2;
+            double y123 = (y12 + y23) / 2;
+            double x234 = (x23 + x34) / 2;
+            double y234 = (y23 + y34) / 2;
+            double x1234 = (x123 + x234) / 2;
+            double y1234 = (y123 + y234) / 2;
 
-            return new System.Windows.Point(
-                t * abbcX + (1.0 - t) * bccdX,
-                t * abbcY + (1.0 - t) * bccdY);
+            double dx = x4 - x1;
+            double dy = y4 - y1;
+
+            double d2 = Math.Abs(((x2 - x4) * dy - (y2 - y4) * dx));
+            double d3 = Math.Abs(((x3 - x4) * dy - (y3 - y4) * dx));
+
+            if ((d2 + d3) * (d2 + d3) < TOLERANCE_MM_SQ * (dx * dx + dy * dy))
+            {
+                points.Add(new System.Windows.Point(x1234, y1234));
+                return;
+            }
+
+            adaptiveBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, points);
+            adaptiveBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, points);
         }
 
         private System.Windows.Point toMM(PointF point)
         {
-            return new System.Windows.Point(Math.Round(point.X / dpmm, 3), Math.Round(point.Y / dpmm, 3));
+            return new System.Windows.Point(point.X / dpmm, point.Y / dpmm);
         }
     }
 }
