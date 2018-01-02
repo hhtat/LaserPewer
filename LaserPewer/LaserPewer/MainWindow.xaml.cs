@@ -114,12 +114,7 @@ namespace LaserPewer
         {
             MachineProfileDialog dialog = new MachineProfileDialog(currentProfile) { Owner = this };
             Opacity = 0.8;
-
-            if (dialog.ShowDialog() ?? false)
-            {
-                refreshProfiles(dialog.Profile);
-            }
-
+            if (dialog.ShowDialog() ?? false) refreshProfiles(dialog.Profile);
             Opacity = 1.0;
         }
 

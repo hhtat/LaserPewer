@@ -7,6 +7,8 @@ namespace LaserPewer
     {
         public MachineProfile Profile { get; private set; }
 
+        private bool duplicate;
+
         public MachineProfileDialog(MachineProfile profile)
         {
             InitializeComponent();
@@ -47,6 +49,7 @@ namespace LaserPewer
         {
             if (apply(Profile))
             {
+                if (duplicate) AppCore.Instance.AddProfile(Profile);
                 AppCore.Instance.SaveSettings();
                 DialogResult = true;
             }
@@ -66,9 +69,8 @@ namespace LaserPewer
             MachineProfile profile = new MachineProfile();
             if (apply(profile))
             {
+                duplicate = true;
                 profile.FriendlyName += " (Duplicate)";
-                AppCore.Instance.AddProfile(profile);
-                AppCore.Instance.SaveSettings();
                 load(profile);
             }
             else
@@ -89,10 +91,7 @@ namespace LaserPewer
 
         private void formGrid_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                save();
-            }
+            if (e.Key == Key.Enter) save();
         }
     }
 }
