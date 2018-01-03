@@ -15,7 +15,8 @@ namespace LaserPewer
         private const byte POINT_TYPE_FLAG_MARKER = 0x20;
         private const byte POINT_TYPE_FLAG_CLOSE = 0x80;
 
-        private const double TOLERANCE_MM_SQ = 0.1 * 0.1;
+        private const double TOLERANCE_MM = 0.1;
+        private const double TOLERANCE_MM_SQ = TOLERANCE_MM * TOLERANCE_MM;
         private const int ADAPTIVE_BEZIER_MAX_DEPTH = 8;
 
         private double dpi;
@@ -27,7 +28,7 @@ namespace LaserPewer
         private Stack<ISvgBoundable> boundables;
         private Region clip;
 
-        private DrawingBuilder drawingBuilder;
+        private PathBuilder pathBuilder;
 
 
         public SvgScraper()
@@ -39,12 +40,22 @@ namespace LaserPewer
             boundables = new Stack<ISvgBoundable>();
             clip = new Region();
 
-            drawingBuilder = new DrawingBuilder();
+            pathBuilder = new PathBuilder();
         }
 
-        public Drawing CollectScraped()
+        public Drawing CreateDrawing()
         {
-            return drawingBuilder.ToDrawing();
+            return new Drawing(pathBuilder.GetPaths());
+        }
+
+        public double GetWidth(SvgDocument svgDocument)
+        {
+            return mmpd * svgDocument.Width.ToDeviceValue(this, UnitRenderingType.Other, svgDocument);
+        }
+
+        public double GetHeight(SvgDocument svgDocument)
+        {
+            return mmpd * svgDocument.Height.ToDeviceValue(this, UnitRenderingType.Other, svgDocument);
         }
 
         public void Dispose()
@@ -73,12 +84,12 @@ namespace LaserPewer
                 switch (pointType & POINT_TYPE_MASK)
                 {
                     case POINT_TYPE_START:
-                        drawingBuilder.StartPath();
-                        drawingBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
+                        pathBuilder.StartPath();
+                        pathBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
                         lastPoint = point;
                         break;
                     case POINT_TYPE_LINE:
-                        drawingBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
+                        pathBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
                         lastPoint = point;
                         break;
                     case POINT_TYPE_BEZIER:
@@ -91,7 +102,7 @@ namespace LaserPewer
                         throw new NotSupportedException();
                 }
 
-                if ((pointType & POINT_TYPE_FLAG_CLOSE) == POINT_TYPE_FLAG_CLOSE) drawingBuilder.ClosePath();
+                if ((pointType & POINT_TYPE_FLAG_CLOSE) == POINT_TYPE_FLAG_CLOSE) pathBuilder.ClosePath();
             }
         }
 
@@ -164,23 +175,23 @@ namespace LaserPewer
         private void traceBezier(PointF a, PointF b, PointF c, PointF d)
         {
             adaptiveBezier(mmpd * a.X, mmpd * a.Y, mmpd * b.X, mmpd * b.Y, mmpd * c.X, mmpd * c.Y, mmpd * d.X, mmpd * d.Y, 0);
-            drawingBuilder.AddPoint(mmpd * d.X, mmpd * d.Y); ;
+            pathBuilder.AddPoint(mmpd * d.X, mmpd * d.Y); ;
         }
 
         void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, int depth)
         {
-            double x12 = (x1 + x2) / 2;
-            double y12 = (y1 + y2) / 2;
-            double x23 = (x2 + x3) / 2;
-            double y23 = (y2 + y3) / 2;
-            double x34 = (x3 + x4) / 2;
-            double y34 = (y3 + y4) / 2;
-            double x123 = (x12 + x23) / 2;
-            double y123 = (y12 + y23) / 2;
-            double x234 = (x23 + x34) / 2;
-            double y234 = (y23 + y34) / 2;
-            double x1234 = (x123 + x234) / 2;
-            double y1234 = (y123 + y234) / 2;
+            double x12 = (x1 + x2) / 2.0;
+            double y12 = (y1 + y2) / 2.0;
+            double x23 = (x2 + x3) / 2.0;
+            double y23 = (y2 + y3) / 2.0;
+            double x34 = (x3 + x4) / 2.0;
+            double y34 = (y3 + y4) / 2.0;
+            double x123 = (x12 + x23) / 2.0;
+            double y123 = (y12 + y23) / 2.0;
+            double x234 = (x23 + x34) / 2.0;
+            double y234 = (y23 + y34) / 2.0;
+            double x1234 = (x123 + x234) / 2.0;
+            double y1234 = (y123 + y234) / 2.0;
 
             double dx = x4 - x1;
             double dy = y4 - y1;
@@ -188,9 +199,10 @@ namespace LaserPewer
             double d2 = Math.Abs(((x2 - x4) * dy - (y2 - y4) * dx));
             double d3 = Math.Abs(((x3 - x4) * dy - (y3 - y4) * dx));
 
-            if ((d2 + d3) * (d2 + d3) < TOLERANCE_MM_SQ * (dx * dx + dy * dy) || depth >= ADAPTIVE_BEZIER_MAX_DEPTH)
+            if ((d2 + d3) * (d2 + d3) < TOLERANCE_MM_SQ * (dx * dx + dy * dy) ||
+                depth >= ADAPTIVE_BEZIER_MAX_DEPTH)
             {
-                drawingBuilder.AddPoint(x1234, y1234);
+                pathBuilder.AddPoint(x1234, y1234);
                 return;
             }
 

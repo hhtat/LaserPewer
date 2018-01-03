@@ -174,10 +174,18 @@ namespace LaserPewer
         private void importButton_Click(object sender, RoutedEventArgs e)
         {
             SvgDocument svgDocument = SvgDocument.Open(@"C:\Users\hhtat\Desktop\test.svg");
+
             SvgScraper svgScraper = new SvgScraper();
             svgDocument.Draw(svgScraper);
+
+            Drawing drawing = svgScraper.CreateDrawing();
+            Size svgSize = new Size(
+                Optimizer.Round3(svgScraper.GetWidth(svgDocument)),
+                Optimizer.Round3(svgScraper.GetHeight(svgDocument)));
+            drawing.Clip(new Rect(svgSize));
+
             workbench.Document.Clear();
-            workbench.Document.Add(svgScraper.CollectScraped());
+            workbench.Document.Add(drawing);
         }
 
         private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)

@@ -62,7 +62,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppCore.cs" />
-    <Compile Include="DrawingBuilder.cs" />
+    <Compile Include="Clipper.cs" />
+    <Compile Include="Optimizer.cs" />
+    <Compile Include="PathBuilder.cs" />
     <Compile Include="SvgScraper.cs" />
     <Compile Include="ConnectionDialog.xaml.cs">
       <DependentUpon>ConnectionDialog.xaml</DependentUpon>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -191,22 +192,17 @@ namespace LaserPewer
                     {
                         foreach (Drawing.Path path in drawing.Paths)
                         {
-                            if (path.Points.Length > 0)
+                            if (path.Points.Count >= 2)
                             {
-                                Point last = path.Points[0];
-                                for (int i = 1; i < path.Points.Length; i++)
+                                Point prev = path.Points[0];
+                                for (int i = 1; i < path.Points.Count + 1; i++)
                                 {
-                                    Point point = path.Points[i];
-                                    drawLineMM(last.X, last.Y, point.X, point.Y, i % 2 == 0 ? Colors.Red : Colors.Green);
-                                    last = point;
+                                    int j = i % path.Points.Count;
+                                    if (j == 0 && !path.Closed) break;
+                                    Point point = path.Points[j];
+                                    drawLineMM(prev.X, prev.Y, point.X, point.Y, j % 2 == 0 ? Colors.Red : Colors.Green);
+                                    prev = point;
                                 }
-                            }
-
-                            if (path.Closed && path.Points.Length >= 2)
-                            {
-                                Point first = path.Points[0];
-                                Point last = path.Points[path.Points.Length - 1];
-                                drawLineMM(first.X, first.Y, last.X, last.Y, Colors.Blue);
                             }
                         }
                     }
