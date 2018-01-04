@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LaserPewer.Model;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -177,9 +178,9 @@ namespace LaserPewer
 
                     drawPointerMM(MachinePosition.X, MachinePosition.Y, Colors.Red);
 
-                    foreach (Drawing drawing in Document.Drawings)
+                    foreach (Model.Drawing drawing in Document.Drawings)
                     {
-                        foreach (Drawing.Path path in drawing.Paths)
+                        foreach (Model.Drawing.Path path in drawing.Paths)
                         {
                             if (path.Points.Count >= 2)
                             {

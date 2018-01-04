@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LaserPewer
+namespace LaserPewer.Model
 {
     public class Document
     {

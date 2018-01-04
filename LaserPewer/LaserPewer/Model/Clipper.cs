@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Linq;
 
-namespace LaserPewer
+namespace LaserPewer.Model
 {
     public class Clipper
     {

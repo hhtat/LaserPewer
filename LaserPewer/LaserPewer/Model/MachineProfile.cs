@@ -1,4 +1,4 @@
-﻿namespace LaserPewer
+﻿namespace LaserPewer.Model
 {
     public class MachineProfile
     {

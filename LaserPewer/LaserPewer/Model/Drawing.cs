@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 
-namespace LaserPewer
+namespace LaserPewer.Model
 {
     public class Drawing
     {

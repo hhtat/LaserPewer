@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LaserPewer.Model;
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;

@@ -5,7 +5,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Text;
 
-namespace LaserPewer
+namespace LaserPewer.Model
 {
     public class GrblStreamer
     {

@@ -1,8 +1,7 @@
-﻿using Svg;
-using System;
+﻿using LaserPewer.Model;
+using Svg;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace LaserPewer
 {

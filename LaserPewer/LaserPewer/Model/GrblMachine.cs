@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Threading;
 
-namespace LaserPewer
+namespace LaserPewer.Model
 {
     public class GrblMachine
     {

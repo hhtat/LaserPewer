@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using LaserPewer.Model;
+using System.Windows;
 
 namespace LaserPewer
 {

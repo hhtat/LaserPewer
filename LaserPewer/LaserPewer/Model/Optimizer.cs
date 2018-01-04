@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace LaserPewer
+namespace LaserPewer.Model
 {
     public class Optimizer
     {

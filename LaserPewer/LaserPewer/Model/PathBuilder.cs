@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows;
 
-namespace LaserPewer
+namespace LaserPewer.Model
 {
     public class PathBuilder
     {
