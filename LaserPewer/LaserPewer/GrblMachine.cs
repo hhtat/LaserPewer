@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows.Threading;
 
 namespace LaserPewer
 {
@@ -10,6 +11,8 @@ namespace LaserPewer
 
         public bool Connected { get { return streamer != null && streamer.Connected; } }
 
+        public event EventHandler MachineConnecting;
+        public event EventHandler MachineConnected;
         public event EventHandler MachineDisconnected;
         public event EventHandler MachineReset;
 
@@ -22,32 +25,42 @@ namespace LaserPewer
         public delegate void MessageFeedbackEventHandler(object sender, string message);
         public event MessageFeedbackEventHandler MessageFeedback;
 
+        private readonly DispatcherTimer statusPollingTimer;
+
         public GrblMachine()
         {
+            statusPollingTimer = new DispatcherTimer();
+            statusPollingTimer.Interval = TimeSpan.FromMilliseconds(500);
+            statusPollingTimer.Tick += statusPollingTimer_Tick;
         }
 
         public bool Connect(string portName)
         {
             if (streamer != null) streamer.Disconnect();
 
-            streamer = new GrblStreamer();
+            MachineConnecting?.Invoke(this, null);
 
             try
             {
+                streamer = new GrblStreamer();
                 streamer.MessageReceived += Streamer_MessageReceived;
                 streamer.Connect(portName);
+                statusPollingTimer.Start();
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
+                MachineDisconnected?.Invoke(this, null);
                 return false;
             }
 
+            MachineConnected?.Invoke(this, null);
             return true;
         }
 
         public void Disconnect()
         {
+            statusPollingTimer.Stop();
             if (streamer != null) streamer.Disconnect();
         }
 
@@ -66,6 +79,11 @@ namespace LaserPewer
             wrapStreamerCall(() => streamer.TrySendUnlockRequest());
         }
 
+        public void Go()
+        {
+            wrapStreamerCall(() => streamer.SendGoRequest());
+        }
+
         public void Hold()
         {
             wrapStreamerCall(() => streamer.SendHoldRequest());
@@ -77,20 +95,21 @@ namespace LaserPewer
             wrapStreamerCall(() => streamer.TrySendCommand(line));
         }
 
-        public void PollStatus()
+        private void statusPollingTimer_Tick(object sender, EventArgs e)
         {
             wrapStreamerCall(() => streamer.TrySendStatusRequest());
         }
 
         public static string ToGcode(double number)
         {
-            return number.ToString("F", CultureInfo.InvariantCulture);
+            return number.ToString("F3", CultureInfo.InvariantCulture);
         }
 
         private bool checkConnection()
         {
             if (!Connected)
             {
+                statusPollingTimer.Stop();
                 MachineDisconnected?.Invoke(this, null);
                 return false;
             }

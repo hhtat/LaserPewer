@@ -79,6 +79,11 @@ namespace LaserPewer
             return trySendCommand("$X");
         }
 
+        public void SendGoRequest()
+        {
+            throw new NotImplementedException();
+        }
+
         public void SendHoldRequest()
         {
             Debug.WriteLine("SENT: !");

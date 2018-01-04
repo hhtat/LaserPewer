@@ -1,0 +1,125 @@
+﻿using System;
+using System.ComponentModel;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+namespace LaserPewer.ViewModel
+{
+    public class MachineViewModel : INotifyPropertyChanged
+    {
+        private const string FIELD_PLACEHOLDER = "-";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private string _positionX;
+        public string PositionX { get { return _positionX; } set { _positionX = value; NotifyPropertyChanged(); } }
+
+        private string _positionY;
+        public string PositionY { get { return _positionY; } set { _positionY = value; NotifyPropertyChanged(); } }
+
+        private string _status;
+        public string Status { get { return _status; } set { _status = value; NotifyPropertyChanged(); } }
+
+        private string _alarm;
+        public string Alarm { get { return _alarm; } set { _alarm = value; NotifyPropertyChanged(); } }
+
+        private string _message;
+        public string Message { get { return _message; } set { _message = value; NotifyPropertyChanged(); } }
+
+        private readonly RelayCommand _resetCommand;
+        public ICommand ResetCommand { get { return _resetCommand; } }
+
+        private readonly RelayCommand _homeCommand;
+        public ICommand HomeCommand { get { return _homeCommand; } }
+
+        private readonly RelayCommand _unlockCommand;
+        public ICommand UnlockCommand { get { return _unlockCommand; } }
+
+        private readonly RelayCommand _goCommand;
+        public ICommand GoCommand { get { return _goCommand; } }
+
+        private readonly RelayCommand _holdCommand;
+        public ICommand HoldCommand { get { return _holdCommand; } }
+
+        public MachineViewModel()
+        {
+            setDefaults();
+
+            _resetCommand = new RelayCommand((parameter) => AppCore.Machine.Reset());
+            _homeCommand = new RelayCommand((parameter) => AppCore.Machine.Home());
+            _unlockCommand = new RelayCommand((parameter) => AppCore.Machine.Unlock());
+            _goCommand = new RelayCommand((parameter) => AppCore.Machine.Go());
+            _holdCommand = new RelayCommand((parameter) => AppCore.Machine.Hold());
+
+            AppCore.Machine.MachineConnecting += Machine_MachineConnecting;
+            AppCore.Machine.MachineConnected += Machine_MachineConnected;
+            AppCore.Machine.MachineDisconnected += Machine_MachineDisconnected;
+            AppCore.Machine.MachineReset += Machine_MachineReset;
+            AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
+            AppCore.Machine.AlarmRaised += Machine_AlarmRaised;
+            AppCore.Machine.MessageFeedback += Machine_MessageFeedback;
+        }
+
+        private void setDefaults()
+        {
+            PositionX = "000.000";
+            PositionY = "000.000";
+            Status = "None";
+            Alarm = "None";
+            Message = "None";
+        }
+
+        private void Machine_MachineConnecting(object sender, EventArgs e)
+        {
+            Status = "Connecting";
+        }
+
+        private void Machine_MachineConnected(object sender, EventArgs e)
+        {
+            Status = "Connected";
+        }
+
+        private void Machine_MachineDisconnected(object sender, EventArgs e)
+        {
+            Status = "Disconnected";
+        }
+
+        private void Machine_MachineReset(object sender, EventArgs e)
+        {
+            setDefaults();
+        }
+
+        private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)
+        {
+            PositionX = toDisplayString(status.X);
+            PositionY = toDisplayString(status.Y);
+            Status = status.Status;
+
+            if (Alarm != string.Empty && status.Status != "Alarm")
+            {
+                Alarm = string.Empty;
+            }
+        }
+
+        private void Machine_AlarmRaised(object sender, int alarm)
+        {
+            Alarm = alarm.ToString();
+        }
+
+        private void Machine_MessageFeedback(object sender, string message)
+        {
+            Message = message;
+        }
+
+        private static string toDisplayString(double value)
+        {
+            return value.ToString("F3", CultureInfo.InvariantCulture);
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}

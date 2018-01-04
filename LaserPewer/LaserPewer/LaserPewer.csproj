@@ -75,6 +75,8 @@
     <Compile Include="MachineProfileDialog.xaml.cs">
       <DependentUpon>MachineProfileDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\MachineViewModel.cs" />
+    <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="Workbench.cs" />
     <Compile Include="WorkbenchInput.cs" />
     <Page Include="ConnectionDialog.xaml">
