@@ -62,6 +62,7 @@ namespace LaserPewer
         {
             statusPollingTimer.Stop();
             if (streamer != null) streamer.Disconnect();
+            MachineDisconnected?.Invoke(this, null);
         }
 
         public void Reset()

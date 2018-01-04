@@ -65,7 +65,7 @@ namespace LaserPewer.ViewModel
         {
             PositionX = "000.000";
             PositionY = "000.000";
-            Status = "None";
+            Status = "Disconnected";
             Alarm = "None";
             Message = "None";
         }
