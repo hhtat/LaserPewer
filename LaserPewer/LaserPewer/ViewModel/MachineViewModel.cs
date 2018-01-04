@@ -13,19 +13,39 @@ namespace LaserPewer.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string _positionX;
-        public string PositionX { get { return _positionX; } set { _positionX = value; NotifyPropertyChanged(); } }
+        public string PositionX
+        {
+            get { return _positionX; }
+            private set { _positionX = value; NotifyPropertyChanged(); }
+        }
 
         private string _positionY;
-        public string PositionY { get { return _positionY; } set { _positionY = value; NotifyPropertyChanged(); } }
+        public string PositionY
+        {
+            get { return _positionY; }
+            private set { _positionY = value; NotifyPropertyChanged(); }
+        }
 
         private string _status;
-        public string Status { get { return _status; } set { _status = value; NotifyPropertyChanged(); } }
+        public string Status
+        {
+            get { return _status; }
+            private set { _status = value; NotifyPropertyChanged(); }
+        }
 
         private string _alarm;
-        public string Alarm { get { return _alarm; } set { _alarm = value; NotifyPropertyChanged(); } }
+        public string Alarm
+        {
+            get { return _alarm; }
+            private set { _alarm = value; NotifyPropertyChanged(); }
+        }
 
         private string _message;
-        public string Message { get { return _message; } set { _message = value; NotifyPropertyChanged(); } }
+        public string Message
+        {
+            get { return _message; }
+            private set { _message = value; NotifyPropertyChanged(); }
+        }
 
         private readonly RelayCommand _resetCommand;
         public ICommand ResetCommand { get { return _resetCommand; } }
@@ -117,7 +137,7 @@ namespace LaserPewer.ViewModel
             return value.ToString("F3", CultureInfo.InvariantCulture);
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

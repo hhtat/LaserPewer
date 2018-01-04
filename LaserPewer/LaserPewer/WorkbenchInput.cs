@@ -58,7 +58,7 @@ namespace LaserPewer
 
             Point offset = e.GetPosition(workbench);
             Point originalMM = workbench.GetPointMMAtOffset(offset);
-            workbench.Zoom *= Math.Pow(2.0, e.Delta / 480.0);
+            workbench.ViewZoom *= Math.Pow(2.0, e.Delta / 480.0);
             Point newOffset = workbench.GetOffsetAtPointMM(originalMM);
             workbench.Pan(new Point(newOffset.X - offset.X, newOffset.Y - offset.Y));
         }

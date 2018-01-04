@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -9,65 +8,58 @@ namespace LaserPewer
 {
     public class Workbench : UserControl
     {
+        public const double ZoomMin = 1.0;
+        public const double ZoomMax = 50.0;
+
         private const int GRAPHICS_SIZE = 2048;
-        private const double MIN_ZOOM = 1.0;
-        private const double MAX_ZOOM = 50.0;
 
-        private Size tableSizeMM;
-        public Size TableSizeMM
+        public static readonly DependencyProperty TableSizeProperty =
+            DependencyProperty.Register("TableSize", typeof(Size), typeof(Workbench),
+                new PropertyMetadata(
+                    new Size(0.0, 0.0),
+                    (d, e) => ((Workbench)d).graphicsStale = true));
+
+        public static readonly DependencyProperty ViewCenterProperty =
+            DependencyProperty.Register("ViewCenter", typeof(Point), typeof(Workbench),
+                new PropertyMetadata(
+                    new Point(0.0, 0.0),
+                    (d, e) => ((Workbench)d).graphicsStale = true));
+
+        public static readonly DependencyProperty ViewZoomProperty =
+            DependencyProperty.Register("ViewZoom", typeof(double), typeof(Workbench),
+                new PropertyMetadata(
+                    1.0,
+                    (d, e) => ((Workbench)d).graphicsStale = true),
+                (value) => ((double)value >= ZoomMin && (double)value <= ZoomMax));
+
+        public static readonly DependencyProperty MachinePositionProperty =
+            DependencyProperty.Register("MachinePosition", typeof(Point), typeof(Workbench),
+                new PropertyMetadata(
+                    new Point(0.0, 0.0),
+                    (d, e) => ((Workbench)d).graphicsStale = true));
+
+        public Size TableSize
         {
-            get { return tableSizeMM; }
-            set
-            {
-                if (tableSizeMM != value)
-                {
-                    tableSizeMM = value;
-                    graphicsStale = true;
-                }
-            }
-        }
-        private Point centerMM;
-        public Point CenterMM
-        {
-            get { return centerMM; }
-            set
-            {
-                if (centerMM != value)
-                {
-                    centerMM = value;
-                    graphicsStale = true;
-                }
-            }
-        }
-        private double zoom;
-        public double Zoom
-        {
-            get { return zoom; }
-            set
-            {
-                if (double.IsNaN(value)) return;
-                if (value < MIN_ZOOM) value = MIN_ZOOM;
-                if (value > MAX_ZOOM) value = MAX_ZOOM;
-                if (zoom != value)
-                {
-                    zoom = value;
-                    graphicsStale = true;
-                }
-            }
+            get { return (Size)GetValue(TableSizeProperty); }
+            set { SetValue(TableSizeProperty, value); }
         }
 
-        private Point pointerMM;
-        public Point PointerMM
+        public Point ViewCenter
         {
-            get { return pointerMM; }
-            set
-            {
-                if (pointerMM != value)
-                {
-                    pointerMM = value;
-                    graphicsStale = true;
-                }
-            }
+            get { return (Point)GetValue(ViewCenterProperty); }
+            set { SetValue(ViewCenterProperty, value); }
+        }
+
+        public double ViewZoom
+        {
+            get { return (double)GetValue(ViewZoomProperty); }
+            set { SetValue(ViewZoomProperty, value); }
+        }
+
+        public Point MachinePosition
+        {
+            get { return (Point)GetValue(MachinePositionProperty); }
+            set { SetValue(MachinePositionProperty, value); }
         }
 
         public Document Document { get; private set; }
@@ -90,9 +82,6 @@ namespace LaserPewer
 
             input = new WorkbenchInput(this);
 
-            TableSizeMM = new Size(200.0, 200.0);
-            Zoom = 1.0;
-
             Document = new Document();
 
             SizeChanged += WorkbenchControl_SizeChanged;
@@ -102,16 +91,16 @@ namespace LaserPewer
 
         public void Pan(Point offset)
         {
-            Point centerOffset = GetOffsetAtPointMM(CenterMM);
-            CenterMM = GetPointMMAtOffset(new Point(centerOffset.X + offset.X, centerOffset.Y + offset.Y));
+            Point centerOffset = GetOffsetAtPointMM(ViewCenter);
+            ViewCenter = GetPointMMAtOffset(new Point(centerOffset.X + offset.X, centerOffset.Y + offset.Y));
         }
 
         public Point GetPointMMAtOffset(Point offset)
         {
             Point offsetGraphics = TranslatePoint(offset, mainImage);
             return new Point(
-                CenterMM.X + (offsetGraphics.X - graphicsCenter.X) / Zoom,
-                CenterMM.Y + (offsetGraphics.Y - graphicsCenter.Y) / Zoom);
+                ViewCenter.X + (offsetGraphics.X - graphicsCenter.X) / ViewZoom,
+                ViewCenter.Y + (offsetGraphics.Y - graphicsCenter.Y) / ViewZoom);
         }
 
         public Point GetOffsetAtPointMM(Point pointMM)
@@ -145,12 +134,12 @@ namespace LaserPewer
 
         private double fwdXd(double x)
         {
-            return graphicsCenter.X + Zoom * (x - CenterMM.X);
+            return graphicsCenter.X + ViewZoom * (x - ViewCenter.X);
         }
 
         private double fwdYd(double y)
         {
-            return graphicsCenter.Y + Zoom * (y - CenterMM.Y);
+            return graphicsCenter.Y + ViewZoom * (y - ViewCenter.Y);
         }
 
         private int fwdXi(double x)
@@ -179,14 +168,14 @@ namespace LaserPewer
                 {
                     writeableBitmap.Clear();
 
-                    fillRectMM(0.0, 0.0, TableSizeMM.Width, TableSizeMM.Height, Colors.White);
+                    fillRectMM(0.0, 0.0, TableSize.Width, TableSize.Height, Colors.White);
 
-                    for (int x = 10; x < TableSizeMM.Width; x += 10) drawLineMM(x, 0.0, x, TableSizeMM.Height, Color.FromRgb(0xF0, 0xF0, 0xF0));
-                    for (int y = 10; y < TableSizeMM.Height; y += 10) drawLineMM(0.0, y, TableSizeMM.Width, y, Color.FromRgb(0xF0, 0xF0, 0xF0));
-                    for (int x = 50; x < TableSizeMM.Width; x += 50) drawLineMM(x, 0.0, x, TableSizeMM.Height, Color.FromRgb(0xE0, 0xE0, 0xE0));
-                    for (int y = 50; y < TableSizeMM.Height; y += 50) drawLineMM(0.0, y, TableSizeMM.Width, y, Color.FromRgb(0xE0, 0xE0, 0xE0));
+                    for (int x = 10; x < TableSize.Width; x += 10) drawLineMM(x, 0.0, x, TableSize.Height, Color.FromRgb(0xF0, 0xF0, 0xF0));
+                    for (int y = 10; y < TableSize.Height; y += 10) drawLineMM(0.0, y, TableSize.Width, y, Color.FromRgb(0xF0, 0xF0, 0xF0));
+                    for (int x = 50; x < TableSize.Width; x += 50) drawLineMM(x, 0.0, x, TableSize.Height, Color.FromRgb(0xE0, 0xE0, 0xE0));
+                    for (int y = 50; y < TableSize.Height; y += 50) drawLineMM(0.0, y, TableSize.Width, y, Color.FromRgb(0xE0, 0xE0, 0xE0));
 
-                    drawPointerMM(pointerMM.X, pointerMM.Y, Colors.Red);
+                    drawPointerMM(MachinePosition.X, MachinePosition.Y, Colors.Red);
 
                     foreach (Drawing drawing in Document.Drawings)
                     {

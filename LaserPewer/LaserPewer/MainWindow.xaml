@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:LaserPewer.ViewModel"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
         Title="LaserPewer" Height="600" Width="800">
@@ -100,6 +99,8 @@
             </GroupBox>
         </StackPanel>
 
-        <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" Background="DarkGray" Grid.Column="1" />
+        <GroupBox Header="Workbench" DataContext="{StaticResource WorkbenchViewModel}" Grid.Column="1">
+            <local:Workbench TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Background="DarkGray" />
+        </GroupBox>
     </Grid>
 </Window>

@@ -39,8 +39,8 @@ namespace LaserPewer
         {
             currentProfile = profile;
 
-            workbench.TableSizeMM = new Size(currentProfile.TableWidth, currentProfile.TableHeight);
-            workbench.CenterMM = new Point(currentProfile.TableWidth / 2.0, currentProfile.TableHeight / 2.0);
+            //workbench.TableSizeMM = new Size(currentProfile.TableWidth, currentProfile.TableHeight);
+            //workbench.CenterMM = new Point(currentProfile.TableWidth / 2.0, currentProfile.TableHeight / 2.0);
         }
 
         private void machineListComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -103,14 +103,14 @@ namespace LaserPewer
                 Optimizer.Round3(svgScraper.GetHeight(svgDocument)));
             drawing.Clip(new Rect(svgSize));
 
-            workbench.Document.Clear();
-            workbench.Document.Add(drawing);
+            //workbench.Document.Clear();
+            //workbench.Document.Add(drawing);
         }
 
-        private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            Point pointMM = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
-            AppCore.Machine.Jog(pointMM.X, -pointMM.Y, currentProfile.MaxFeedRate);
-        }
+        //private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        //{
+        //    Point pointMM = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
+        //    AppCore.Machine.Jog(pointMM.X, -pointMM.Y, currentProfile.MaxFeedRate);
+        //}
     }
 }
