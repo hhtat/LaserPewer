@@ -25,7 +25,15 @@ namespace LaserPewer.ViewModel
 
         public WorkbenchViewModel()
         {
+            if (AppCore.MachineProfiles.Active != null) MachineSize = AppCore.MachineProfiles.Active.TableSize;
+
+            AppCore.MachineProfiles.ActiveChanged += MachineProfiles_ActiveChanged;
             AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
+        }
+
+        private void MachineProfiles_ActiveChanged(object sender, MachineProfileManager.Profile profile)
+        {
+            MachineSize = profile.TableSize;
         }
 
         private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)

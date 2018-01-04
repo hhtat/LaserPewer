@@ -46,14 +46,14 @@
 
             <GroupBox Header="Connection">
                 <StackPanel>
-                    <Grid>
+                    <Grid DataContext="{StaticResource MachineProfileManagerViewModel}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox Name="machineListComboBox" SelectionChanged="machineListComboBox_SelectionChanged" Grid.Column="0" />
-                        <Button Name="machineManageButton" Click="machineManageButton_Click" Content="Manage" Grid.Column="1" />
+                        <ComboBox ItemsSource="{Binding Profiles}" DisplayMemberPath="FriendlyName" SelectedItem="{Binding Active}" Grid.Column="0" />
+                        <Button Content="Manage" Grid.Column="1" />
                     </Grid>
 
                     <Button Name="connectionButton" Click="connectionButton_Click" Content="Connection" />

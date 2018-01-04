@@ -6,17 +6,17 @@ namespace LaserPewer
 {
     public partial class MachineProfileDialog : Window
     {
-        public MachineProfile Profile { get; private set; }
+        //public MachineProfile Profile { get; private set; }
 
         private bool duplicate;
 
-        public MachineProfileDialog(MachineProfile profile)
+        public MachineProfileDialog(/*MachineProfile profile*/)
         {
             InitializeComponent();
 
-            load(profile);
+            //load(profile);
         }
-
+        /*
         private void load(MachineProfile profile)
         {
             Profile = profile;
@@ -59,14 +59,15 @@ namespace LaserPewer
                 MessageBox.Show(this, "Check values!");
             }
         }
-
+        */
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
-            save();
+            //save();
         }
 
         private void duplicateButton_Click(object sender, RoutedEventArgs e)
         {
+            /*
             MachineProfile profile = new MachineProfile();
             if (apply(profile))
             {
@@ -78,21 +79,24 @@ namespace LaserPewer
             {
                 MessageBox.Show(this, "Check values!");
             }
+            */
         }
 
         private void deleteButton_Click(object sender, RoutedEventArgs e)
         {
+            /*
             if (AppCore.Instance.TryDeleteProfile(Profile))
             {
                 AppCore.Instance.SaveSettings();
                 Profile = null;
             }
             DialogResult = true;
+            */
         }
 
         private void formGrid_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter) save();
+            //if (e.Key == Key.Enter) save();
         }
     }
 }

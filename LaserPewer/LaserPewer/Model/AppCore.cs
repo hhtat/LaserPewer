@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Windows;
 
 namespace LaserPewer.Model
 {
@@ -12,36 +12,20 @@ namespace LaserPewer.Model
         {
             get
             {
-                if (singleton == null)
-                {
-                    singleton = new AppCore();
-                }
+                if (singleton == null) singleton = new AppCore();
                 return singleton;
             }
         }
 
-        public static IReadOnlyList<MachineProfile> Profiles
-        {
-            get
-            {
-                return Instance.profiles.AsReadOnly();
-            }
-        }
+        public static MachineProfileManager MachineProfiles { get { return Instance.machineProfileManager; } }
+        public static GrblMachine Machine { get { return Instance.machine; } }
 
-        public static GrblMachine Machine
-        {
-            get
-            {
-                return Instance.machine;
-            }
-        }
-
-        private readonly List<MachineProfile> profiles;
+        private readonly MachineProfileManager machineProfileManager;
         private readonly GrblMachine machine;
 
         private AppCore()
         {
-            profiles = new List<MachineProfile>();
+            machineProfileManager = new MachineProfileManager();
             machine = new GrblMachine();
         }
 
@@ -49,10 +33,17 @@ namespace LaserPewer.Model
         {
             LoadSettings();
 
-            if (profiles.Count == 0)
+            if (machineProfileManager.Profiles.Count == 0)
             {
-                profiles.Add(new MachineProfile() { FriendlyName = "Default Machine", TableWidth = 300, TableHeight = 200, MaxFeedRate = 10000 });
+                machineProfileManager.AddProfile(new MachineProfileManager.Profile()
+                {
+                    FriendlyName = "Default Machine",
+                    TableSize = new Size(300, 200),
+                    MaxFeedRate = 10000,
+                });
             }
+
+            machineProfileManager.Active = machineProfileManager.Profiles[0];
         }
 
         public void LoadSettings()
@@ -69,12 +60,12 @@ namespace LaserPewer.Model
                     if (tokens.Length == 0) continue;
                     if (tokens[0] == "PROFILE")
                     {
-                        MachineProfile profile = new MachineProfile();
-                        profile.FriendlyName = decodeString(tokens[1]);
-                        profile.TableWidth = decodeDouble(tokens[2]);
-                        profile.TableHeight = decodeDouble(tokens[3]);
-                        profile.MaxFeedRate = decodeDouble(tokens[4]);
-                        profiles.Add(profile);
+                        machineProfileManager.AddProfile(new MachineProfileManager.Profile()
+                        {
+                            FriendlyName = decodeString(tokens[1]),
+                            TableSize = new Size(decodeDouble(tokens[2]), decodeDouble(tokens[3])),
+                            MaxFeedRate = decodeDouble(tokens[4]),
+                        });
                     }
                 }
             }
@@ -84,36 +75,20 @@ namespace LaserPewer.Model
         {
             using (StreamWriter writer = new StreamWriter(getConfigPath()))
             {
-                foreach (MachineProfile profile in profiles)
+                foreach (MachineProfileManager.Profile profile in machineProfileManager.Profiles)
                 {
                     writer.Write("PROFILE");
                     writer.Write(' ');
                     writer.Write(encode(profile.FriendlyName));
                     writer.Write(' ');
-                    writer.Write(encode(profile.TableWidth));
+                    writer.Write(encode(profile.TableSize.Width));
                     writer.Write(' ');
-                    writer.Write(encode(profile.TableHeight));
+                    writer.Write(encode(profile.TableSize.Height));
                     writer.Write(' ');
                     writer.Write(encode(profile.MaxFeedRate));
                     writer.WriteLine();
                 }
             }
-        }
-
-        public int ProfileIndex(MachineProfile profile)
-        {
-            return profiles.IndexOf(profile);
-        }
-
-        public void AddProfile(MachineProfile profile)
-        {
-            profiles.Add(profile);
-        }
-
-        public bool TryDeleteProfile(MachineProfile profile)
-        {
-            if (profiles.Count == 1) return false;
-            return profiles.Remove(profile);
         }
 
         private static string getConfigPath()
