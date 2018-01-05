@@ -72,6 +72,13 @@ namespace LaserPewer.Model
                 get { return _maxFeedRate; }
                 set { _maxFeedRate = value; Modified?.Invoke(this, null); }
             }
+
+            public Profile(string friendlyName, Size tableSize, double maxFeedRate)
+            {
+                FriendlyName = friendlyName;
+                TableSize = tableSize;
+                MaxFeedRate = maxFeedRate;
+            }
         }
     }
 }

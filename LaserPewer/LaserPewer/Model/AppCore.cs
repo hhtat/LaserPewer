@@ -35,12 +35,8 @@ namespace LaserPewer.Model
 
             if (machineProfileManager.Profiles.Count == 0)
             {
-                machineProfileManager.AddProfile(new MachineProfileManager.Profile()
-                {
-                    FriendlyName = "Default Machine",
-                    TableSize = new Size(300, 200),
-                    MaxFeedRate = 10000,
-                });
+                machineProfileManager.AddProfile(
+                    new MachineProfileManager.Profile("Default Machine", new Size(300.0, 200.0), 10000.0));
             }
 
             machineProfileManager.Active = machineProfileManager.Profiles[0];
@@ -60,12 +56,10 @@ namespace LaserPewer.Model
                     if (tokens.Length == 0) continue;
                     if (tokens[0] == "PROFILE")
                     {
-                        machineProfileManager.AddProfile(new MachineProfileManager.Profile()
-                        {
-                            FriendlyName = decodeString(tokens[1]),
-                            TableSize = new Size(decodeDouble(tokens[2]), decodeDouble(tokens[3])),
-                            MaxFeedRate = decodeDouble(tokens[4]),
-                        });
+                        machineProfileManager.AddProfile(new MachineProfileManager.Profile(
+                            decodeString(tokens[1]),
+                            new Size(decodeDouble(tokens[2]), decodeDouble(tokens[3])),
+                            decodeDouble(tokens[4])));
                     }
                 }
             }

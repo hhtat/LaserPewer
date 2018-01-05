@@ -28,7 +28,7 @@ namespace LaserPewer.ViewModel
             get
             {
                 if (Model != AppCore.MachineProfiles.Active) return FriendlyName;
-                return FriendlyName + " (Active)";
+                return FriendlyName + " [Current]";
             }
         }
 

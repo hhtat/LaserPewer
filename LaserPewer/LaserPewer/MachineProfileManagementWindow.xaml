@@ -16,7 +16,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Profiles" DataContext="{StaticResource MachineProfileManagerViewModel}" Grid.Column="0">
+        <GroupBox Header="Profiles" DataContext="{StaticResource MachineProfileManagementViewModel}" Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -26,8 +26,9 @@
                 <ListBox Name="profilesListBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ListDisplayName" SelectionMode="Single" Grid.Row="0" />
 
                 <StackPanel Grid.Row="1">
-                    <Button Content="Duplicate" />
-                    <Button Content="Delete" />
+                    <Button Command="{Binding ActivateCommand}" CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}" Content="Switch to" />
+                    <Button Command="{Binding DuplicateCommand}" CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}" Content="Duplicate" />
+                    <Button Command="{Binding DeleteCommand}" CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}" Content="Delete" />
                 </StackPanel>
             </Grid>
         </GroupBox>
@@ -39,6 +40,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

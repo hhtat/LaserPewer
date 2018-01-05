@@ -77,7 +77,7 @@
     <Compile Include="Model\Drawing.cs" />
     <Compile Include="DoubleToStringConverter.cs" />
     <Compile Include="NullableToVisibilityConverter.cs" />
-    <Compile Include="ViewModel\MachineProfileManagerViewModel.cs" />
+    <Compile Include="ViewModel\MachineProfileManagementViewModel.cs" />
     <Compile Include="ViewModel\MachineProfileViewModel.cs" />
     <Compile Include="ViewModel\MachineViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />

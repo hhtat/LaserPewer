@@ -46,7 +46,7 @@
 
             <GroupBox Header="Connection">
                 <StackPanel>
-                    <Grid DataContext="{StaticResource MachineProfileManagerViewModel}">
+                    <Grid DataContext="{StaticResource MachineProfileManagementViewModel}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />

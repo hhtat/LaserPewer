@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:LaserPewer"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <vm:MachineProfileManagerViewModel x:Key="MachineProfileManagerViewModel" />
+        <vm:MachineProfileManagementViewModel x:Key="MachineProfileManagementViewModel" />
         <vm:MachineViewModel x:Key="MachineViewModel" />
         <vm:WorkbenchViewModel x:Key="WorkbenchViewModel" />
     </Application.Resources>
