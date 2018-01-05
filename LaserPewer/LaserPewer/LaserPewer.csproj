@@ -61,14 +61,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MachineProfileManagementWindow.xaml.cs">
-      <DependentUpon>MachineProfileManagementWindow.xaml</DependentUpon>
+    <Compile Include="MachineListWindow.xaml.cs">
+      <DependentUpon>MachineListWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\AppCore.cs" />
     <Compile Include="Model\Clipper.cs" />
     <Compile Include="Model\Optimizer.cs" />
     <Compile Include="Model\PathBuilder.cs" />
-    <Compile Include="Model\MachineProfileManager.cs" />
+    <Compile Include="Model\MachineList.cs" />
+    <Compile Include="Model\PersistentSettings.cs" />
     <Compile Include="Model\SvgScraper.cs" />
     <Compile Include="ConnectionDialog.xaml.cs">
       <DependentUpon>ConnectionDialog.xaml</DependentUpon>
@@ -77,7 +78,7 @@
     <Compile Include="Model\Drawing.cs" />
     <Compile Include="DoubleToStringConverter.cs" />
     <Compile Include="NullableToVisibilityConverter.cs" />
-    <Compile Include="ViewModel\MachineProfileManagementViewModel.cs" />
+    <Compile Include="ViewModel\MachineListViewModel.cs" />
     <Compile Include="ViewModel\MachineProfileViewModel.cs" />
     <Compile Include="ViewModel\MachineViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
@@ -88,7 +89,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MachineProfileManagementWindow.xaml">
+    <Page Include="MachineListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

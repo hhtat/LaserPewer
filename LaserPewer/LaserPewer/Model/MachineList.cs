@@ -4,11 +4,12 @@ using System.Windows;
 
 namespace LaserPewer.Model
 {
-    public class MachineProfileManager
+    public class MachineList
     {
         public delegate void ProfileEventHandler(object sender, Profile profile);
         public event ProfileEventHandler ProfileAdded;
         public event ProfileEventHandler ProfileRemoved;
+        public event ProfileEventHandler ProfileModified;
 
         public delegate void ProfileSwapEventHandler(object sender, Profile profile, Profile old);
         public event ProfileSwapEventHandler ActiveChanged;
@@ -29,7 +30,7 @@ namespace LaserPewer.Model
             }
         }
 
-        public MachineProfileManager()
+        public MachineList()
         {
             profiles = new List<Profile>();
         }
@@ -38,6 +39,7 @@ namespace LaserPewer.Model
         {
             if (profiles.Contains(profile)) throw new ArgumentException();
             profiles.Add(profile);
+            profile.Modified += Profile_Modified;
             ProfileAdded?.Invoke(this, profile);
         }
 
@@ -45,7 +47,13 @@ namespace LaserPewer.Model
         {
             if (profile == Active) throw new ArgumentException();
             if (!profiles.Remove(profile)) throw new ArgumentException();
+            profile.Modified -= Profile_Modified;
             ProfileRemoved?.Invoke(this, profile);
+        }
+
+        private void Profile_Modified(object sender, EventArgs e)
+        {
+            ProfileModified?.Invoke(this, (Profile)sender);
         }
 
         public class Profile

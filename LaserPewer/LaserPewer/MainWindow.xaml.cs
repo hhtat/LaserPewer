@@ -13,10 +13,9 @@ namespace LaserPewer
 
         private void machineProfilesManageButton_Click(object sender, RoutedEventArgs e)
         {
-            MachineProfileManagementWindow managementWindow = new MachineProfileManagementWindow();
-            managementWindow.Owner = this;
+            MachineListWindow dialog = new MachineListWindow() { Owner = this };
             Opacity = 0.8;
-            managementWindow.ShowDialog();
+            dialog.ShowDialog();
             Opacity = 1.0;
         }
 

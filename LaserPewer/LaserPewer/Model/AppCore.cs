@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace LaserPewer.Model
 {
@@ -17,97 +16,57 @@ namespace LaserPewer.Model
             }
         }
 
-        public static MachineProfileManager MachineProfiles { get { return Instance.machineProfileManager; } }
-        public static GrblMachine Machine { get { return Instance.machine; } }
+        public static MachineList MachineList { get { return Instance._machineList; } }
+        public static GrblMachine Machine { get { return Instance._machine; } }
 
-        private readonly MachineProfileManager machineProfileManager;
-        private readonly GrblMachine machine;
+        private readonly MachineList _machineList;
+        private readonly GrblMachine _machine;
+
+        private readonly PersistentSettings settings;
+        private readonly DispatcherTimer settingsTimer;
 
         private AppCore()
         {
-            machineProfileManager = new MachineProfileManager();
-            machine = new GrblMachine();
+            _machineList = new MachineList();
+            _machine = new GrblMachine();
+
+            _machineList.ProfileAdded += _machineList_ProfileEventHandler;
+            _machineList.ProfileRemoved += _machineList_ProfileEventHandler;
+            _machineList.ProfileModified += _machineList_ProfileEventHandler;
+
+            settings = new PersistentSettings();
+            settingsTimer = new DispatcherTimer();
+            settingsTimer.Interval = TimeSpan.FromSeconds(10);
+            settingsTimer.Tick += settingsTimer_Tick;
         }
 
         public void Initialize()
         {
-            LoadSettings();
+            settings.Load();
 
-            if (machineProfileManager.Profiles.Count == 0)
+            if (_machineList.Profiles.Count == 0)
             {
-                machineProfileManager.AddProfile(
-                    new MachineProfileManager.Profile("Default Machine", new Size(300.0, 200.0), 10000.0));
+                _machineList.AddProfile(
+                    new MachineList.Profile("Default Machine", new Size(300.0, 200.0), 10000.0));
             }
 
-            machineProfileManager.Active = machineProfileManager.Profiles[0];
+            _machineList.Active = _machineList.Profiles[0];
         }
 
-        public void LoadSettings()
+        public void Deinitialize()
         {
-            string configPath = getConfigPath();
-
-            if (!File.Exists(configPath)) return;
-
-            using (StreamReader reader = new StreamReader(getConfigPath()))
-            {
-                for (string line = reader.ReadLine(); line != null; line = reader.ReadLine())
-                {
-                    string[] tokens = line.Split(' ');
-                    if (tokens.Length == 0) continue;
-                    if (tokens[0] == "PROFILE")
-                    {
-                        machineProfileManager.AddProfile(new MachineProfileManager.Profile(
-                            decodeString(tokens[1]),
-                            new Size(decodeDouble(tokens[2]), decodeDouble(tokens[3])),
-                            decodeDouble(tokens[4])));
-                    }
-                }
-            }
+            settings.Save();
         }
 
-        public void SaveSettings()
+        private void _machineList_ProfileEventHandler(object sender, MachineList.Profile profile)
         {
-            using (StreamWriter writer = new StreamWriter(getConfigPath()))
-            {
-                foreach (MachineProfileManager.Profile profile in machineProfileManager.Profiles)
-                {
-                    writer.Write("PROFILE");
-                    writer.Write(' ');
-                    writer.Write(encode(profile.FriendlyName));
-                    writer.Write(' ');
-                    writer.Write(encode(profile.TableSize.Width));
-                    writer.Write(' ');
-                    writer.Write(encode(profile.TableSize.Height));
-                    writer.Write(' ');
-                    writer.Write(encode(profile.MaxFeedRate));
-                    writer.WriteLine();
-                }
-            }
+            settingsTimer.Start();
         }
 
-        private static string getConfigPath()
+        private void settingsTimer_Tick(object sender, EventArgs e)
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".lspewer");
-        }
-
-        private static string encode(double d)
-        {
-            return Convert.ToBase64String(BitConverter.GetBytes(d));
-        }
-
-        private static double decodeDouble(string s)
-        {
-            return BitConverter.ToDouble(Convert.FromBase64String(s), 0);
-        }
-
-        private static string encode(string s)
-        {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(s));
-        }
-
-        private static string decodeString(string s)
-        {
-            return Encoding.UTF8.GetString(Convert.FromBase64String(s));
+            settingsTimer.Stop();
+            settings.Save();
         }
     }
 }

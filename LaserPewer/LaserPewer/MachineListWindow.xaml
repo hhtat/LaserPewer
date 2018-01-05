@@ -1,4 +1,4 @@
-﻿<Window x:Class="LaserPewer.MachineProfileManagementWindow"
+﻿<Window x:Class="LaserPewer.MachineListWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,7 +16,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Profiles" DataContext="{StaticResource MachineProfileManagementViewModel}" Grid.Column="0">
+        <GroupBox Header="Profiles" DataContext="{StaticResource MachineListViewModel}" Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />

@@ -11,7 +11,13 @@ namespace LaserPewer
             base.OnStartup(e);
 
             AppCore.Instance.Initialize();
-            AppCore.Instance.SaveSettings();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+
+            AppCore.Instance.Deinitialize();
         }
     }
 }
