@@ -11,7 +11,7 @@ namespace LaserPewer.ViewModel
         private readonly Predicate<object> canExecute;
 
         public RelayCommand(Action<object> execute)
-            : this(execute, (parameter) => true)
+            : this(execute, parameter => true)
         {
         }
 

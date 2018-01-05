@@ -9,7 +9,9 @@ namespace LaserPewer.Model
         public delegate void ProfileEventHandler(object sender, Profile profile);
         public event ProfileEventHandler ProfileAdded;
         public event ProfileEventHandler ProfileRemoved;
-        public event ProfileEventHandler ActiveChanged;
+
+        public delegate void ProfileSwapEventHandler(object sender, Profile profile, Profile old);
+        public event ProfileSwapEventHandler ActiveChanged;
 
         private readonly List<Profile> profiles;
         public IReadOnlyList<Profile> Profiles { get { return profiles.AsReadOnly(); } }
@@ -21,8 +23,9 @@ namespace LaserPewer.Model
             set
             {
                 if (!profiles.Contains(value)) throw new ArgumentException();
+                Profile old = _active;
                 _active = value;
-                ActiveChanged?.Invoke(this, value);
+                ActiveChanged?.Invoke(this, value, old);
             }
         }
 

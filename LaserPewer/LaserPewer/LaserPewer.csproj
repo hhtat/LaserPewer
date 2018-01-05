@@ -61,6 +61,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MachineProfileManagementWindow.xaml.cs">
+      <DependentUpon>MachineProfileManagementWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\AppCore.cs" />
     <Compile Include="Model\Clipper.cs" />
     <Compile Include="Model\Optimizer.cs" />
@@ -72,9 +75,8 @@
     </Compile>
     <Compile Include="Model\Document.cs" />
     <Compile Include="Model\Drawing.cs" />
-    <Compile Include="MachineProfileDialog.xaml.cs">
-      <DependentUpon>MachineProfileDialog.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="DoubleToStringConverter.cs" />
+    <Compile Include="NullableToVisibilityConverter.cs" />
     <Compile Include="ViewModel\MachineProfileManagerViewModel.cs" />
     <Compile Include="ViewModel\MachineProfileViewModel.cs" />
     <Compile Include="ViewModel\MachineViewModel.cs" />
@@ -86,7 +88,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MachineProfileDialog.xaml">
+    <Page Include="MachineProfileManagementWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

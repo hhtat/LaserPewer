@@ -1,4 +1,5 @@
 ﻿using LaserPewer.Model;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -25,15 +26,26 @@ namespace LaserPewer.ViewModel
 
         public WorkbenchViewModel()
         {
-            if (AppCore.MachineProfiles.Active != null) MachineSize = AppCore.MachineProfiles.Active.TableSize;
+            if (AppCore.MachineProfiles.Active != null)
+            {
+                MachineSize = AppCore.MachineProfiles.Active.TableSize;
+                AppCore.MachineProfiles.Active.Modified += MachineProfile_Modified;
+            }
 
             AppCore.MachineProfiles.ActiveChanged += MachineProfiles_ActiveChanged;
             AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
         }
 
-        private void MachineProfiles_ActiveChanged(object sender, MachineProfileManager.Profile profile)
+        private void MachineProfile_Modified(object sender, EventArgs e)
+        {
+            MachineSize = ((MachineProfileManager.Profile)sender).TableSize;
+        }
+
+        private void MachineProfiles_ActiveChanged(object sender, MachineProfileManager.Profile profile, MachineProfileManager.Profile old)
         {
             MachineSize = profile.TableSize;
+            profile.Modified += MachineProfile_Modified;
+            if (old != null) old.Modified -= MachineProfile_Modified;
         }
 
         private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)

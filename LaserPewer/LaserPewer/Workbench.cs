@@ -31,7 +31,7 @@ namespace LaserPewer
                 new PropertyMetadata(
                     1.0,
                     (d, e) => ((Workbench)d).graphicsStale = true),
-                (value) => ((double)value >= ZoomMin && (double)value <= ZoomMax));
+                value => ((double)value >= ZoomMin && (double)value <= ZoomMax));
 
         public static readonly DependencyProperty MachinePositionProperty =
             DependencyProperty.Register("MachinePosition", typeof(Point), typeof(Workbench),

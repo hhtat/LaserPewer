@@ -11,6 +11,15 @@ namespace LaserPewer
             InitializeComponent();
         }
 
+        private void machineProfilesManageButton_Click(object sender, RoutedEventArgs e)
+        {
+            MachineProfileManagementWindow managementWindow = new MachineProfileManagementWindow();
+            managementWindow.Owner = this;
+            Opacity = 0.8;
+            managementWindow.ShowDialog();
+            Opacity = 1.0;
+        }
+
         private void connectionButton_Click(object sender, RoutedEventArgs e)
         {
             ConnectionDialog dialog = new ConnectionDialog() { Owner = this };

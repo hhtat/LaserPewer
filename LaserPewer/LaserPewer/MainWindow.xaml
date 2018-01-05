@@ -53,7 +53,7 @@
                         </Grid.ColumnDefinitions>
 
                         <ComboBox ItemsSource="{Binding Profiles}" DisplayMemberPath="FriendlyName" SelectedItem="{Binding Active}" Grid.Column="0" />
-                        <Button Content="Manage" Grid.Column="1" />
+                        <Button Name="machineProfilesManageButton" Click="machineProfilesManageButton_Click" Content="Manage" Grid.Column="1" />
                     </Grid>
 
                     <Button Name="connectionButton" Click="connectionButton_Click" Content="Connection" />

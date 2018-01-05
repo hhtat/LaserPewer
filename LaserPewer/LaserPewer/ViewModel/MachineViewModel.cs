@@ -67,11 +67,11 @@ namespace LaserPewer.ViewModel
         {
             setDefaults();
 
-            _resetCommand = new RelayCommand((parameter) => AppCore.Machine.Reset());
-            _homeCommand = new RelayCommand((parameter) => AppCore.Machine.Home());
-            _unlockCommand = new RelayCommand((parameter) => AppCore.Machine.Unlock());
-            _goCommand = new RelayCommand((parameter) => AppCore.Machine.Go());
-            _holdCommand = new RelayCommand((parameter) => AppCore.Machine.Hold());
+            _resetCommand = new RelayCommand(parameter => AppCore.Machine.Reset());
+            _homeCommand = new RelayCommand(parameter => AppCore.Machine.Home());
+            _unlockCommand = new RelayCommand(parameter => AppCore.Machine.Unlock());
+            _goCommand = new RelayCommand(parameter => AppCore.Machine.Go());
+            _holdCommand = new RelayCommand(parameter => AppCore.Machine.Hold());
 
             AppCore.Machine.MachineConnecting += Machine_MachineConnecting;
             AppCore.Machine.MachineConnected += Machine_MachineConnected;

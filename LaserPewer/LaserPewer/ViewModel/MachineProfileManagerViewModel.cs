@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
+using System.Windows.Input;
 using LaserPewer.Model;
 
 namespace LaserPewer.ViewModel
@@ -31,18 +32,17 @@ namespace LaserPewer.ViewModel
         {
             profileViewModels = new ObservableCollection<MachineProfileViewModel>();
             profileToViewModels = new Dictionary<MachineProfileManager.Profile, MachineProfileViewModel>();
+            Profiles.SortDescriptions.Add(new SortDescription("FriendlyName", ListSortDirection.Ascending));
 
             foreach (MachineProfileManager.Profile profile in AppCore.MachineProfiles.Profiles)
             {
                 addProfile(profile);
             }
-            Active = profileToViewModels[AppCore.MachineProfiles.Active];
+            if (AppCore.MachineProfiles.Active != null) Active = profileToViewModels[AppCore.MachineProfiles.Active];
 
             AppCore.MachineProfiles.ProfileAdded += MachineProfiles_ProfileAdded;
             AppCore.MachineProfiles.ProfileRemoved += MachineProfiles_ProfileRemoved;
             AppCore.MachineProfiles.ActiveChanged += MachineProfiles_ActiveChanged;
-
-            Profiles.SortDescriptions.Add(new SortDescription("FriendlyName", ListSortDirection.Ascending));
         }
 
         private void addProfile(MachineProfileManager.Profile profile)
@@ -64,7 +64,7 @@ namespace LaserPewer.ViewModel
             profileToViewModels.Remove(profile);
         }
 
-        private void MachineProfiles_ActiveChanged(object sender, MachineProfileManager.Profile profile)
+        private void MachineProfiles_ActiveChanged(object sender, MachineProfileManager.Profile profile, MachineProfileManager.Profile old)
         {
             Active = profileToViewModels[profile];
         }
