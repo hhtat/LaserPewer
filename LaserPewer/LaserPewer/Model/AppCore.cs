@@ -30,9 +30,9 @@ namespace LaserPewer.Model
             _machineList = new MachineList();
             _machine = new GrblMachine();
 
-            _machineList.ProfileAdded += _machineList_ProfileEventHandler;
-            _machineList.ProfileRemoved += _machineList_ProfileEventHandler;
-            _machineList.ProfileModified += _machineList_ProfileEventHandler;
+            _machineList.ProfileAdded += _machineList_EventHandler;
+            _machineList.ProfileRemoved += _machineList_EventHandler;
+            _machineList.ProfileModified += _machineList_EventHandler;
 
             settings = new PersistentSettings();
             settingsTimer = new DispatcherTimer();
@@ -46,8 +46,7 @@ namespace LaserPewer.Model
 
             if (_machineList.Profiles.Count == 0)
             {
-                _machineList.AddProfile(
-                    new MachineList.Profile("Default Machine", new Size(300.0, 200.0), 10000.0));
+                _machineList.CreateProfile("Default Machine", new Size(300.0, 200.0), 10000.0);
             }
 
             _machineList.Active = _machineList.Profiles[0];
@@ -58,7 +57,7 @@ namespace LaserPewer.Model
             settings.Save();
         }
 
-        private void _machineList_ProfileEventHandler(object sender, MachineList.Profile profile)
+        private void _machineList_EventHandler(object sender, MachineList.IProfile profile)
         {
             settingsTimer.Start();
         }

@@ -24,10 +24,10 @@ namespace LaserPewer.Model
                     if (tokens.Length == 0) continue;
                     if (tokens[0] == "PROFILE")
                     {
-                        AppCore.MachineList.AddProfile(new MachineList.Profile(
+                        AppCore.MachineList.CreateProfile(
                             decodeString(tokens[1]),
                             new Size(decodeDouble(tokens[2]), decodeDouble(tokens[3])),
-                            decodeDouble(tokens[4])));
+                            decodeDouble(tokens[4]));
                     }
                 }
             }
@@ -37,7 +37,7 @@ namespace LaserPewer.Model
         {
             using (StreamWriter writer = new StreamWriter(getConfigPath()))
             {
-                foreach (MachineList.Profile profile in AppCore.MachineList.Profiles)
+                foreach (MachineList.IProfile profile in AppCore.MachineList.Profiles)
                 {
                     writer.Write("PROFILE");
                     writer.Write(' ');

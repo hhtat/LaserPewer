@@ -6,25 +6,25 @@ namespace LaserPewer.Model
 {
     public class MachineList
     {
-        public delegate void ProfileEventHandler(object sender, Profile profile);
-        public event ProfileEventHandler ProfileAdded;
-        public event ProfileEventHandler ProfileRemoved;
-        public event ProfileEventHandler ProfileModified;
+        public delegate void MachineListEventHandler(object sender, IProfile profile);
+        public event MachineListEventHandler ProfileAdded;
+        public event MachineListEventHandler ProfileRemoved;
+        public event MachineListEventHandler ProfileModified;
 
-        public delegate void ProfileSwapEventHandler(object sender, Profile profile, Profile old);
-        public event ProfileSwapEventHandler ActiveChanged;
+        public delegate void MachineSwapEventHandler(object sender, IProfile profile, IProfile old);
+        public event MachineSwapEventHandler ActiveChanged;
 
-        private readonly List<Profile> profiles;
-        public IReadOnlyList<Profile> Profiles { get { return profiles.AsReadOnly(); } }
+        private readonly List<IProfile> profiles;
+        public IReadOnlyList<IProfile> Profiles { get { return profiles.AsReadOnly(); } }
 
-        private Profile _active;
-        public Profile Active
+        private IProfile _active;
+        public IProfile Active
         {
             get { return _active; }
             set
             {
                 if (!profiles.Contains(value)) throw new ArgumentException();
-                Profile old = _active;
+                IProfile old = _active;
                 _active = value;
                 ActiveChanged?.Invoke(this, value, old);
             }
@@ -32,18 +32,18 @@ namespace LaserPewer.Model
 
         public MachineList()
         {
-            profiles = new List<Profile>();
+            profiles = new List<IProfile>();
         }
 
-        public void AddProfile(Profile profile)
+        public void CreateProfile(string friendlyName, Size tableSize, double maxFeedRate)
         {
-            if (profiles.Contains(profile)) throw new ArgumentException();
+            Profile profile = new Profile(friendlyName, tableSize, maxFeedRate);
             profiles.Add(profile);
             profile.Modified += Profile_Modified;
             ProfileAdded?.Invoke(this, profile);
         }
 
-        public void RemoveProfile(Profile profile)
+        public void RemoveProfile(IProfile profile)
         {
             if (profile == Active) throw new ArgumentException();
             if (!profiles.Remove(profile)) throw new ArgumentException();
@@ -53,10 +53,19 @@ namespace LaserPewer.Model
 
         private void Profile_Modified(object sender, EventArgs e)
         {
-            ProfileModified?.Invoke(this, (Profile)sender);
+            ProfileModified?.Invoke(this, (IProfile)sender);
         }
 
-        public class Profile
+        public interface IProfile
+        {
+            event EventHandler Modified;
+
+            string FriendlyName { get; set; }
+            Size TableSize { get; set; }
+            double MaxFeedRate { get; set; }
+        }
+
+        private class Profile : IProfile
         {
             public event EventHandler Modified;
 

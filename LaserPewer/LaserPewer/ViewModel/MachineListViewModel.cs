@@ -13,7 +13,7 @@ namespace LaserPewer.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly ObservableCollection<MachineProfileViewModel> profileViewModels;
-        private readonly Dictionary<MachineList.Profile, MachineProfileViewModel> profileToViewModels;
+        private readonly Dictionary<MachineList.IProfile, MachineProfileViewModel> profileToViewModels;
         public ICollectionView Profiles { get { return CollectionViewSource.GetDefaultView(profileViewModels); } }
 
         private MachineProfileViewModel _active;
@@ -40,10 +40,10 @@ namespace LaserPewer.ViewModel
         public MachineListViewModel()
         {
             profileViewModels = new ObservableCollection<MachineProfileViewModel>();
-            profileToViewModels = new Dictionary<MachineList.Profile, MachineProfileViewModel>();
+            profileToViewModels = new Dictionary<MachineList.IProfile, MachineProfileViewModel>();
             Profiles.SortDescriptions.Add(new SortDescription("FriendlyName", ListSortDirection.Ascending));
 
-            foreach (MachineList.Profile profile in AppCore.MachineList.Profiles)
+            foreach (MachineList.IProfile profile in AppCore.MachineList.Profiles)
             {
                 addProfile(profile);
             }
@@ -58,7 +58,7 @@ namespace LaserPewer.ViewModel
             AppCore.MachineList.ActiveChanged += MachineProfiles_ActiveChanged;
         }
 
-        private void addProfile(MachineList.Profile profile)
+        private void addProfile(MachineList.IProfile profile)
         {
             MachineProfileViewModel vm = new MachineProfileViewModel(profile);
             profileViewModels.Add(vm);
@@ -76,8 +76,7 @@ namespace LaserPewer.ViewModel
         {
             MachineProfileViewModel vm = parameter as MachineProfileViewModel;
             if (vm == null) return;
-            AppCore.MachineList.AddProfile(new MachineList.Profile(
-                vm.Model.FriendlyName + " (Duplicate)", vm.Model.TableSize, vm.Model.MaxFeedRate));
+            AppCore.MachineList.CreateProfile(vm.Model.FriendlyName + " (Duplicate)", vm.Model.TableSize, vm.Model.MaxFeedRate);
         }
 
         private void _deleteCommand_Execute(object parameter)
@@ -87,19 +86,19 @@ namespace LaserPewer.ViewModel
             AppCore.MachineList.RemoveProfile(vm.Model);
         }
 
-        private void MachineProfiles_ProfileAdded(object sender, MachineList.Profile profile)
+        private void MachineProfiles_ProfileAdded(object sender, MachineList.IProfile profile)
         {
             addProfile(profile);
         }
 
-        private void MachineProfiles_ProfileRemoved(object sender, MachineList.Profile profile)
+        private void MachineProfiles_ProfileRemoved(object sender, MachineList.IProfile profile)
         {
             MachineProfileViewModel vm = profileToViewModels[profile];
             profileViewModels.Remove(vm);
             profileToViewModels.Remove(profile);
         }
 
-        private void MachineProfiles_ActiveChanged(object sender, MachineList.Profile profile, MachineList.Profile old)
+        private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
         {
             Active = profileToViewModels[profile];
         }

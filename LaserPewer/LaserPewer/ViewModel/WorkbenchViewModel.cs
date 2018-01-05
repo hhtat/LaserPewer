@@ -38,10 +38,10 @@ namespace LaserPewer.ViewModel
 
         private void MachineProfile_Modified(object sender, EventArgs e)
         {
-            MachineSize = ((MachineList.Profile)sender).TableSize;
+            MachineSize = ((MachineList.IProfile)sender).TableSize;
         }
 
-        private void MachineProfiles_ActiveChanged(object sender, MachineList.Profile profile, MachineList.Profile old)
+        private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
         {
             MachineSize = profile.TableSize;
             profile.Modified += MachineProfile_Modified;

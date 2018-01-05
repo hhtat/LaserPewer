@@ -10,7 +10,7 @@ namespace LaserPewer.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public readonly MachineList.Profile Model;
+        public readonly MachineList.IProfile Model;
 
         public string FriendlyName
         {
@@ -62,14 +62,14 @@ namespace LaserPewer.ViewModel
             }
         }
 
-        public MachineProfileViewModel(MachineList.Profile profile)
+        public MachineProfileViewModel(MachineList.IProfile profile)
         {
             Model = profile;
             Model.Modified += Profile_Modified;
             AppCore.MachineList.ActiveChanged += MachineProfiles_ActiveChanged;
         }
 
-        private void MachineProfiles_ActiveChanged(object sender, MachineList.Profile profile, MachineList.Profile old)
+        private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
         {
             if (Model == profile || Model == old) NotifyPropertyChanged("ListDisplayName");
         }
