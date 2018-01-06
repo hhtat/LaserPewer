@@ -1,34 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using Svg;
+using System;
+using System.Diagnostics;
+using System.Windows;
 
 namespace LaserPewer.Model
 {
     public class Document
     {
-        private List<Drawing> drawings;
-        public IReadOnlyList<Drawing> Drawings { get { return drawings.AsReadOnly(); } }
+        public event EventHandler Modified;
 
-        public bool Stale { get; private set; }
+        public string FileName { get; private set; }
+        public Drawing Drawing { get; private set; }
+        public Size Size { get; private set; }
 
-        public Document()
+        public bool LoadSVG(string fileName)
         {
-            drawings = new List<Drawing>();
-        }
+            SvgScraper svgScraper = new SvgScraper();
+            Size svgSize;
 
-        public void Clear()
-        {
-            drawings.Clear();
-            Stale = true;
-        }
+            try
+            {
+                SvgDocument svgDocument = SvgDocument.Open(fileName);
+                svgSize = new Size(
+                    Optimizer.Round3(svgScraper.GetWidth(svgDocument)),
+                    Optimizer.Round3(svgScraper.GetHeight(svgDocument)));
+                svgDocument.Draw(svgScraper);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return false;
+            }
 
-        public void Add(Drawing drawing)
-        {
-            drawings.Add(drawing);
-            Stale = true;
-        }
+            Drawing svgDrawing = svgScraper.CreateDrawing();
+            svgDrawing.Clip(new Rect(svgSize));
 
-        public void Refresh()
-        {
-            Stale = false;
+            FileName = fileName;
+            Drawing = svgDrawing;
+            Size = svgSize;
+            Modified?.Invoke(this, null);
+
+            return true;
         }
     }
 }

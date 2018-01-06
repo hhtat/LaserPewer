@@ -18,9 +18,11 @@ namespace LaserPewer.Model
 
         public static MachineList MachineList { get { return Instance._machineList; } }
         public static GrblMachine Machine { get { return Instance._machine; } }
+        public static Document Document { get { return Instance._document; } }
 
         private readonly MachineList _machineList;
         private readonly GrblMachine _machine;
+        private readonly Document _document;
 
         private readonly PersistentSettings settings;
         private readonly DispatcherTimer settingsTimer;
@@ -29,6 +31,7 @@ namespace LaserPewer.Model
         {
             _machineList = new MachineList();
             _machine = new GrblMachine();
+            _document = new Document();
 
             _machineList.ProfileAdded += _machineList_EventHandler;
             _machineList.ProfileRemoved += _machineList_EventHandler;

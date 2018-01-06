@@ -5,10 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
-        Title="LaserPewer" Height="600" Width="800">
+        Title="LaserPewer" Height="600" Width="1000">
+    <Window.Resources>
+        <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
+        <local:SizeToStringConverter x:Key="SizeToStringConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="200" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -28,23 +32,23 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="X:" FontSize="32" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
-                    <TextBlock Text="{Binding PositionX}" FontSize="32" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
+                    <TextBlock Text="X:" FontSize="24" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
+                    <TextBlock Text="{Binding PositionX}" FontSize="24" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
 
-                    <TextBlock Text="Y:" FontSize="32" TextAlignment="Right" Grid.Row="1" Grid.Column="0" />
-                    <TextBlock Text="{Binding PositionY}" FontSize="32" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
+                    <TextBlock Text="Y:" FontSize="24" TextAlignment="Right" Grid.Row="1" Grid.Column="0" />
+                    <TextBlock Text="{Binding PositionY}" FontSize="24" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
 
-                    <TextBlock Text="Status" FontSize="18" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                    <TextBlock Text="{Binding Status}" FontSize="24" TextAlignment="Center" Grid.Row="2" Grid.Column="1" />
+                    <TextBlock Text="Status" FontSize="14" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                    <TextBlock Text="{Binding Status}" FontSize="18" TextAlignment="Center" Grid.Row="2" Grid.Column="1" />
 
-                    <TextBlock Text="Alarm" FontSize="18" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
-                    <TextBlock Text="{Binding Alarm}" FontSize="24" TextAlignment="Center" Grid.Row="3" Grid.Column="1" />
+                    <TextBlock Text="Alarm" FontSize="14" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                    <TextBlock Text="{Binding Alarm}" FontSize="18" TextAlignment="Center" Grid.Row="3" Grid.Column="1" />
 
                     <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="14" TextAlignment="Center" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" />
                 </Grid>
             </GroupBox>
 
-            <GroupBox Header="Connection">
+            <GroupBox Header="Machine">
                 <StackPanel>
                     <Grid DataContext="{StaticResource MachineListViewModel}">
                         <Grid.ColumnDefinitions>
@@ -86,21 +90,31 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Drawing">
-                <Grid Height="50">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <GroupBox Header="File" DataContext="{StaticResource DocumentViewModel}">
+                <StackPanel>
+                    <Button Command="{Binding OpenCommand}" Content="Open" />
+                    <Grid Visibility="{Binding Drawing,Converter={StaticResource NullableToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <Button Name="importButton" Click="importButton_Click" Content="Import" Grid.Column="0" />
-                    <Button Content="Clear" Grid.Column="1" />
-                </Grid>
+                        <TextBlock Text="Name:" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
+                        <TextBlock Text="{Binding FriendlyName,Mode=OneWay}" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
+
+                        <TextBlock Text="Size:" TextAlignment="Right" Grid.Row="1" Grid.Column="0" />
+                        <TextBlock Text="{Binding Size,Converter={StaticResource SizeToStringConverter},Mode=OneWay}" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
+                    </Grid>
+                </StackPanel>
             </GroupBox>
         </StackPanel>
 
         <GroupBox Header="Workbench" DataContext="{StaticResource WorkbenchViewModel}" Grid.Column="1">
-            <local:Workbench TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Background="DarkGray" />
+            <local:Workbench ViewCenter="{Binding ViewCenter}" TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Drawing="{Binding Drawing}" Background="DarkGray" />
         </GroupBox>
     </Grid>
 </Window>

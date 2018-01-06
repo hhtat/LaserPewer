@@ -39,6 +39,12 @@ namespace LaserPewer
                     new Point(0.0, 0.0),
                     (d, e) => ((Workbench)d).graphicsStale = true));
 
+        public static readonly DependencyProperty DrawingProperty =
+            DependencyProperty.Register("Drawing", typeof(Model.Drawing), typeof(Workbench),
+                new PropertyMetadata(
+                    null,
+                    (d, e) => ((Workbench)d).graphicsStale = true));
+
         public Size TableSize
         {
             get { return (Size)GetValue(TableSizeProperty); }
@@ -63,7 +69,11 @@ namespace LaserPewer
             set { SetValue(MachinePositionProperty, value); }
         }
 
-        public Document Document { get; private set; }
+        public Model.Drawing Drawing
+        {
+            get { return (Model.Drawing)GetValue(DrawingProperty); }
+            set { SetValue(DrawingProperty, value); }
+        }
 
         private Image mainImage;
         private WriteableBitmap writeableBitmap;
@@ -82,8 +92,6 @@ namespace LaserPewer
             Content = mainImage;
 
             input = new WorkbenchInput(this);
-
-            Document = new Document();
 
             SizeChanged += WorkbenchControl_SizeChanged;
 
@@ -163,7 +171,7 @@ namespace LaserPewer
 
         private void CompositionTarget_Rendering(object sender, System.EventArgs e)
         {
-            if (graphicsStale || Document.Stale)
+            if (graphicsStale)
             {
                 using (writeableBitmap.GetBitmapContext())
                 {
@@ -178,9 +186,9 @@ namespace LaserPewer
 
                     drawPointerMM(MachinePosition.X, MachinePosition.Y, Colors.Red);
 
-                    foreach (Model.Drawing drawing in Document.Drawings)
+                    if (Drawing != null)
                     {
-                        foreach (Model.Drawing.Path path in drawing.Paths)
+                        foreach (Model.Drawing.Path path in Drawing.Paths)
                         {
                             if (path.Points.Count >= 2)
                             {
@@ -199,7 +207,6 @@ namespace LaserPewer
                 }
 
                 graphicsStale = false;
-                Document.Refresh();
             }
         }
     }
