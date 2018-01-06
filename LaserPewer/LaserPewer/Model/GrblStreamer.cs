@@ -79,9 +79,11 @@ namespace LaserPewer.Model
             return trySendCommand("$X");
         }
 
-        public void SendGoRequest()
+        public void SendResumeRequest()
         {
-            throw new NotImplementedException();
+            Debug.WriteLine("SENT: ~");
+            writer.Write('~');
+            writer.Flush();
         }
 
         public void SendHoldRequest()

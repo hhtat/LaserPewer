@@ -66,7 +66,7 @@
 
             <GroupBox Header="Controls" DataContext="{StaticResource MachineViewModel}">
                 <StackPanel>
-                    <Grid Height="50">
+                    <Grid Height="30">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
@@ -77,15 +77,21 @@
                         <Button Command="{Binding HomeCommand}" Content="HOME" Grid.Column="1" />
                         <Button Command="{Binding UnlockCommand}" Content="UNLOCK" Grid.Column="2" />
                     </Grid>
-
-                    <Grid Height="50">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="30" />
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-
-                        <Button Command="{Binding GoCommand}" Content="GO" Grid.Column="0" />
-                        <Button Command="{Binding HoldCommand}" Content="HOLD" Grid.Column="1" />
+                        
+                        <Button Content="START" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" />
+                        <Button Command="{Binding HoldCommand}" Content="HOLD" Grid.Row="0" Grid.Column="1" />
+                        <Button Command="{Binding ResumeCommand}" Content="RESUME" Grid.Row="1" Grid.Column="1" />
+                        <Button Content="STOP" Grid.Row="2" Grid.Column="1" />
                     </Grid>
                 </StackPanel>
             </GroupBox>

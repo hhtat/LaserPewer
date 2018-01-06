@@ -80,9 +80,9 @@ namespace LaserPewer.Model
             wrapStreamerCall(() => streamer.TrySendUnlockRequest());
         }
 
-        public void Go()
+        public void Resume()
         {
-            wrapStreamerCall(() => streamer.SendGoRequest());
+            wrapStreamerCall(() => streamer.SendResumeRequest());
         }
 
         public void Hold()
