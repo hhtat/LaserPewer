@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using LaserPewer.Model;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Input;
-using LaserPewer.Model;
 
 namespace LaserPewer.ViewModel
 {
-    public class MachineListViewModel : INotifyPropertyChanged
+    public class MachineListViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private readonly ObservableCollection<MachineProfileViewModel> profileViewModels;
         private readonly Dictionary<MachineList.IProfile, MachineProfileViewModel> profileToViewModels;
         public ICollectionView Profiles { get { return CollectionViewSource.GetDefaultView(profileViewModels); } }
@@ -101,11 +98,6 @@ namespace LaserPewer.ViewModel
         private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
         {
             Active = profileToViewModels[profile];
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

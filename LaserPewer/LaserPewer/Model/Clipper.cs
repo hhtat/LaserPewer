@@ -42,10 +42,11 @@ namespace LaserPewer.Model
 
                 if (firstPath.Points.First() == lastPath.Points.Last())
                 {
-                    lastPath.Points.RemoveAt(lastPath.Points.Count - 1);
-                    lastPath.Points.AddRange(firstPath.Points);
+                    List<Point> points = new List<Point>();
+                    for (int i = 0; i < lastPath.Points.Count; i++) points.Add(lastPath.Points[i]);
+                    for (int i = 1; i < firstPath.Points.Count; i++) points.Add(firstPath.Points[i]);
+                    paths[0] = new Drawing.Path(points, false);
                     paths.RemoveAt(paths.Count - 1);
-                    paths[0] = lastPath;
                 }
             }
 

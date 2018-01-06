@@ -22,12 +22,27 @@ namespace LaserPewer.Model
                 {
                     string[] tokens = line.Split(' ');
                     if (tokens.Length == 0) continue;
-                    if (tokens[0] == "PROFILE")
+
+                    if (tokens[0] == "MACHINE")
                     {
                         AppCore.MachineList.CreateProfile(
-                            decodeString(tokens[1]),
-                            new Size(decodeDouble(tokens[2]), decodeDouble(tokens[3])),
-                            decodeDouble(tokens[4]));
+                            decodeGuid(tokens[1]),
+                            decodeString(tokens[2]),
+                            new Size(decodeDouble(tokens[3]), decodeDouble(tokens[4])),
+                            decodeDouble(tokens[5]));
+                    }
+
+                    if (tokens[0] == "LAST_MACHINE")
+                    {
+                        Guid uniqueId = decodeGuid(tokens[1]);
+                        MachineList.IProfile lastActive = AppCore.MachineList.Profiles.First(profile => profile.UniqueId == uniqueId);
+                        AppCore.MachineList.Active = lastActive;
+                    }
+
+                    if (tokens[0] == "LAST_VECTOR")
+                    {
+                        AppCore.Generator.VectorPower = decodeDouble(tokens[1]);
+                        AppCore.Generator.VectorSpeed = decodeDouble(tokens[2]);
                     }
                 }
             }
@@ -39,7 +54,9 @@ namespace LaserPewer.Model
             {
                 foreach (MachineList.IProfile profile in AppCore.MachineList.Profiles)
                 {
-                    writer.Write("PROFILE");
+                    writer.Write("MACHINE");
+                    writer.Write(' ');
+                    writer.Write(encode(profile.UniqueId));
                     writer.Write(' ');
                     writer.Write(encode(profile.FriendlyName));
                     writer.Write(' ');
@@ -50,12 +67,34 @@ namespace LaserPewer.Model
                     writer.Write(encode(profile.MaxFeedRate));
                     writer.WriteLine();
                 }
+
+                writer.Write("LAST_MACHINE");
+                writer.Write(' ');
+                writer.Write(encode(AppCore.MachineList.Active.UniqueId));
+                writer.WriteLine();
+
+                writer.Write("LAST_VECTOR");
+                writer.Write(' ');
+                writer.Write(encode(AppCore.Generator.VectorPower));
+                writer.Write(' ');
+                writer.Write(encode(AppCore.Generator.VectorSpeed));
+                writer.WriteLine();
             }
         }
 
         private static string getConfigPath()
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".lspewer");
+        }
+
+        private static string encode(Guid g)
+        {
+            return Convert.ToBase64String(g.ToByteArray());
+        }
+
+        private static Guid decodeGuid(string s)
+        {
+            return new Guid(Convert.FromBase64String(s));
         }
 
         private static string encode(double d)

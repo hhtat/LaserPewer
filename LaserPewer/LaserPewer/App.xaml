@@ -8,6 +8,7 @@
         <vm:DocumentViewModel x:Key="DocumentViewModel" />
         <vm:MachineListViewModel x:Key="MachineListViewModel" />
         <vm:MachineViewModel x:Key="MachineViewModel" />
+        <vm:ProgramGeneratorViewModel x:Key="ProgramGeneratorViewModel" />
         <vm:WorkbenchViewModel x:Key="WorkbenchViewModel" />
     </Application.Resources>
 </Application>

@@ -1,15 +1,11 @@
 ﻿using LaserPewer.Model;
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace LaserPewer.ViewModel
 {
-    public class WorkbenchViewModel : INotifyPropertyChanged
+    public class WorkbenchViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private Point _viewCenter;
         public Point ViewCenter
         {
@@ -46,13 +42,13 @@ namespace LaserPewer.ViewModel
 
         private void MachineProfile_Modified(object sender, EventArgs e)
         {
-            NotifyPropertyChanged("MachineSize");
+            NotifyPropertyChanged(nameof(MachineSize));
         }
 
         private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
         {
             ViewCenter = new Point(profile.TableSize.Width / 2.0, profile.TableSize.Height / 2.0);
-            NotifyPropertyChanged("MachineSize");
+            NotifyPropertyChanged(nameof(MachineSize));
             profile.Modified += MachineProfile_Modified;
             if (old != null) old.Modified -= MachineProfile_Modified;
         }
@@ -64,12 +60,7 @@ namespace LaserPewer.ViewModel
 
         private void Document_Modified(object sender, EventArgs e)
         {
-            NotifyPropertyChanged("Drawing");
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            NotifyPropertyChanged(nameof(Drawing));
         }
     }
 }

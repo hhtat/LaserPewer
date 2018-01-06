@@ -1,34 +1,34 @@
 ﻿using LaserPewer.Model;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace LaserPewer.ViewModel
 {
-    class DocumentViewModel : INotifyPropertyChanged
+    class DocumentViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public string FriendlyName
         {
             get
             {
-                if (AppCore.Document.FileName == null) return string.Empty;
+                if (AppCore.Document.FileName == null) return FIELD_PLACEHOLDER;
                 return Path.GetFileName(AppCore.Document.FileName);
             }
         }
 
         public Drawing Drawing { get { return AppCore.Document.Drawing; } }
 
-        public Size Size { get { return AppCore.Document.Size; } }
+        public string Size
+        {
+            get
+            {
+                if (AppCore.Document.FileName == null) return FIELD_PLACEHOLDER;
+                return AppCore.Document.Size.Width.ToString("F0", CultureInfo.InvariantCulture) + "x" +
+                    AppCore.Document.Size.Height.ToString("F0", CultureInfo.InvariantCulture) + "mm";
+            }
+        }
 
         private readonly RelayCommand _openCommand;
         public ICommand OpenCommand { get { return _openCommand; } }
@@ -52,14 +52,9 @@ namespace LaserPewer.ViewModel
 
         private void Document_Modified(object sender, EventArgs e)
         {
-            NotifyPropertyChanged("FriendlyName");
-            NotifyPropertyChanged("Drawing");
-            NotifyPropertyChanged("Size");
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            NotifyPropertyChanged(nameof(FriendlyName));
+            NotifyPropertyChanged(nameof(Drawing));
+            NotifyPropertyChanged(nameof(Size));
         }
     }
 }

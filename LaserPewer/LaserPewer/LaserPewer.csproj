@@ -61,7 +61,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="SizeToStringConverter.cs" />
+    <Compile Include="DoubleToPercentConverter.cs" />
     <Compile Include="MachineListWindow.xaml.cs">
       <DependentUpon>MachineListWindow.xaml</DependentUpon>
     </Compile>
@@ -79,10 +79,13 @@
     <Compile Include="Model\Drawing.cs" />
     <Compile Include="DoubleToStringConverter.cs" />
     <Compile Include="NullableToVisibilityConverter.cs" />
+    <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\DocumentViewModel.cs" />
     <Compile Include="ViewModel\MachineListViewModel.cs" />
     <Compile Include="ViewModel\MachineProfileViewModel.cs" />
     <Compile Include="ViewModel\MachineViewModel.cs" />
+    <Compile Include="Model\ProgramGenerator.cs" />
+    <Compile Include="ViewModel\ProgramGeneratorViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\WorkbenchViewModel.cs" />
     <Compile Include="Workbench.cs" />

@@ -7,13 +7,14 @@
         mc:Ignorable="d"
         Title="LaserPewer" Height="600" Width="1000">
     <Window.Resources>
+        <local:DoubleToPercentConverter x:Key="DoubleToPercentConverter" />
         <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
-        <local:SizeToStringConverter x:Key="SizeToStringConverter" />
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="200" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
@@ -87,7 +88,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        
+
                         <Button Content="START" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" />
                         <Button Command="{Binding HoldCommand}" Content="HOLD" Grid.Row="0" Grid.Column="1" />
                         <Button Command="{Binding ResumeCommand}" Content="RESUME" Grid.Row="1" Grid.Column="1" />
@@ -99,7 +100,7 @@
             <GroupBox Header="File" DataContext="{StaticResource DocumentViewModel}">
                 <StackPanel>
                     <Button Command="{Binding OpenCommand}" Content="Open" />
-                    <Grid Visibility="{Binding Drawing,Converter={StaticResource NullableToVisibilityConverter}}">
+                    <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -109,11 +110,11 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Name:" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
+                        <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0" />
                         <TextBlock Text="{Binding FriendlyName,Mode=OneWay}" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
 
-                        <TextBlock Text="Size:" TextAlignment="Right" Grid.Row="1" Grid.Column="0" />
-                        <TextBlock Text="{Binding Size,Converter={StaticResource SizeToStringConverter},Mode=OneWay}" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
+                        <TextBlock Text="Size:" Grid.Row="1" Grid.Column="0" />
+                        <TextBlock Text="{Binding Size}" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
                     </Grid>
                 </StackPanel>
             </GroupBox>
@@ -122,5 +123,23 @@
         <GroupBox Header="Workbench" DataContext="{StaticResource WorkbenchViewModel}" Grid.Column="1">
             <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" ViewCenter="{Binding ViewCenter}" TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Drawing="{Binding Drawing}" Background="DarkGray" />
         </GroupBox>
+
+        <StackPanel Grid.Column="2">
+            <GroupBox Header="Cut" DataContext="{StaticResource ProgramGeneratorViewModel}">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="Power" />
+                        <TextBlock Text="{Binding VectorPower,Converter={StaticResource DoubleToPercentConverter}}" TextAlignment="Right" />
+                    </Grid>
+                    <Slider Value="{Binding VectorPower}" Minimum="0.0" Maximum="1.0" TickPlacement="TopLeft" TickFrequency="0.05" IsSnapToTickEnabled="True" />
+
+                    <Grid>
+                        <TextBlock Text="Speed" />
+                        <TextBlock Text="{Binding VectorSpeed,Converter={StaticResource DoubleToPercentConverter}}" TextAlignment="Right" />
+                    </Grid>
+                    <Slider Value="{Binding VectorSpeed}" Minimum="0.0" Maximum="1.0" TickPlacement="TopLeft" TickFrequency="0.05" IsSnapToTickEnabled="True" />
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
     </Grid>
 </Window>

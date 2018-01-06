@@ -1,18 +1,12 @@
 ﻿using LaserPewer.Model;
 using System;
-using System.ComponentModel;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 namespace LaserPewer.ViewModel
 {
-    public class MachineViewModel : INotifyPropertyChanged
+    public class MachineViewModel : BaseViewModel
     {
-        private const string FIELD_PLACEHOLDER = "-";
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private string _positionX;
         public string PositionX
         {
@@ -136,11 +130,6 @@ namespace LaserPewer.ViewModel
         private static string toDisplayString(double value)
         {
             return value.ToString("F3", CultureInfo.InvariantCulture);
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -37,7 +37,12 @@ namespace LaserPewer.Model
 
         public void CreateProfile(string friendlyName, Size tableSize, double maxFeedRate)
         {
-            Profile profile = new Profile(friendlyName, tableSize, maxFeedRate);
+            CreateProfile(Guid.NewGuid(), friendlyName, tableSize, maxFeedRate);
+        }
+
+        public void CreateProfile(Guid uniqueId, string friendlyName, Size tableSize, double maxFeedRate)
+        {
+            Profile profile = new Profile(uniqueId, friendlyName, tableSize, maxFeedRate);
             profiles.Add(profile);
             profile.Modified += Profile_Modified;
             ProfileAdded?.Invoke(this, profile);
@@ -60,6 +65,8 @@ namespace LaserPewer.Model
         {
             event EventHandler Modified;
 
+            Guid UniqueId { get; }
+
             string FriendlyName { get; set; }
             Size TableSize { get; set; }
             double MaxFeedRate { get; set; }
@@ -68,6 +75,8 @@ namespace LaserPewer.Model
         private class Profile : IProfile
         {
             public event EventHandler Modified;
+
+            public Guid UniqueId { get; private set; }
 
             private string _friendlyName;
             public string FriendlyName
@@ -90,8 +99,9 @@ namespace LaserPewer.Model
                 set { _maxFeedRate = value; Modified?.Invoke(this, null); }
             }
 
-            public Profile(string friendlyName, Size tableSize, double maxFeedRate)
+            public Profile(Guid uniqueId, string friendlyName, Size tableSize, double maxFeedRate)
             {
+                UniqueId = uniqueId;
                 FriendlyName = friendlyName;
                 TableSize = tableSize;
                 MaxFeedRate = maxFeedRate;

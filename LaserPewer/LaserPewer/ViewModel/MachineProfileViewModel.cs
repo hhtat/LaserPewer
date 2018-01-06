@@ -1,15 +1,11 @@
 ﻿using LaserPewer.Model;
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace LaserPewer.ViewModel
 {
-    public class MachineProfileViewModel : INotifyPropertyChanged
+    public class MachineProfileViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public readonly MachineList.IProfile Model;
 
         public string FriendlyName
@@ -17,9 +13,9 @@ namespace LaserPewer.ViewModel
             get { return Model.FriendlyName; }
             set
             {
-                if (value.Length > 0) Model.FriendlyName = value;
+                if (Model.FriendlyName != value && value.Length > 0) Model.FriendlyName = value;
                 NotifyPropertyChanged();
-                NotifyPropertyChanged("ListDisplayName");
+                NotifyPropertyChanged(nameof(ListDisplayName));
             }
         }
 
@@ -37,7 +33,10 @@ namespace LaserPewer.ViewModel
             get { return Model.TableSize.Width; }
             set
             {
-                if (value > 0.0 && value < 1000.0) Model.TableSize = new Size(value, TableHeight);
+                if (Model.TableSize.Width != value && value > 0.0 && value < 1000.0)
+                {
+                    Model.TableSize = new Size(value, TableHeight);
+                }
                 NotifyPropertyChanged();
             }
         }
@@ -47,7 +46,10 @@ namespace LaserPewer.ViewModel
             get { return Model.TableSize.Height; }
             set
             {
-                if (value > 0.0 && value < 1000.0) Model.TableSize = new Size(TableWidth, value);
+                if (Model.TableSize.Height != value && value > 0.0 && value < 1000.0)
+                {
+                    Model.TableSize = new Size(TableWidth, value);
+                }
                 NotifyPropertyChanged();
             }
         }
@@ -57,7 +59,10 @@ namespace LaserPewer.ViewModel
             get { return Model.MaxFeedRate; }
             set
             {
-                if (value > 0.0 && value < 100000.0) Model.MaxFeedRate = value;
+                if (Model.MaxFeedRate != value && value > 0.0 && value < 100000.0)
+                {
+                    Model.MaxFeedRate = value;
+                }
                 NotifyPropertyChanged();
             }
         }
@@ -71,21 +76,16 @@ namespace LaserPewer.ViewModel
 
         private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
         {
-            if (Model == profile || Model == old) NotifyPropertyChanged("ListDisplayName");
+            if (Model == profile || Model == old) NotifyPropertyChanged(nameof(ListDisplayName));
         }
 
         private void Profile_Modified(object sender, EventArgs e)
         {
-            NotifyPropertyChanged("FriendlyName");
-            NotifyPropertyChanged("ListDisplayName");
-            NotifyPropertyChanged("TableWidth");
-            NotifyPropertyChanged("TableHeight");
-            NotifyPropertyChanged("MaxFeedRate");
-        }
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            NotifyPropertyChanged(nameof(FriendlyName));
+            NotifyPropertyChanged(nameof(ListDisplayName));
+            NotifyPropertyChanged(nameof(TableWidth));
+            NotifyPropertyChanged(nameof(TableHeight));
+            NotifyPropertyChanged(nameof(MaxFeedRate));
         }
     }
 }

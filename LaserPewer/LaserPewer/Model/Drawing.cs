@@ -6,7 +6,7 @@ namespace LaserPewer.Model
 {
     public class Drawing
     {
-        public List<Path> Paths;
+        public IReadOnlyList<Path> Paths { get; private set; }
 
         public Drawing(List<Path> paths)
         {
@@ -27,9 +27,14 @@ namespace LaserPewer.Model
             Paths = paths;
         }
 
+        public Drawing Clone()
+        {
+            return new Drawing(new List<Path>(Paths));
+        }
+
         public class Path
         {
-            public readonly List<Point> Points;
+            public readonly IReadOnlyList<Point> Points;
             public readonly bool Closed;
 
             public Path(List<Point> points, bool closed)
