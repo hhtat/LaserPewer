@@ -34,7 +34,7 @@ namespace LaserPewer.ViewModel
             {
                 ViewCenter = new Point(
                     AppCore.MachineList.Active.TableSize.Width / 2.0,
-                    AppCore.MachineList.Active.TableSize.Height / 2.0);
+                    -AppCore.MachineList.Active.TableSize.Height / 2.0);
                 AppCore.MachineList.Active.Modified += MachineProfile_Modified;
             }
 

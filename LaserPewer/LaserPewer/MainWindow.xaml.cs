@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Model;
 using System.Windows;
+using System.Windows.Input;
 
 namespace LaserPewer
 {
@@ -36,6 +37,12 @@ namespace LaserPewer
             }
 
             Opacity = 1.0;
+        }
+
+        private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Point point = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
+            AppCore.Machine.Jog(point.X, point.Y, AppCore.MachineList.Active.MaxFeedRate);
         }
     }
 }

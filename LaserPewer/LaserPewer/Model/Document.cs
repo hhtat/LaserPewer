@@ -33,7 +33,7 @@ namespace LaserPewer.Model
             }
 
             Drawing svgDrawing = svgScraper.CreateDrawing();
-            svgDrawing.Clip(new Rect(svgSize));
+            svgDrawing.Clip(new Rect(0.0, -svgSize.Height, svgSize.Width, svgSize.Height));
 
             FileName = fileName;
             Drawing = svgDrawing;

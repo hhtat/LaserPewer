@@ -114,7 +114,7 @@
         </StackPanel>
 
         <GroupBox Header="Workbench" DataContext="{StaticResource WorkbenchViewModel}" Grid.Column="1">
-            <local:Workbench ViewCenter="{Binding ViewCenter}" TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Drawing="{Binding Drawing}" Background="DarkGray" />
+            <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" ViewCenter="{Binding ViewCenter}" TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Drawing="{Binding Drawing}" Background="DarkGray" />
         </GroupBox>
     </Grid>
 </Window>

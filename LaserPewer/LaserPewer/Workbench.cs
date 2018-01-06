@@ -109,7 +109,7 @@ namespace LaserPewer
             Point offsetGraphics = TranslatePoint(offset, mainImage);
             return new Point(
                 ViewCenter.X + (offsetGraphics.X - graphicsCenter.X) / ViewZoom,
-                ViewCenter.Y + (offsetGraphics.Y - graphicsCenter.Y) / ViewZoom);
+                ViewCenter.Y - (offsetGraphics.Y - graphicsCenter.Y) / ViewZoom);
         }
 
         public Point GetOffsetAtPointMM(Point pointMM)
@@ -148,7 +148,7 @@ namespace LaserPewer
 
         private double fwdYd(double y)
         {
-            return graphicsCenter.Y + ViewZoom * (y - ViewCenter.Y);
+            return graphicsCenter.Y - ViewZoom * (y - ViewCenter.Y);
         }
 
         private int fwdXi(double x)
@@ -169,7 +169,7 @@ namespace LaserPewer
             graphicsStale = true;
         }
 
-        private void CompositionTarget_Rendering(object sender, System.EventArgs e)
+        private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
             if (graphicsStale)
             {
@@ -177,12 +177,12 @@ namespace LaserPewer
                 {
                     writeableBitmap.Clear();
 
-                    fillRectMM(0.0, 0.0, TableSize.Width, TableSize.Height, Colors.White);
+                    fillRectMM(0.0, 0.0, TableSize.Width, -TableSize.Height, Colors.White);
 
-                    for (int x = 10; x < TableSize.Width; x += 10) drawLineMM(x, 0.0, x, TableSize.Height, Color.FromRgb(0xF0, 0xF0, 0xF0));
-                    for (int y = 10; y < TableSize.Height; y += 10) drawLineMM(0.0, y, TableSize.Width, y, Color.FromRgb(0xF0, 0xF0, 0xF0));
-                    for (int x = 50; x < TableSize.Width; x += 50) drawLineMM(x, 0.0, x, TableSize.Height, Color.FromRgb(0xE0, 0xE0, 0xE0));
-                    for (int y = 50; y < TableSize.Height; y += 50) drawLineMM(0.0, y, TableSize.Width, y, Color.FromRgb(0xE0, 0xE0, 0xE0));
+                    for (int x = 10; x < TableSize.Width; x += 10) drawLineMM(x, 0.0, x, -TableSize.Height, Color.FromRgb(0xF0, 0xF0, 0xF0));
+                    for (int y = 10; y < TableSize.Height; y += 10) drawLineMM(0.0, -y, TableSize.Width, -y, Color.FromRgb(0xF0, 0xF0, 0xF0));
+                    for (int x = 50; x < TableSize.Width; x += 50) drawLineMM(x, 0.0, x, -TableSize.Height, Color.FromRgb(0xE0, 0xE0, 0xE0));
+                    for (int y = 50; y < TableSize.Height; y += 50) drawLineMM(0.0, -y, TableSize.Width, -y, Color.FromRgb(0xE0, 0xE0, 0xE0));
 
                     drawPointerMM(MachinePosition.X, MachinePosition.Y, Colors.Red);
 

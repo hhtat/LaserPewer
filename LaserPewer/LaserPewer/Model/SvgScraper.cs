@@ -85,11 +85,11 @@ namespace LaserPewer.Model
                 {
                     case POINT_TYPE_START:
                         pathBuilder.StartPath();
-                        pathBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
+                        pathBuilder.AddPoint(mmpd * point.X, mmpd * -point.Y);
                         lastPoint = point;
                         break;
                     case POINT_TYPE_LINE:
-                        pathBuilder.AddPoint(mmpd * point.X, mmpd * point.Y);
+                        pathBuilder.AddPoint(mmpd * point.X, mmpd * -point.Y);
                         lastPoint = point;
                         break;
                     case POINT_TYPE_BEZIER:
@@ -175,7 +175,7 @@ namespace LaserPewer.Model
         private void traceBezier(PointF a, PointF b, PointF c, PointF d)
         {
             adaptiveBezier(mmpd * a.X, mmpd * a.Y, mmpd * b.X, mmpd * b.Y, mmpd * c.X, mmpd * c.Y, mmpd * d.X, mmpd * d.Y, 0);
-            pathBuilder.AddPoint(mmpd * d.X, mmpd * d.Y); ;
+            pathBuilder.AddPoint(mmpd * d.X, mmpd * -d.Y); ;
         }
 
         void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, int depth)
@@ -202,7 +202,7 @@ namespace LaserPewer.Model
             if ((d2 + d3) * (d2 + d3) < TOLERANCE_MM_SQ * (dx * dx + dy * dy) ||
                 depth >= ADAPTIVE_BEZIER_MAX_DEPTH)
             {
-                pathBuilder.AddPoint(x1234, y1234);
+                pathBuilder.AddPoint(x1234, -y1234);
                 return;
             }
 
