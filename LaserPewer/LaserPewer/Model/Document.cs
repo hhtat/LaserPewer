@@ -1,4 +1,5 @@
-﻿using Svg;
+﻿using LaserPewer.Utilities;
+using Svg;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -22,8 +23,8 @@ namespace LaserPewer.Model
             {
                 SvgDocument svgDocument = SvgDocument.Open(fileName);
                 svgSize = new Size(
-                    Optimizer.Round3(svgScraper.GetWidth(svgDocument)),
-                    Optimizer.Round3(svgScraper.GetHeight(svgDocument)));
+                    Precision.Round3(svgScraper.GetWidth(svgDocument)),
+                    Precision.Round3(svgScraper.GetHeight(svgDocument)));
                 svgDocument.Draw(svgScraper);
             }
             catch (Exception e)

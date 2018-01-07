@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Linq;
+using LaserPewer.Utilities;
 
 namespace LaserPewer.Model
 {
@@ -12,14 +13,13 @@ namespace LaserPewer.Model
         {
             PathBuilder pathBuilder = new PathBuilder();
 
-            Point prev = Optimizer.Round3(path.Points[0]);
+            Point prev = Precision.Round3(path.Points[0]);
             pathBuilder.AddPoint(prev);
 
             for (int i = 1; i <= path.Points.Count; i++)
             {
-                int j = i % path.Points.Count;
-                if (j == 0 && !path.Closed) break;
-                Point point = Optimizer.Round3(path.Points[j]);
+                if (i == path.Points.Count && !path.Closed) break;
+                Point point = Precision.Round3(path.Points[i % path.Points.Count]);
 
                 Point a = prev;
                 Point b = point;
@@ -89,10 +89,10 @@ namespace LaserPewer.Model
 
             Point _a = a;
 
-            a.X = Optimizer.Round3(_a.X + t0 * delta.X);
-            a.Y = Optimizer.Round3(_a.Y + t0 * delta.Y);
-            b.X = Optimizer.Round3(_a.X + t1 * delta.X);
-            b.Y = Optimizer.Round3(_a.Y + t1 * delta.Y);
+            a.X = Precision.Round3(_a.X + t0 * delta.X);
+            a.Y = Precision.Round3(_a.Y + t0 * delta.Y);
+            b.X = Precision.Round3(_a.X + t1 * delta.X);
+            b.Y = Precision.Round3(_a.Y + t1 * delta.Y);
 
             return true;
         }

@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Model;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace LaserPewer.ViewModel
@@ -24,6 +25,22 @@ namespace LaserPewer.ViewModel
 
         public Drawing Drawing { get { return AppCore.Document.Drawing; } }
 
+        public IReadOnlyList<Point> MachinePath { get { return AppCore.Generator.VectorPath; } }
+
+        public int MachinePathFrame { get { return MachinePath != null ? (int)Math.Round(MachinePathProgress * MachinePath.Count) : 0; } }
+
+        private double _machinePathProgress;
+        public double MachinePathProgress
+        {
+            get { return _machinePathProgress; }
+            set
+            {
+                _machinePathProgress = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(MachinePathFrame));
+            }
+        }
+
         public WorkbenchViewModel()
         {
             if (AppCore.MachineList.Active != null)
@@ -38,6 +55,8 @@ namespace LaserPewer.ViewModel
             AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
 
             AppCore.Document.Modified += Document_Modified;
+
+            AppCore.Generator.Generated += Generator_Generated;
         }
 
         private void MachineProfile_Modified(object sender, EventArgs e)
@@ -61,6 +80,12 @@ namespace LaserPewer.ViewModel
         private void Document_Modified(object sender, EventArgs e)
         {
             NotifyPropertyChanged(nameof(Drawing));
+        }
+
+        private void Generator_Generated(object sender, EventArgs e)
+        {
+            NotifyPropertyChanged(nameof(MachinePath));
+            MachinePathProgress = 1.0;
         }
     }
 }

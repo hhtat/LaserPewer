@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
 
-namespace LaserPewer.Model
+namespace LaserPewer.Utilities
 {
-    public class Optimizer
+    public class Precision
     {
         public static double Round3(double value)
         {

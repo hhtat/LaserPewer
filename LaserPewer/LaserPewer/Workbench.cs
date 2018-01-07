@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Model;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -45,6 +46,18 @@ namespace LaserPewer
                     null,
                     (d, e) => ((Workbench)d).graphicsStale = true));
 
+        public static readonly DependencyProperty MachinePathProperty =
+            DependencyProperty.Register("MachinePath", typeof(IReadOnlyList<Point>), typeof(Workbench),
+                new PropertyMetadata(
+                    null,
+                    (d, e) => ((Workbench)d).graphicsStale = true));
+
+        public static readonly DependencyProperty MachinePathFrameProperty =
+            DependencyProperty.Register("MachinePathFrame", typeof(int), typeof(Workbench),
+                new PropertyMetadata(
+                    0,
+                    (d, e) => ((Workbench)d).graphicsStale = true));
+
         public Size TableSize
         {
             get { return (Size)GetValue(TableSizeProperty); }
@@ -73,6 +86,18 @@ namespace LaserPewer
         {
             get { return (Model.Drawing)GetValue(DrawingProperty); }
             set { SetValue(DrawingProperty, value); }
+        }
+
+        public IReadOnlyList<Point> MachinePath
+        {
+            get { return (IReadOnlyList<Point>)GetValue(MachinePathProperty); }
+            set { SetValue(MachinePathProperty, value); }
+        }
+
+        public int MachinePathFrame
+        {
+            get { return (int)GetValue(MachinePathFrameProperty); }
+            set { SetValue(MachinePathFrameProperty, value); }
         }
 
         private Image mainImage;
@@ -195,13 +220,24 @@ namespace LaserPewer
                                 Point prev = path.Points[0];
                                 for (int i = 1; i < path.Points.Count + 1; i++)
                                 {
-                                    int j = i % path.Points.Count;
-                                    if (j == 0 && !path.Closed) break;
-                                    Point point = path.Points[j];
-                                    drawLineMM(prev.X, prev.Y, point.X, point.Y, j % 2 == 0 ? Colors.Red : Colors.Green);
+                                    if (i == path.Points.Count && !path.Closed) break;
+                                    Point point = path.Points[i % path.Points.Count];
+                                    drawLineMM(prev.X, prev.Y, point.X, point.Y, i % 2 == 0 ? Colors.LightBlue : Colors.LightGreen);
                                     prev = point;
                                 }
                             }
+                        }
+                    }
+
+                    if (MachinePath != null)
+                    {
+                        Point prev = new Point(0.0, 0.0);
+                        int indexCap = Math.Min(MachinePathFrame, MachinePath.Count);
+                        for (int i = 0; i < indexCap; i++)
+                        {
+                            Point point = MachinePath[i];
+                            drawLineMM(prev.X, prev.Y, point.X, point.Y, Colors.Red);
+                            prev = point;
                         }
                     }
                 }

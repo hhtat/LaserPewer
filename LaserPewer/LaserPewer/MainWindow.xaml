@@ -121,7 +121,15 @@
         </StackPanel>
 
         <GroupBox Header="Workbench" DataContext="{StaticResource WorkbenchViewModel}" Grid.Column="1">
-            <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" ViewCenter="{Binding ViewCenter}" TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Drawing="{Binding Drawing}" Background="DarkGray" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" ViewCenter="{Binding ViewCenter}" TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Drawing="{Binding Drawing}" MachinePath="{Binding MachinePath}" MachinePathFrame="{Binding MachinePathFrame}" Background="DarkGray" Grid.Row="0" />
+                <Slider Value="{Binding MachinePathProgress}" Minimum="0.0" Maximum="1.0" Grid.Row="1" />
+            </Grid>
         </GroupBox>
 
         <StackPanel Grid.Column="2">
@@ -138,6 +146,8 @@
                         <TextBlock Text="{Binding VectorSpeed,Converter={StaticResource DoubleToPercentConverter}}" TextAlignment="Right" />
                     </Grid>
                     <Slider Value="{Binding VectorSpeed}" Minimum="0.0" Maximum="1.0" TickPlacement="TopLeft" TickFrequency="0.05" IsSnapToTickEnabled="True" />
+
+                    <Button Command="{Binding GenerateCommand}" Content="Generate" />
                 </StackPanel>
             </GroupBox>
         </StackPanel>

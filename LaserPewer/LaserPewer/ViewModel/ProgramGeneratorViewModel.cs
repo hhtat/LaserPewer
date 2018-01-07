@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Model;
 using System;
+using System.Windows.Input;
 
 namespace LaserPewer.ViewModel
 {
@@ -33,8 +34,13 @@ namespace LaserPewer.ViewModel
             }
         }
 
+        private RelayCommand _generateCommand;
+        public ICommand GenerateCommand { get { return _generateCommand; } }
+
         public ProgramGeneratorViewModel()
         {
+            _generateCommand = new RelayCommand(parameter => AppCore.Generator.Generate());
+
             AppCore.Generator.SettingModified += ProgramGenerator_SettingModified;
         }
 

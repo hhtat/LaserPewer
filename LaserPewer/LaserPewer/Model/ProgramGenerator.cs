@@ -1,4 +1,7 @@
-﻿using System;
+﻿using LaserPewer.Model.Generation;
+using System;
+using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace LaserPewer.Model
@@ -6,6 +9,7 @@ namespace LaserPewer.Model
     public class ProgramGenerator
     {
         public event EventHandler SettingModified;
+        public event EventHandler Generated;
 
         private double _vectorPower;
         public double VectorPower
@@ -29,10 +33,39 @@ namespace LaserPewer.Model
             }
         }
 
+        public IReadOnlyList<Point> VectorPath
+        {
+            get
+            {
+                return vectorGeneration != null ? vectorGeneration.VectorPath : null;
+            }
+        }
+
+        private VectorGeneration vectorGeneration;
+
         public ProgramGenerator()
         {
             VectorPower = 1.0;
             VectorSpeed = 1.0;
+        }
+
+        public void Generate()
+        {
+            if (AppCore.Document.Drawing == null) return;
+
+            Drawing drawing = AppCore.Document.Drawing.Clone();
+            drawing.Clip(new Rect(
+                0.0, -AppCore.MachineList.Active.TableSize.Height,
+                AppCore.MachineList.Active.TableSize.Width, AppCore.MachineList.Active.TableSize.Height));
+
+            vectorGeneration = new VectorGeneration(VectorPower, VectorSpeed, drawing.Paths);
+            vectorGeneration.GenerationCompleted += VectorGeneration_GenerationCompleted;
+            vectorGeneration.GenerateAsync();
+        }
+
+        private void VectorGeneration_GenerationCompleted(object sender, EventArgs e)
+        {
+            Generated?.Invoke(this, null);
         }
     }
 }
