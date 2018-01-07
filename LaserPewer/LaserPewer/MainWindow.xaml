@@ -242,6 +242,8 @@
 
                     <Button Command="{Binding GenerateCommand}"
                             Content="Generate" />
+
+                    <Button Name="viewGCodeButton" Click="viewGCodeButton_Click" Content="View G-Code" />
                 </StackPanel>
             </GroupBox>
         </StackPanel>

@@ -31,12 +31,8 @@ namespace LaserPewer.Model
             }
         }
 
-        public MachinePath VectorPath
-        {
-            get { return vectorGeneration != null ? vectorGeneration.VectorPath : null; }
-        }
-
-        private VectorGeneration vectorGeneration;
+        public MachinePath VectorPath { get; private set; }
+        public string GCodeProgram { get; private set; }
 
         public ProgramGenerator()
         {
@@ -44,18 +40,24 @@ namespace LaserPewer.Model
             VectorSpeed = 1.0;
         }
 
-        public void Generate()
+        public void Clear()
         {
-            if (AppCore.Document.Drawing == null) return;
+            VectorPath = null;
+        }
 
-            Drawing drawing = AppCore.Document.Drawing.Clone();
+        public void Generate(Drawing drawing, Size tableSize, double maxFeedRate)
+        {
+            if (drawing == null) return;
+
+            drawing = drawing.Clone();
             drawing.Clip(new Rect(
-                0.0, -AppCore.MachineList.Active.TableSize.Height,
-                AppCore.MachineList.Active.TableSize.Width, AppCore.MachineList.Active.TableSize.Height));
+                0.0, -tableSize.Height,
+                tableSize.Width, tableSize.Height));
 
-            vectorGeneration = new VectorGeneration(VectorPower, VectorSpeed, drawing.Paths);
-            vectorGeneration.GenerationCompleted += VectorGeneration_GenerationCompleted;
-            vectorGeneration.GenerateAsync();
+            VectorPath = VectorGenerator.Generate(drawing.Paths, VectorPower, VectorSpeed);
+            GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, maxFeedRate);
+
+            Generated?.Invoke(this, null);
         }
 
         private void VectorGeneration_GenerationCompleted(object sender, EventArgs e)

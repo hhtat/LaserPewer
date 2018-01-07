@@ -1,0 +1,15 @@
+﻿<Window x:Class="LaserPewer.ProgramViewerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LaserPewer"
+        mc:Ignorable="d"
+        Title="Program"
+        WindowStartupLocation="CenterOwner"
+        Width="600"
+        Height="500">
+    <Grid DataContext="{StaticResource ProgramGeneratorViewModel}">
+        <TextBox Text="{Binding GCode,Mode=OneWay}" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+    </Grid>
+</Window>

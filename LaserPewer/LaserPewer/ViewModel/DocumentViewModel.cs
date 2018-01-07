@@ -47,6 +47,7 @@ namespace LaserPewer.ViewModel
             if (dialog.ShowDialog() ?? false)
             {
                 AppCore.Document.LoadSVG(dialog.FileName);
+                AppCore.Generator.Clear();
             }
         }
 

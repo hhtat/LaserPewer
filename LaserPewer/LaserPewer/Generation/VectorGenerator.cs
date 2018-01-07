@@ -6,28 +6,9 @@ using System.Windows;
 
 namespace LaserPewer.Generation
 {
-    public class VectorGeneration
+    public static class VectorGenerator
     {
-        public event EventHandler GenerationCompleted;
-
-        public readonly MachinePath VectorPath;
-
-        private readonly double power;
-        private readonly double speed;
-
-        private readonly List<Drawing.Path> inputPaths;
-
-        public VectorGeneration(double power, double speed, IReadOnlyList<Drawing.Path> paths)
-        {
-            VectorPath = new MachinePath();
-
-            this.power = power;
-            this.speed = speed;
-
-            inputPaths = new List<Drawing.Path>(paths);
-        }
-
-        public async void GenerateAsync()
+        public static MachinePath Generate(IReadOnlyList<Drawing.Path> inputPaths, double power, double speed)
         {
             StopWatch stopWatch = new StopWatch();
 
@@ -113,7 +94,9 @@ namespace LaserPewer.Generation
 
             stopWatch.TraceLap("Paths sequenced");
 
-            VectorPath.SetPowerAndSpeed(power, speed);
+            MachinePath machinePath = new MachinePath();
+
+            machinePath.SetPowerAndSpeed(power, speed);
 
             foreach (PathInfo path in paths)
             {
@@ -121,28 +104,28 @@ namespace LaserPewer.Generation
                 {
                     for (int i = 0; i <= path.Path.Points.Count; i++)
                     {
-                        VectorPath.TravelTo(path.Path.Points[(path.StartIndex + i) % path.Path.Points.Count]);
+                        machinePath.TravelTo(path.Path.Points[(path.StartIndex + i) % path.Path.Points.Count]);
                     }
                 }
                 else if (path.StartIndex == 0)
                 {
                     for (int i = 0; i < path.Path.Points.Count; i++)
                     {
-                        VectorPath.TravelTo(path.Path.Points[i]);
+                        machinePath.TravelTo(path.Path.Points[i]);
                     }
                 }
                 else
                 {
                     for (int i = path.Path.Points.Count - 1; i >= 0; i--)
                     {
-                        VectorPath.TravelTo(path.Path.Points[i]);
+                        machinePath.TravelTo(path.Path.Points[i]);
                     }
                 }
 
-                VectorPath.EndCut();
+                machinePath.EndCut();
             }
 
-            GenerationCompleted?.Invoke(this, null);
+            return machinePath;
         }
 
         private class PathInfo

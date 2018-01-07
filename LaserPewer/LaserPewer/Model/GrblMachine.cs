@@ -92,7 +92,7 @@ namespace LaserPewer.Model
 
         public void Jog(double x, double y, double rate)
         {
-            string line = "$J=G21 G90 X" + ToGcode(x) + " Y" + ToGcode(y) + " F" + ToGcode(rate);
+            string line = string.Format(CultureInfo.InvariantCulture, "$J=G21 G90 X{0:F3} Y{1:F3} F{2:F3}", x, y, rate);
             wrapStreamerCall(() => streamer.TrySendCommand(line));
         }
 

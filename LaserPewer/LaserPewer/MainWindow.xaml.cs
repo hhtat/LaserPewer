@@ -44,5 +44,13 @@ namespace LaserPewer
             Point point = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
             AppCore.Machine.Jog(point.X, point.Y, AppCore.MachineList.Active.MaxFeedRate);
         }
+
+        private void viewGCodeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ProgramViewerWindow dialog = new ProgramViewerWindow() { Owner = this };
+            Opacity = 0.8;
+            dialog.ShowDialog();
+            Opacity = 1.0;
+        }
     }
 }

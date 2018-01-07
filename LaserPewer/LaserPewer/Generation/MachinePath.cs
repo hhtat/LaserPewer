@@ -52,8 +52,8 @@ namespace LaserPewer.Generation
             {
                 Destination = destination;
                 Rapid = true;
-                Power = 0.0;
-                Speed = 0.0;
+                Power = double.NaN;
+                Speed = double.NaN;
             }
 
             public Travel(Point destination, double power, double speed)

@@ -34,12 +34,15 @@ namespace LaserPewer.ViewModel
             }
         }
 
+        public string GCode { get { return AppCore.Generator.GCodeProgram; } }
+
         private RelayCommand _generateCommand;
         public ICommand GenerateCommand { get { return _generateCommand; } }
 
         public ProgramGeneratorViewModel()
         {
-            _generateCommand = new RelayCommand(parameter => AppCore.Generator.Generate());
+            _generateCommand = new RelayCommand(parameter => AppCore.Generator.Generate(
+                AppCore.Document.Drawing, AppCore.MachineList.Active.TableSize, AppCore.MachineList.Active.MaxFeedRate));
 
             AppCore.Generator.SettingModified += ProgramGenerator_SettingModified;
         }
