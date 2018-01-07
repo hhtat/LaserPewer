@@ -62,6 +62,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DoubleToPercentConverter.cs" />
+    <Compile Include="Generation\MachinePath.cs" />
     <Compile Include="MachineListWindow.xaml.cs">
       <DependentUpon>MachineListWindow.xaml</DependentUpon>
     </Compile>

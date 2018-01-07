@@ -15,7 +15,7 @@ namespace LaserPewer.Model
         public event MachineSwapEventHandler ActiveChanged;
 
         private readonly List<IProfile> profiles;
-        public IReadOnlyList<IProfile> Profiles { get { return profiles.AsReadOnly(); } }
+        public IReadOnlyList<IProfile> Profiles { get { return profiles; } }
 
         private IProfile _active;
         public IProfile Active

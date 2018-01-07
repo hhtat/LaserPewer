@@ -1,4 +1,5 @@
-﻿using LaserPewer.Model;
+﻿using LaserPewer.Generation;
+using LaserPewer.Model;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -47,7 +48,7 @@ namespace LaserPewer
                     (d, e) => ((Workbench)d).graphicsStale = true));
 
         public static readonly DependencyProperty MachinePathProperty =
-            DependencyProperty.Register("MachinePath", typeof(IReadOnlyList<Point>), typeof(Workbench),
+            DependencyProperty.Register("MachinePath", typeof(MachinePath), typeof(Workbench),
                 new PropertyMetadata(
                     null,
                     (d, e) => ((Workbench)d).graphicsStale = true));
@@ -88,9 +89,9 @@ namespace LaserPewer
             set { SetValue(DrawingProperty, value); }
         }
 
-        public IReadOnlyList<Point> MachinePath
+        public MachinePath MachinePath
         {
-            get { return (IReadOnlyList<Point>)GetValue(MachinePathProperty); }
+            get { return (MachinePath)GetValue(MachinePathProperty); }
             set { SetValue(MachinePathProperty, value); }
         }
 
@@ -232,12 +233,12 @@ namespace LaserPewer
                     if (MachinePath != null)
                     {
                         Point prev = new Point(0.0, 0.0);
-                        int indexCap = Math.Min(MachinePathFrame, MachinePath.Count);
+                        int indexCap = Math.Min(MachinePathFrame, MachinePath.Travels.Count);
                         for (int i = 0; i < indexCap; i++)
                         {
-                            Point point = MachinePath[i];
-                            drawLineMM(prev.X, prev.Y, point.X, point.Y, Colors.Red);
-                            prev = point;
+                            MachinePath.Travel travel = MachinePath.Travels[i];
+                            drawLineMM(prev.X, prev.Y, travel.Destination.X, travel.Destination.Y, !travel.Rapid ? Colors.Red : Colors.Yellow);
+                            prev = travel.Destination;
                         }
                     }
                 }

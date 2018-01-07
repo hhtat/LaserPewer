@@ -1,8 +1,6 @@
-﻿using LaserPewer.Model.Generation;
+﻿using LaserPewer.Generation;
 using System;
-using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace LaserPewer.Model
 {
@@ -33,12 +31,9 @@ namespace LaserPewer.Model
             }
         }
 
-        public IReadOnlyList<Point> VectorPath
+        public MachinePath VectorPath
         {
-            get
-            {
-                return vectorGeneration != null ? vectorGeneration.VectorPath : null;
-            }
+            get { return vectorGeneration != null ? vectorGeneration.VectorPath : null; }
         }
 
         private VectorGeneration vectorGeneration;

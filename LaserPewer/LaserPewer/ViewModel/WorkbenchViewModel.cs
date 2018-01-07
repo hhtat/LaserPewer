@@ -1,6 +1,6 @@
-﻿using LaserPewer.Model;
+﻿using LaserPewer.Generation;
+using LaserPewer.Model;
 using System;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace LaserPewer.ViewModel
@@ -25,9 +25,9 @@ namespace LaserPewer.ViewModel
 
         public Drawing Drawing { get { return AppCore.Document.Drawing; } }
 
-        public IReadOnlyList<Point> MachinePath { get { return AppCore.Generator.VectorPath; } }
+        public MachinePath MachinePath { get { return AppCore.Generator.VectorPath; } }
 
-        public int MachinePathFrame { get { return MachinePath != null ? (int)Math.Round(MachinePathProgress * MachinePath.Count) : 0; } }
+        public int MachinePathFrame { get { return MachinePath != null ? (int)Math.Round(MachinePathProgress * MachinePath.Travels.Count) : 0; } }
 
         private double _machinePathProgress;
         public double MachinePathProgress
