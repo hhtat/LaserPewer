@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
-        Title="LaserPewer" Height="600" Width="1000">
+        Title="LaserPewer"
+        Width="1000"
+        Height="600">
     <Window.Resources>
         <local:DoubleToPercentConverter x:Key="DoubleToPercentConverter" />
         <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
@@ -33,19 +35,49 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="X:" FontSize="24" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
-                    <TextBlock Text="{Binding PositionX}" FontSize="24" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
+                    <TextBlock Text="X:"
+                               FontSize="24"
+                               TextAlignment="Right"
+                               Grid.Row="0" Grid.Column="0" />
+                    <TextBlock Text="{Binding PositionX}"
+                               FontSize="24"
+                               TextAlignment="Right"
+                               Grid.Row="0" Grid.Column="1" />
 
-                    <TextBlock Text="Y:" FontSize="24" TextAlignment="Right" Grid.Row="1" Grid.Column="0" />
-                    <TextBlock Text="{Binding PositionY}" FontSize="24" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
+                    <TextBlock Text="Y:"
+                               FontSize="24"
+                               TextAlignment="Right"
+                               Grid.Row="1" Grid.Column="0" />
+                    <TextBlock Text="{Binding PositionY}"
+                               FontSize="24"
+                               TextAlignment="Right"
+                               Grid.Row="1" Grid.Column="1" />
 
-                    <TextBlock Text="Status" FontSize="14" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                    <TextBlock Text="{Binding Status}" FontSize="18" TextAlignment="Center" Grid.Row="2" Grid.Column="1" />
+                    <TextBlock Text="Status"
+                               FontSize="14"
+                               TextAlignment="Right"
+                               VerticalAlignment="Center"
+                               Grid.Row="2" Grid.Column="0" />
+                    <TextBlock Text="{Binding Status}"
+                               FontSize="18"
+                               TextAlignment="Center"
+                               Grid.Row="2" Grid.Column="1" />
 
-                    <TextBlock Text="Alarm" FontSize="14" TextAlignment="Right" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
-                    <TextBlock Text="{Binding Alarm}" FontSize="18" TextAlignment="Center" Grid.Row="3" Grid.Column="1" />
+                    <TextBlock Text="Alarm"
+                               FontSize="14"
+                               TextAlignment="Right"
+                               VerticalAlignment="Center"
+                               Grid.Row="3" Grid.Column="0" />
+                    <TextBlock Text="{Binding Alarm}"
+                               FontSize="18"
+                               TextAlignment="Center"
+                               Grid.Row="3" Grid.Column="1" />
 
-                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="14" TextAlignment="Center" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" />
+                    <TextBlock Text="{Binding Message}"
+                               TextWrapping="Wrap"
+                               FontSize="14"
+                               TextAlignment="Center"
+                               Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" />
                 </Grid>
             </GroupBox>
 
@@ -57,15 +89,24 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox ItemsSource="{Binding Profiles}" DisplayMemberPath="FriendlyName" SelectedItem="{Binding Active}" Grid.Column="0" />
-                        <Button Name="machineProfilesManageButton" Click="machineProfilesManageButton_Click" Content="Manage" Grid.Column="1" />
+                        <ComboBox ItemsSource="{Binding Profiles}"
+                                  DisplayMemberPath="FriendlyName"
+                                  SelectedItem="{Binding Active}"
+                                  Grid.Column="0" />
+                        <Button Name="machineProfilesManageButton"
+                                Click="machineProfilesManageButton_Click"
+                                Content="Manage"
+                                Grid.Column="1" />
                     </Grid>
 
-                    <Button Name="connectionButton" Click="connectionButton_Click" Content="Connection" />
+                    <Button Name="connectionButton"
+                            Click="connectionButton_Click"
+                            Content="Connection" />
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Controls" DataContext="{StaticResource MachineViewModel}">
+            <GroupBox Header="Controls"
+                      DataContext="{StaticResource MachineViewModel}">
                 <StackPanel>
                     <Grid Height="30">
                         <Grid.ColumnDefinitions>
@@ -74,9 +115,15 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Command="{Binding ResetCommand}" Content="RESET" Grid.Column="0" />
-                        <Button Command="{Binding HomeCommand}" Content="HOME" Grid.Column="1" />
-                        <Button Command="{Binding UnlockCommand}" Content="UNLOCK" Grid.Column="2" />
+                        <Button Command="{Binding ResetCommand}"
+                                Content="RESET"
+                                Grid.Column="0" />
+                        <Button Command="{Binding HomeCommand}"
+                                Content="HOME"
+                                Grid.Column="1" />
+                        <Button Command="{Binding UnlockCommand}"
+                                Content="UNLOCK"
+                                Grid.Column="2" />
                     </Grid>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -89,17 +136,30 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Content="START" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" />
-                        <Button Command="{Binding HoldCommand}" Content="HOLD" Grid.Row="0" Grid.Column="1" />
-                        <Button Command="{Binding ResumeCommand}" Content="RESUME" Grid.Row="1" Grid.Column="1" />
-                        <Button Content="STOP" Grid.Row="2" Grid.Column="1" />
+                        <Button Content="START"
+                                Grid.Row="0"
+                                Grid.RowSpan="3"
+                                Grid.Column="0" />
+                        <Button Command="{Binding HoldCommand}"
+                                Content="HOLD"
+                                Grid.Row="0"
+                                Grid.Column="1" />
+                        <Button Command="{Binding ResumeCommand}"
+                                Content="RESUME"
+                                Grid.Row="1"
+                                Grid.Column="1" />
+                        <Button Content="STOP"
+                                Grid.Row="2"
+                                Grid.Column="1" />
                     </Grid>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="File" DataContext="{StaticResource DocumentViewModel}">
+            <GroupBox Header="File"
+                      DataContext="{StaticResource DocumentViewModel}">
                 <StackPanel>
-                    <Button Command="{Binding OpenCommand}" Content="Open" />
+                    <Button Command="{Binding OpenCommand}"
+                            Content="Open" />
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -110,44 +170,78 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Name:" Grid.Row="0" Grid.Column="0" />
-                        <TextBlock Text="{Binding FriendlyName,Mode=OneWay}" TextAlignment="Right" Grid.Row="0" Grid.Column="1" />
+                        <TextBlock Text="Name:"
+                                   Grid.Row="0" Grid.Column="0" />
+                        <TextBlock Text="{Binding FriendlyName,Mode=OneWay}"
+                                   TextAlignment="Right"
+                                   Grid.Row="0" Grid.Column="1" />
 
-                        <TextBlock Text="Size:" Grid.Row="1" Grid.Column="0" />
-                        <TextBlock Text="{Binding Size}" TextAlignment="Right" Grid.Row="1" Grid.Column="1" />
+                        <TextBlock Text="Size:"
+                                   Grid.Row="1" Grid.Column="0" />
+                        <TextBlock Text="{Binding Size}"
+                                   TextAlignment="Right"
+                                   Grid.Row="1" Grid.Column="1" />
                     </Grid>
                 </StackPanel>
             </GroupBox>
         </StackPanel>
 
-        <GroupBox Header="Workbench" DataContext="{StaticResource WorkbenchViewModel}" Grid.Column="1">
+        <GroupBox Header="Workbench"
+                  DataContext="{StaticResource WorkbenchViewModel}"
+                  Grid.Column="1">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <local:Workbench x:Name="workbench" MouseDoubleClick="workbench_MouseDoubleClick" ViewCenter="{Binding ViewCenter}" TableSize="{Binding MachineSize}" MachinePosition="{Binding MachinePosition}" Drawing="{Binding Drawing}" MachinePath="{Binding MachinePath}" MachinePathFrame="{Binding MachinePathFrame}" Background="DarkGray" Grid.Row="0" />
-                <Slider Value="{Binding MachinePathProgress}" Minimum="0.0" Maximum="1.0" Grid.Row="1" />
+                <local:Workbench x:Name="workbench"
+                                 MouseDoubleClick="workbench_MouseDoubleClick"
+                                 ViewCenter="{Binding ViewCenter}"
+                                 TableSize="{Binding MachineSize}"
+                                 MachinePosition="{Binding MachinePosition}"
+                                 Drawing="{Binding Drawing}"
+                                 MachinePath="{Binding MachinePath}"
+                                 MachinePathFrame="{Binding MachinePathFrame}"
+                                 Background="DarkGray"
+                                 Grid.Row="0" />
+                <Slider Value="{Binding MachinePathProgress}"
+                        Minimum="0.0"
+                        Maximum="1.0"
+                        Grid.Row="1" />
             </Grid>
         </GroupBox>
 
         <StackPanel Grid.Column="2">
-            <GroupBox Header="Cut" DataContext="{StaticResource ProgramGeneratorViewModel}">
+            <GroupBox Header="Cut"
+                      DataContext="{StaticResource ProgramGeneratorViewModel}">
                 <StackPanel>
                     <Grid>
                         <TextBlock Text="Power" />
-                        <TextBlock Text="{Binding VectorPower,Converter={StaticResource DoubleToPercentConverter}}" TextAlignment="Right" />
+                        <TextBlock Text="{Binding VectorPower,Converter={StaticResource DoubleToPercentConverter}}"
+                                   TextAlignment="Right" />
                     </Grid>
-                    <Slider Value="{Binding VectorPower}" Minimum="0.0" Maximum="1.0" TickPlacement="TopLeft" TickFrequency="0.05" IsSnapToTickEnabled="True" />
+                    <Slider Value="{Binding VectorPower}"
+                            Minimum="0.0"
+                            Maximum="1.0"
+                            TickPlacement="TopLeft"
+                            TickFrequency="0.05"
+                            IsSnapToTickEnabled="True" />
 
                     <Grid>
                         <TextBlock Text="Speed" />
-                        <TextBlock Text="{Binding VectorSpeed,Converter={StaticResource DoubleToPercentConverter}}" TextAlignment="Right" />
+                        <TextBlock Text="{Binding VectorSpeed,Converter={StaticResource DoubleToPercentConverter}}"
+                                   TextAlignment="Right" />
                     </Grid>
-                    <Slider Value="{Binding VectorSpeed}" Minimum="0.0" Maximum="1.0" TickPlacement="TopLeft" TickFrequency="0.05" IsSnapToTickEnabled="True" />
+                    <Slider Value="{Binding VectorSpeed}"
+                            Minimum="0.0"
+                            Maximum="1.0"
+                            TickPlacement="TopLeft"
+                            TickFrequency="0.05"
+                            IsSnapToTickEnabled="True" />
 
-                    <Button Command="{Binding GenerateCommand}" Content="Generate" />
+                    <Button Command="{Binding GenerateCommand}"
+                            Content="Generate" />
                 </StackPanel>
             </GroupBox>
         </StackPanel>

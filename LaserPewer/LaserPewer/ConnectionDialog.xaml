@@ -5,22 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
-        Title="Connection" WindowStartupLocation="CenterOwner" Height="200" Width="300">
+        Title="Connection"
+        WindowStartupLocation="CenterOwner"
+        Width="300"
+        Height="200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="COM Ports" TextAlignment="Right" Grid.Row="0" Grid.Column="0" />
-            <ComboBox Name="portListComboBox" Grid.Row="0" Grid.Column="1" />
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="COM Ports"
+                       TextAlignment="Right"
+                       Grid.Row="0" Grid.Column="0" />
+            <ComboBox Name="portListComboBox"
+                      Grid.Row="0" Grid.Column="1" />
         </StackPanel>
 
         <StackPanel Grid.Row="1">
-            <Button Name="connectButton" Click="connectButton_Click" Content="Connect" />
-            <Button Name="rescanButton" Click="rescanButton_Click" Content="Rescan" />
-            <Button Name="disconnectButton" Click="disconnectButton_Click" Content="Disconnect" />
+            <Button Name="connectButton"
+                    Click="connectButton_Click"
+                    Content="Connect" />
+            <Button Name="rescanButton"
+                    Click="rescanButton_Click"
+                    Content="Rescan" />
+            <Button Name="disconnectButton"
+                    Click="disconnectButton_Click"
+                    Content="Disconnect" />
         </StackPanel>
     </Grid>
 </Window>

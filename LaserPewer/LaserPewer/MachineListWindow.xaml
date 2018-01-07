@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
-        Title="Machines" WindowStartupLocation="CenterOwner" Height="200" Width="500">
+        Title="Machines"
+        WindowStartupLocation="CenterOwner"
+        Width="500"
+        Height="200">
     <Window.Resources>
         <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
         <local:DoubleToStringConverter x:Key="DoubleToStringConverter" />
@@ -16,19 +19,30 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Profiles" DataContext="{StaticResource MachineListViewModel}" Grid.Column="0">
+        <GroupBox Header="Profiles"
+                  DataContext="{StaticResource MachineListViewModel}" Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <ListBox Name="profilesListBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ListDisplayName" SelectionMode="Single" Grid.Row="0" />
+                <ListBox Name="profilesListBox"
+                         ItemsSource="{Binding Profiles}"
+                         DisplayMemberPath="ListDisplayName"
+                         SelectionMode="Single"
+                         Grid.Row="0" />
 
                 <StackPanel Grid.Row="1">
-                    <Button Command="{Binding ActivateCommand}" CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}" Content="Switch to" />
-                    <Button Command="{Binding DuplicateCommand}" CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}" Content="Duplicate" />
-                    <Button Command="{Binding DeleteCommand}" CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}" Content="Delete" />
+                    <Button Command="{Binding ActivateCommand}"
+                            CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}"
+                            Content="Switch to" />
+                    <Button Command="{Binding DuplicateCommand}"
+                            CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}"
+                            Content="Duplicate" />
+                    <Button Command="{Binding DeleteCommand}"
+                            CommandParameter="{Binding ElementName=profilesListBox,Path=SelectedValue}"
+                            Content="Delete" />
                 </StackPanel>
             </Grid>
         </GroupBox>
@@ -47,17 +61,25 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Name" Grid.Row="0" Grid.Column="0" />
-                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedValue.FriendlyName}" Grid.Row="0" Grid.Column="1" />
+                <TextBlock Text="Name"
+                           Grid.Row="0" Grid.Column="0" />
+                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedValue.FriendlyName}"
+                         Grid.Row="0" Grid.Column="1" />
 
-                <TextBlock Text="Table width (mm)" Grid.Row="1" Grid.Column="0" />
-                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.TableWidth,Converter={StaticResource DoubleToStringConverter}}" Grid.Row="1" Grid.Column="1" />
+                <TextBlock Text="Table width (mm)"
+                           Grid.Row="1" Grid.Column="0" />
+                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.TableWidth,Converter={StaticResource DoubleToStringConverter}}"
+                         Grid.Row="1" Grid.Column="1" />
 
-                <TextBlock Text="Table height (mm)" Grid.Row="2" Grid.Column="0" />
-                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.TableHeight,Converter={StaticResource DoubleToStringConverter}}" Grid.Row="2" Grid.Column="2" />
+                <TextBlock Text="Table height (mm)"
+                           Grid.Row="2" Grid.Column="0" />
+                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.TableHeight,Converter={StaticResource DoubleToStringConverter}}"
+                         Grid.Row="2" Grid.Column="2" />
 
-                <TextBlock Text="Max feed rate (mm/min)" Grid.Row="3" Grid.Column="0" />
-                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.MaxFeedRate,Converter={StaticResource DoubleToStringConverter}}" Grid.Row="3" Grid.Column="3" />
+                <TextBlock Text="Max feed rate (mm/min)"
+                           Grid.Row="3" Grid.Column="0" />
+                <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.MaxFeedRate,Converter={StaticResource DoubleToStringConverter}}"
+                         Grid.Row="3" Grid.Column="3" />
             </Grid>
         </GroupBox>
     </Grid>
