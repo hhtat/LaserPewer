@@ -72,14 +72,17 @@ namespace LaserPewer.Model
 
         public void DrawPath(Pen pen, GraphicsPath path)
         {
-            GraphicsPath _path = (GraphicsPath)path.Clone();
-            _path.Transform(Transform);
+            GraphicsPath pathCopy = (GraphicsPath)path.Clone();
+            pathCopy.Transform(Transform);
+
+            byte[] types = pathCopy.PathTypes;
+            PointF[] points = pathCopy.PathPoints;
 
             PointF lastPoint = PointF.Empty;
-            for (int i = 0; i < _path.PointCount; i++)
+            for (int i = 0; i < points.Length; i++)
             {
-                byte pointType = _path.PathTypes[i];
-                PointF point = _path.PathPoints[i];
+                byte pointType = types[i];
+                PointF point = points[i];
 
                 switch (pointType & POINT_TYPE_MASK)
                 {
@@ -93,8 +96,8 @@ namespace LaserPewer.Model
                         lastPoint = point;
                         break;
                     case POINT_TYPE_BEZIER:
-                        PointF point2 = _path.PathPoints[++i];
-                        PointF point3 = _path.PathPoints[++i];
+                        PointF point2 = points[++i];
+                        PointF point3 = points[++i];
                         traceBezier(lastPoint, point, point2, point3);
                         lastPoint = point3;
                         break;
