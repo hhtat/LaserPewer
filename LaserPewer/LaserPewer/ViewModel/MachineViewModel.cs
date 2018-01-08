@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace LaserPewer.ViewModel
 {
@@ -60,6 +61,9 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _startCommand;
         public ICommand StartCommand { get { return _startCommand; } }
 
+        private readonly RelayCommand _stopCommand;
+        public ICommand StopCommand { get { return _stopCommand; } }
+
         public MachineViewModel()
         {
             setDefaults();
@@ -71,7 +75,10 @@ namespace LaserPewer.ViewModel
             _holdCommand = new RelayCommand(parameter => AppCore.Machine.Hold(), parameter => AppCore.Machine.Connected);
             _startCommand = new RelayCommand(
                 parameter => AppCore.Sender.Start(AppCore.Generator.GCodeProgram),
-                parameter => AppCore.Machine.Connected && AppCore.Generator.GCodeProgram != null);
+                parameter => AppCore.Machine.Connected && AppCore.Sender.State == GrblSender.SenderState.Idle && AppCore.Generator.GCodeProgram != null);
+            _stopCommand = new RelayCommand(
+                parameter => AppCore.Sender.Stop(),
+                parameter => AppCore.Sender.State != GrblSender.SenderState.Idle);
 
             AppCore.Machine.MachineConnecting += Machine_MachineConnecting;
             AppCore.Machine.MachineConnected += Machine_MachineConnected;
@@ -82,6 +89,8 @@ namespace LaserPewer.ViewModel
             AppCore.Machine.MessageFeedback += Machine_MessageFeedback;
 
             AppCore.Generator.Completed += Generator_Completed;
+
+            AppCore.Sender.StateChanged += Sender_StateChanged;
         }
 
         private void setDefaults()
@@ -153,6 +162,12 @@ namespace LaserPewer.ViewModel
         private void Generator_Completed(object sender, EventArgs e)
         {
             _startCommand.NotifyCanExecuteChanged();
+        }
+
+        private void Sender_StateChanged(object sender, EventArgs e)
+        {
+            _startCommand.NotifyCanExecuteChanged();
+            _stopCommand.NotifyCanExecuteChanged();
         }
 
         private static string toDisplayString(double value)

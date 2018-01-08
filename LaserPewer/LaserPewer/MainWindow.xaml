@@ -203,29 +203,28 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
-                                    <RowDefinition Height="30" />
-                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="90" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Button Command="{Binding StartCommand}"
-                                        Content="START"
-                                        Grid.Row="0"
-                                        Grid.RowSpan="3"
-                                        Grid.Column="0" />
                                 <Button Command="{Binding HoldCommand}"
-                                        Content="HOLD"
+                                        Content="PAUSE"
                                         Grid.Row="0"
-                                        Grid.Column="1" />
+                                        Grid.Column="0" />
                                 <Button Command="{Binding ResumeCommand}"
                                         Content="RESUME"
-                                        Grid.Row="1"
+                                        Grid.Row="0"
                                         Grid.Column="1" />
-                                <Button Content="STOP"
-                                        Grid.Row="2"
+                                <Button Command="{Binding StartCommand}"
+                                        Content="START"
+                                        Grid.Row="1"
+                                        Grid.Column="0" />
+                                <Button Command="{Binding StopCommand}"
+                                        Content="STOP"
+                                        Grid.Row="1"
                                         Grid.Column="1" />
                             </Grid>
                         </StackPanel>

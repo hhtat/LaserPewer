@@ -4,12 +4,25 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Windows;
 
 namespace LaserPewer.Model
 {
     public class GrblSender
     {
-        public SenderState State { get; private set; }
+        public event EventHandler StateChanged;
+
+        private SenderState _state;
+        public SenderState State
+        {
+            get { return _state; }
+            private set
+            {
+                _state = value;
+                Application.Current.Dispatcher.Invoke(() => StateChanged?.Invoke(this, null));
+            }
+        }
+
         public SenderError Error { get; private set; }
 
         private readonly GrblMachine machine;
@@ -85,6 +98,7 @@ namespace LaserPewer.Model
                             if (machineResetEvent.WaitOne(0)) { Error = SenderError.MachineReset; break; }
                             if (!machine.Connected) { Error = SenderError.ConnectionBroken; break; }
                             if (backgroundWorker.CancellationPending) { Error = SenderError.Aborted; break; }
+                            // TODO check for "error:"
 
                             GrblMachine.SendResult result = machine.SendGCode(lines[i]);
                             if (result == GrblMachine.SendResult.Sent) break;
@@ -97,6 +111,18 @@ namespace LaserPewer.Model
                 catch (Exception e)
                 {
                     Debug.WriteLine(e);
+                    Error = SenderError.Unknown;
+                }
+
+
+                if (machine.Connected)
+                {
+                    for (int i = 0; i < 5 * 10; i++)
+                    {
+                        machine.Reset();
+                        if (machineResetEvent.WaitOne(0)) break;
+                        Thread.Sleep(100);
+                    }
                 }
             }
             else
@@ -122,6 +148,7 @@ namespace LaserPewer.Model
         public enum SenderError
         {
             None,
+            Unknown,
             Aborted,
             ConnectionBroken,
             MachineReset,

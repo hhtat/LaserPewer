@@ -1,6 +1,5 @@
 ﻿using LaserPewer.Model;
 using LaserPewer.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -40,17 +39,12 @@ namespace LaserPewer.Generation
 
             stopWatch.TraceLap("Lineages calculated");
 
-            HashSet<PathInfo> parkedPaths = new HashSet<PathInfo>(); // TODO for assertion only
             HashSet<PathInfo> readyPaths = new HashSet<PathInfo>();
             foreach (PathInfo path in paths)
             {
                 if (path.Children.Count == 0)
                 {
                     readyPaths.Add(path);
-                }
-                else
-                {
-                    parkedPaths.Add(path);
                 }
             }
 
@@ -81,7 +75,6 @@ namespace LaserPewer.Generation
                     parent.Children.Remove(nearestPath);
                     if (parent.Children.Count == 0)
                     {
-                        parkedPaths.Remove(parent);
                         readyPaths.Add(parent);
                     }
                 }
@@ -89,8 +82,6 @@ namespace LaserPewer.Generation
 
                 lastEndPoint = nearestPath.EndPoint;
             }
-
-            if (parkedPaths.Count > 0) throw new InvalidOperationException();
 
             stopWatch.TraceLap("Paths sequenced");
 
