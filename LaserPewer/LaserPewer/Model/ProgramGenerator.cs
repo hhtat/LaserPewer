@@ -7,7 +7,7 @@ namespace LaserPewer.Model
     public class ProgramGenerator
     {
         public event EventHandler SettingModified;
-        public event EventHandler Generated;
+        public event EventHandler Completed;
 
         private double _vectorPower;
         public double VectorPower
@@ -43,26 +43,28 @@ namespace LaserPewer.Model
         public void Clear()
         {
             VectorPath = null;
+            GCodeProgram = null;
+            Completed?.Invoke(this, null);
         }
 
-        public void Generate(Drawing drawing, Size tableSize, double maxFeedRate)
+        public void Generate(Drawing drawing, MachineList.IProfile machineProfile)
         {
             if (drawing == null) return;
 
             drawing = drawing.Clone();
             drawing.Clip(new Rect(
-                0.0, -tableSize.Height,
-                tableSize.Width, tableSize.Height));
+                0.0, -machineProfile.TableSize.Height,
+                machineProfile.TableSize.Width, machineProfile.TableSize.Height));
 
             VectorPath = VectorGenerator.Generate(drawing.Paths, VectorPower, VectorSpeed);
-            GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, maxFeedRate);
+            GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, machineProfile.MaxFeedRate);
 
-            Generated?.Invoke(this, null);
+            Completed?.Invoke(this, null);
         }
 
         private void VectorGeneration_GenerationCompleted(object sender, EventArgs e)
         {
-            Generated?.Invoke(this, null);
+            Completed?.Invoke(this, null);
         }
     }
 }

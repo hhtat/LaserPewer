@@ -48,7 +48,7 @@
         </GroupBox>
 
         <GroupBox Header="Edit" Grid.Column="1">
-            <Grid Visibility="{Binding ElementName=profilesListBox,Path=SelectedValue,Converter={StaticResource NullableToVisibilityConverter}}">
+            <Grid Visibility="{Binding ElementName=profilesListBox,Path=SelectedValue,Converter={StaticResource NullableToVisibilityConverter},Mode=OneWay}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />

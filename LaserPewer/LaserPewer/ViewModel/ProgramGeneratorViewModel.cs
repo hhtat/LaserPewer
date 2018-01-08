@@ -41,16 +41,30 @@ namespace LaserPewer.ViewModel
 
         public ProgramGeneratorViewModel()
         {
-            _generateCommand = new RelayCommand(parameter => AppCore.Generator.Generate(
-                AppCore.Document.Drawing, AppCore.MachineList.Active.TableSize, AppCore.MachineList.Active.MaxFeedRate));
+            _generateCommand = new RelayCommand(
+                parameter => AppCore.Generator.Generate(AppCore.Document.Drawing, AppCore.MachineList.Active),
+                parameter => AppCore.Document.Drawing != null);
 
             AppCore.Generator.SettingModified += ProgramGenerator_SettingModified;
+            AppCore.Generator.Completed += Generator_Completed;
+
+            AppCore.Document.Modified += Document_Modified;
         }
 
         private void ProgramGenerator_SettingModified(object sender, EventArgs e)
         {
             NotifyPropertyChanged(nameof(VectorPower));
             NotifyPropertyChanged(nameof(VectorSpeed));
+        }
+
+        private void Generator_Completed(object sender, EventArgs e)
+        {
+            NotifyPropertyChanged(nameof(GCode));
+        }
+
+        private void Document_Modified(object sender, EventArgs e)
+        {
+            _generateCommand.NotifyCanExecuteChanged();
         }
     }
 }

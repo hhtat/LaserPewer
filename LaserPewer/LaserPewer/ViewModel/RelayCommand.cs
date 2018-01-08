@@ -31,7 +31,7 @@ namespace LaserPewer.ViewModel
             execute(parameter);
         }
 
-        public void NotifyCanExecuteChanged(EventArgs e)
+        public void NotifyCanExecuteChanged(EventArgs e = null)
         {
             CanExecuteChanged?.Invoke(this, e);
         }

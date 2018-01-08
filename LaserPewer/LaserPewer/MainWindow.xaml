@@ -10,6 +10,7 @@
         Height="600">
     <Window.Resources>
         <local:DoubleToPercentConverter x:Key="DoubleToPercentConverter" />
+        <local:NullableToBooleanConverter x:Key="NullableToBooleanConverter" />
         <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
     </Window.Resources>
     <Grid>
@@ -219,7 +220,7 @@
                 <StackPanel>
                     <Grid>
                         <TextBlock Text="Power" />
-                        <TextBlock Text="{Binding VectorPower,Converter={StaticResource DoubleToPercentConverter}}"
+                        <TextBlock Text="{Binding VectorPower,Converter={StaticResource DoubleToPercentConverter},Mode=OneWay}"
                                    TextAlignment="Right" />
                     </Grid>
                     <Slider Value="{Binding VectorPower}"
@@ -244,7 +245,10 @@
                     <Button Command="{Binding GenerateCommand}"
                             Content="Generate" />
 
-                    <Button Name="viewGCodeButton" Click="viewGCodeButton_Click" Content="View G-Code" />
+                    <Button Name="viewGCodeButton"
+                            Click="viewGCodeButton_Click"
+                            IsEnabled="{Binding GCode,Converter={StaticResource NullableToBooleanConverter},Mode=OneWay}"
+                            Content="View G-Code" />
                 </StackPanel>
             </GroupBox>
         </StackPanel>

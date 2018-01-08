@@ -64,12 +64,14 @@ namespace LaserPewer.ViewModel
         {
             setDefaults();
 
-            _resetCommand = new RelayCommand(parameter => AppCore.Machine.Reset());
-            _homeCommand = new RelayCommand(parameter => AppCore.Machine.Home());
-            _unlockCommand = new RelayCommand(parameter => AppCore.Machine.Unlock());
-            _resumeCommand = new RelayCommand(parameter => AppCore.Machine.Resume());
-            _holdCommand = new RelayCommand(parameter => AppCore.Machine.Hold());
-            _startCommand = new RelayCommand(parameter => AppCore.Sender.Start(AppCore.Generator.GCodeProgram));
+            _resetCommand = new RelayCommand(parameter => AppCore.Machine.Reset(), parameter => AppCore.Machine.Connected);
+            _homeCommand = new RelayCommand(parameter => AppCore.Machine.Home(), parameter => AppCore.Machine.Connected);
+            _unlockCommand = new RelayCommand(parameter => AppCore.Machine.Unlock(), parameter => AppCore.Machine.Connected);
+            _resumeCommand = new RelayCommand(parameter => AppCore.Machine.Resume(), parameter => AppCore.Machine.Connected);
+            _holdCommand = new RelayCommand(parameter => AppCore.Machine.Hold(), parameter => AppCore.Machine.Connected);
+            _startCommand = new RelayCommand(
+                parameter => AppCore.Sender.Start(AppCore.Generator.GCodeProgram),
+                parameter => AppCore.Machine.Connected && AppCore.Generator.GCodeProgram != null);
 
             AppCore.Machine.MachineConnecting += Machine_MachineConnecting;
             AppCore.Machine.MachineConnected += Machine_MachineConnected;
@@ -78,6 +80,8 @@ namespace LaserPewer.ViewModel
             AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
             AppCore.Machine.AlarmRaised += Machine_AlarmRaised;
             AppCore.Machine.MessageFeedback += Machine_MessageFeedback;
+
+            AppCore.Generator.Completed += Generator_Completed;
         }
 
         private void setDefaults()
@@ -97,11 +101,25 @@ namespace LaserPewer.ViewModel
         private void Machine_MachineConnected(object sender, EventArgs e)
         {
             Status = "Connected";
+
+            _resetCommand.NotifyCanExecuteChanged();
+            _homeCommand.NotifyCanExecuteChanged();
+            _unlockCommand.NotifyCanExecuteChanged();
+            _resumeCommand.NotifyCanExecuteChanged();
+            _holdCommand.NotifyCanExecuteChanged();
+            _startCommand.NotifyCanExecuteChanged();
         }
 
         private void Machine_MachineDisconnected(object sender, EventArgs e)
         {
             Status = "Disconnected";
+
+            _resetCommand.NotifyCanExecuteChanged();
+            _homeCommand.NotifyCanExecuteChanged();
+            _unlockCommand.NotifyCanExecuteChanged();
+            _resumeCommand.NotifyCanExecuteChanged();
+            _holdCommand.NotifyCanExecuteChanged();
+            _startCommand.NotifyCanExecuteChanged();
         }
 
         private void Machine_MachineReset(object sender, EventArgs e)
@@ -129,6 +147,12 @@ namespace LaserPewer.ViewModel
         private void Machine_MessageFeedback(object sender, string message)
         {
             Message = message;
+        }
+
+
+        private void Generator_Completed(object sender, EventArgs e)
+        {
+            _startCommand.NotifyCanExecuteChanged();
         }
 
         private static string toDisplayString(double value)

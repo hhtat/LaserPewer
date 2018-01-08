@@ -56,7 +56,7 @@ namespace LaserPewer.ViewModel
 
             AppCore.Document.Modified += Document_Modified;
 
-            AppCore.Generator.Generated += Generator_Generated;
+            AppCore.Generator.Completed += Generator_Completed;
         }
 
         private void MachineProfile_Modified(object sender, EventArgs e)
@@ -82,7 +82,7 @@ namespace LaserPewer.ViewModel
             NotifyPropertyChanged(nameof(Drawing));
         }
 
-        private void Generator_Generated(object sender, EventArgs e)
+        private void Generator_Completed(object sender, EventArgs e)
         {
             NotifyPropertyChanged(nameof(MachinePath));
             MachinePathProgress = 1.0;

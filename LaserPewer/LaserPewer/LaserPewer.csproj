@@ -71,6 +71,7 @@
     <Compile Include="Model\Clipper.cs" />
     <Compile Include="Model\Document.cs" />
     <Compile Include="Model\GrblSender.cs" />
+    <Compile Include="NullableToBooleanConverter.cs" />
     <Compile Include="ProgramViewerWindow.xaml.cs">
       <DependentUpon>ProgramViewerWindow.xaml</DependentUpon>
     </Compile>
