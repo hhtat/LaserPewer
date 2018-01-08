@@ -57,6 +57,9 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _holdCommand;
         public ICommand HoldCommand { get { return _holdCommand; } }
 
+        private readonly RelayCommand _startCommand;
+        public ICommand StartCommand { get { return _startCommand; } }
+
         public MachineViewModel()
         {
             setDefaults();
@@ -66,6 +69,7 @@ namespace LaserPewer.ViewModel
             _unlockCommand = new RelayCommand(parameter => AppCore.Machine.Unlock());
             _resumeCommand = new RelayCommand(parameter => AppCore.Machine.Resume());
             _holdCommand = new RelayCommand(parameter => AppCore.Machine.Hold());
+            _startCommand = new RelayCommand(parameter => AppCore.Sender.Start(AppCore.Generator.GCodeProgram));
 
             AppCore.Machine.MachineConnecting += Machine_MachineConnecting;
             AppCore.Machine.MachineConnected += Machine_MachineConnected;

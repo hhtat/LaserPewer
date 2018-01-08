@@ -14,7 +14,7 @@ namespace LaserPewer.Model
         public delegate void MessageReceivedEventHandler(object sender, string message);
         public event MessageReceivedEventHandler MessageReceived;
 
-        public event EventHandler SendBufferAvailability;
+        public event EventHandler ReadyToSend;
 
         public bool Connected { get { return serialPort != null && serialPort.IsOpen; } }
 
@@ -140,12 +140,12 @@ namespace LaserPewer.Model
                     {
                         if (pendingCommands.Count > 0) pendingCommandsBytes -= pendingCommands.Dequeue();
                         if (pendingCommands.Count == 0) pendingHomingRequest = false;
-                        SendBufferAvailability?.Invoke(this, null);
+                        ReadyToSend?.Invoke(this, null);
                     }
                     else if (line.StartsWith("<"))
                     {
                         if (pendingStatusRequests > 0) pendingStatusRequests--;
-                        SendBufferAvailability?.Invoke(this, null);
+                        ReadyToSend?.Invoke(this, null);
                     }
                     else if (line.StartsWith("Grbl "))
                     {
@@ -153,7 +153,7 @@ namespace LaserPewer.Model
                         pendingHomingRequest = false;
                         pendingCommands.Clear();
                         pendingCommandsBytes = 0;
-                        SendBufferAvailability?.Invoke(this, null);
+                        ReadyToSend?.Invoke(this, null);
                     }
 
                     MessageReceived?.Invoke(this, line);

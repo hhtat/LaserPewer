@@ -136,7 +136,8 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Content="START"
+                        <Button Command="{Binding StartCommand}"
+                                Content="START"
                                 Grid.Row="0"
                                 Grid.RowSpan="3"
                                 Grid.Column="0" />

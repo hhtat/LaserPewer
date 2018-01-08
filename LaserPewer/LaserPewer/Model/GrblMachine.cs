@@ -15,6 +15,7 @@ namespace LaserPewer.Model
         public event EventHandler MachineConnected;
         public event EventHandler MachineDisconnected;
         public event EventHandler MachineReset;
+        public event EventHandler MachineReadyToSend;
 
         public delegate void StatusUpdatedEventHandler(object sender, MachineStatus status);
         public event StatusUpdatedEventHandler StatusUpdated;
@@ -44,6 +45,7 @@ namespace LaserPewer.Model
             {
                 streamer = new GrblStreamer();
                 streamer.MessageReceived += Streamer_MessageReceived;
+                streamer.ReadyToSend += Streamer_ReadyToSend;
                 streamer.Connect(portName);
                 statusPollingTimer.Start();
             }
@@ -67,7 +69,7 @@ namespace LaserPewer.Model
 
         public void Reset()
         {
-            wrapStreamerCall(() => streamer.SendReset());
+            wrapStreamerCall(() => { streamer.SendReset(); return true; });
         }
 
         public void Home()
@@ -82,18 +84,23 @@ namespace LaserPewer.Model
 
         public void Resume()
         {
-            wrapStreamerCall(() => streamer.SendResumeRequest());
+            wrapStreamerCall(() => { streamer.SendResumeRequest(); return true; });
         }
 
         public void Hold()
         {
-            wrapStreamerCall(() => streamer.SendHoldRequest());
+            wrapStreamerCall(() => { streamer.SendHoldRequest(); return true; });
         }
 
         public void Jog(double x, double y, double rate)
         {
             string line = string.Format(CultureInfo.InvariantCulture, "$J=G21 G90 X{0:F3} Y{1:F3} F{2:F3}", x, y, rate);
             wrapStreamerCall(() => streamer.TrySendCommand(line));
+        }
+
+        public SendResult SendGCode(string line)
+        {
+            return wrapStreamerCall(() => streamer.TrySendCommand(line));
         }
 
         private void statusPollingTimer_Tick(object sender, EventArgs e)
@@ -118,19 +125,22 @@ namespace LaserPewer.Model
             return true;
         }
 
-        private void wrapStreamerCall(Action call)
+        private SendResult wrapStreamerCall(Func<bool> call)
         {
-            if (!checkConnection()) return;
+            if (checkConnection())
+            {
+                try
+                {
+                    return call() ? SendResult.Sent : SendResult.Retry;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                    checkConnection();
+                }
+            }
 
-            try
-            {
-                call();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                checkConnection();
-            }
+            return SendResult.Failed;
         }
 
         private void Streamer_MessageReceived(object sender, string message)
@@ -176,6 +186,11 @@ namespace LaserPewer.Model
             }
         }
 
+        private void Streamer_ReadyToSend(object sender, EventArgs e)
+        {
+            MachineReadyToSend?.Invoke(this, null);
+        }
+
         private static double parseNumber(string s)
         {
             double number;
@@ -205,6 +220,13 @@ namespace LaserPewer.Model
             public string Status;
             public double X;
             public double Y;
+        }
+
+        public enum SendResult
+        {
+            Sent,
+            Retry,
+            Failed,
         }
     }
 }
