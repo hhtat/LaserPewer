@@ -52,8 +52,10 @@ namespace LaserPewer.Model
 
             using (StringReader reader = new StringReader(program))
             {
-                string line = reader.ReadLine().Trim();
-                if (line.Length != 0) lines.Add(line);
+                for (string line = reader.ReadLine(); line != null; line = reader.ReadLine())
+                {
+                    lines.Add(line);
+                }
             }
 
             backgroundWorker = new BackgroundWorker();
@@ -87,7 +89,8 @@ namespace LaserPewer.Model
                             GrblMachine.SendResult result = machine.SendGCode(lines[i]);
                             if (result == GrblMachine.SendResult.Sent) break;
                             if (result == GrblMachine.SendResult.Failed) { Error = SenderError.ConnectionBroken; break; }
-                            if (result != GrblMachine.SendResult.Retry) throw new NotSupportedException();
+                            if (result == GrblMachine.SendResult.Retry) Thread.Sleep(1);
+                            else throw new NotSupportedException();
                         }
                     }
                 }

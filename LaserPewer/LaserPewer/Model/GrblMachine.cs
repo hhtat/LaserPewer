@@ -47,6 +47,7 @@ namespace LaserPewer.Model
                 streamer.MessageReceived += Streamer_MessageReceived;
                 streamer.ReadyToSend += Streamer_ReadyToSend;
                 streamer.Connect(portName);
+                streamer.SendReset();
                 statusPollingTimer.Start();
             }
             catch (Exception e)

@@ -39,6 +39,9 @@ namespace LaserPewer.Generation
                 {
                     gcode.AppendFormat(CultureInfo.InvariantCulture, "G0 X{0:F2} Y{1:F2}",
                         travel.Destination.X, travel.Destination.Y);
+
+                    currentPower = double.NaN;
+                    currentSpeed = double.NaN;
                 }
 
                 gcode.AppendLine();
