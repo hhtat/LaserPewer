@@ -204,6 +204,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
                                     <RowDefinition Height="90" />
+                                    <RowDefinition Height="20" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -226,6 +227,12 @@
                                         Content="STOP"
                                         Grid.Row="1"
                                         Grid.Column="1" />
+
+                                <Grid Visibility="{Binding ProgramStatus,Converter={StaticResource NullableToVisibilityConverter},Mode=OneWay}"
+                                      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+                                    <ProgressBar Value="{Binding ProgramProgress,Mode=OneWay}" Minimum="0.0" Maximum="1.0" />
+                                    <TextBlock Text="{Binding ProgramStatus}" FontSize="14" TextAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
                             </Grid>
                         </StackPanel>
                     </GroupBox>

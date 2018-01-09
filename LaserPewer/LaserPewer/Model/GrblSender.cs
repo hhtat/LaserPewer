@@ -12,6 +12,9 @@ namespace LaserPewer.Model
     {
         public event EventHandler StateChanged;
 
+        public delegate void ProgressEventHandler(object sender, int lineAt);
+        public event ProgressEventHandler Progress;
+
         private SenderState _state;
         public SenderState State
         {
@@ -24,6 +27,8 @@ namespace LaserPewer.Model
         }
 
         public SenderError Error { get; private set; }
+
+        public int LineCount { get { return lines != null ? lines.Count : 0; } }
 
         private readonly GrblMachine machine;
 
@@ -101,7 +106,7 @@ namespace LaserPewer.Model
                             // TODO check for "error:"
 
                             GrblMachine.SendResult result = machine.SendGCode(lines[i]);
-                            if (result == GrblMachine.SendResult.Sent) break;
+                            if (result == GrblMachine.SendResult.Sent) { Progress?.Invoke(this, i + 1); break; }
                             if (result == GrblMachine.SendResult.Failed) { Error = SenderError.ConnectionBroken; break; }
                             if (result == GrblMachine.SendResult.Retry) Thread.Sleep(1);
                             else throw new NotSupportedException();
@@ -113,7 +118,6 @@ namespace LaserPewer.Model
                     Debug.WriteLine(e);
                     Error = SenderError.Unknown;
                 }
-
 
                 if (machine.Connected)
                 {

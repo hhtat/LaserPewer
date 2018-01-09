@@ -64,6 +64,28 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _stopCommand;
         public ICommand StopCommand { get { return _stopCommand; } }
 
+        private string _programStatus;
+        public string ProgramStatus
+        {
+            get { return _programStatus; }
+            private set
+            {
+                _programStatus = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private double _programProgress;
+        public double ProgramProgress
+        {
+            get { return _programProgress; }
+            private set
+            {
+                _programProgress = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public MachineViewModel()
         {
             setDefaults();
@@ -91,6 +113,7 @@ namespace LaserPewer.ViewModel
             AppCore.Generator.Completed += Generator_Completed;
 
             AppCore.Sender.StateChanged += Sender_StateChanged;
+            AppCore.Sender.Progress += Sender_Progress;
         }
 
         private void setDefaults()
@@ -158,9 +181,14 @@ namespace LaserPewer.ViewModel
             Message = message;
         }
 
-
         private void Generator_Completed(object sender, EventArgs e)
         {
+            if (AppCore.Sender.State == GrblSender.SenderState.Idle)
+            {
+                ProgramStatus = string.Empty;
+                ProgramProgress = 0.0;
+            }
+
             _startCommand.NotifyCanExecuteChanged();
         }
 
@@ -168,6 +196,12 @@ namespace LaserPewer.ViewModel
         {
             _startCommand.NotifyCanExecuteChanged();
             _stopCommand.NotifyCanExecuteChanged();
+        }
+
+        private void Sender_Progress(object sender, int lineAt)
+        {
+            ProgramStatus = lineAt + "/" + AppCore.Sender.LineCount;
+            ProgramProgress = AppCore.Sender.LineCount != 0 ? (double)lineAt / AppCore.Sender.LineCount : 0;
         }
 
         private static string toDisplayString(double value)
