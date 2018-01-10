@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LaserPewer.Utilities;
+using System;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -55,7 +56,7 @@ namespace LaserPewer.Model
 
             if (_machineList.Profiles.Count == 0)
             {
-                _machineList.CreateProfile("Default Machine", new Size(300.0, 200.0), 10000.0);
+                _machineList.CreateProfile("Default Machine", new Size(300.0, 200.0), Corner.TopLeft, 10000.0);
             }
 
             if (_machineList.Active == null)

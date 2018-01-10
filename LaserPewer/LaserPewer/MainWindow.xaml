@@ -3,15 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:utils="clr-namespace:LaserPewer.Utilities"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
         Title="LaserPewer"
         Width="1000"
         Height="600">
     <Window.Resources>
-        <local:DoubleToPercentConverter x:Key="DoubleToPercentConverter" />
-        <local:NullableToBooleanConverter x:Key="NullableToBooleanConverter" />
-        <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
+        <utils:DoubleToPercentConverter x:Key="DoubleToPercentConverter" />
+        <utils:NullableToBooleanConverter x:Key="NullableToBooleanConverter" />
+        <utils:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -253,11 +254,12 @@
                                  MouseDoubleClick="workbench_MouseDoubleClick"
                                  ViewCenter="{Binding ViewCenter}"
                                  TableSize="{Binding MachineSize}"
+                                 TableOrigin="{Binding MachineOrigin}"
                                  MachinePosition="{Binding MachinePosition}"
-                                 Drawing="{Binding Drawing}"
+                                 Document="{Binding Document}"
                                  MachinePath="{Binding MachinePath}"
                                  MachinePathFrame="{Binding MachinePathFrame}"
-                                 Background="DarkGray"
+                                 Background="#F9F9F9"
                                  Grid.Row="0" />
                 <Slider Value="{Binding MachinePathProgress}"
                         Minimum="0.0"

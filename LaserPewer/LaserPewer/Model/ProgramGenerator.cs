@@ -1,5 +1,7 @@
 ﻿using LaserPewer.Generation;
+using LaserPewer.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace LaserPewer.Model
@@ -47,16 +49,19 @@ namespace LaserPewer.Model
             Completed?.Invoke(this, null);
         }
 
-        public void Generate(Drawing drawing, MachineList.IProfile machineProfile)
+        public void Generate(Drawing drawing, Vector offset, MachineList.IProfile machineProfile)
         {
             if (drawing == null) return;
 
-            drawing = drawing.Clone();
-            drawing.Clip(new Rect(
-                0.0, -machineProfile.TableSize.Height,
-                machineProfile.TableSize.Width, machineProfile.TableSize.Height));
+            List<Drawing.Path> paths = new List<Drawing.Path>();
+            foreach (Drawing.Path path in drawing.Paths)
+            {
+                paths.Add(Drawing.Path.Offset(path, offset));
+            }
+            paths = Clipper.ClipPaths(paths, new Rect(new Point(0.0, 0.0),
+                CoordinateMath.FarExtent(machineProfile.TableSize, machineProfile.Origin)));
 
-            VectorPath = VectorGenerator.Generate(drawing.Paths, VectorPower, VectorSpeed);
+            VectorPath = VectorGenerator.Generate(paths, VectorPower, VectorSpeed);
             GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, machineProfile.MaxFeedRate);
 
             Completed?.Invoke(this, null);

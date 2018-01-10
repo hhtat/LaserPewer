@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:utils="clr-namespace:LaserPewer.Utilities"
         xmlns:local="clr-namespace:LaserPewer"
         mc:Ignorable="d"
         Title="Machines"
@@ -10,8 +11,17 @@
         Width="500"
         Height="200">
     <Window.Resources>
-        <local:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
-        <local:DoubleToStringConverter x:Key="DoubleToStringConverter" />
+        <utils:DoubleToStringConverter x:Key="DoubleToStringConverter" />
+        <utils:EnumToDescriptionStringConverter x:Key="EnumToDescriptionStringConverter" />
+        <utils:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
+
+        <ObjectDataProvider x:Key="OriginCornerDataProvider"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type utils:Corner}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="utils:Corner"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -30,6 +40,7 @@
                 <ListBox Name="profilesListBox"
                          ItemsSource="{Binding Profiles}"
                          DisplayMemberPath="ListDisplayName"
+                         SelectedItem="{Binding Active,Mode=OneTime}"
                          SelectionMode="Single"
                          Grid.Row="0" />
 
@@ -50,6 +61,7 @@
         <GroupBox Header="Edit" Grid.Column="1">
             <Grid Visibility="{Binding ElementName=profilesListBox,Path=SelectedValue,Converter={StaticResource NullableToVisibilityConverter},Mode=OneWay}">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -76,10 +88,22 @@
                 <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.TableHeight,Converter={StaticResource DoubleToStringConverter}}"
                          Grid.Row="2" Grid.Column="2" />
 
-                <TextBlock Text="Max feed rate (mm/min)"
+                <TextBlock Text="Origin corner (0, 0)"
                            Grid.Row="3" Grid.Column="0" />
+                <ComboBox ItemsSource="{Binding Source={StaticResource OriginCornerDataProvider}}"
+                          SelectedItem="{Binding ElementName=profilesListBox,Path=SelectedItem.Origin}"
+                          Grid.Row="3" Grid.Column="1">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type utils:Corner}">
+                            <TextBlock Text="{Binding Converter={StaticResource EnumToDescriptionStringConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock Text="Max feed rate (mm/min)"
+                           Grid.Row="4" Grid.Column="0" />
                 <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.MaxFeedRate,Converter={StaticResource DoubleToStringConverter}}"
-                         Grid.Row="3" Grid.Column="3" />
+                         Grid.Row="4" Grid.Column="3" />
             </Grid>
         </GroupBox>
     </Grid>

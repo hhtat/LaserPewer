@@ -2,18 +2,20 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace LaserPewer
+namespace LaserPewer.Utilities
 {
-    public class NullableToBooleanConverter : IValueConverter
+    public class DoubleToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value != null;
+            return ((double)value).ToString("F");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotSupportedException();
+            double _value;
+            double.TryParse((string)value, out _value);
+            return _value;
         }
     }
 }

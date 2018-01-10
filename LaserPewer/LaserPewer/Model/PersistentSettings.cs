@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LaserPewer.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,7 +30,8 @@ namespace LaserPewer.Model
                             decodeGuid(tokens[1]),
                             decodeString(tokens[2]),
                             new Size(decodeDouble(tokens[3]), decodeDouble(tokens[4])),
-                            decodeDouble(tokens[5]));
+                            (Corner)decodeUShort(tokens[5]),
+                            decodeDouble(tokens[6]));
                     }
 
                     if (tokens[0] == "LAST_MACHINE")
@@ -64,6 +66,8 @@ namespace LaserPewer.Model
                     writer.Write(' ');
                     writer.Write(encode(profile.TableSize.Height));
                     writer.Write(' ');
+                    writer.Write(encode((ushort)profile.Origin));
+                    writer.Write(' ');
                     writer.Write(encode(profile.MaxFeedRate));
                     writer.WriteLine();
                 }
@@ -87,14 +91,14 @@ namespace LaserPewer.Model
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".lspewer");
         }
 
-        private static string encode(Guid g)
+        private static string encode(ushort d)
         {
-            return Convert.ToBase64String(g.ToByteArray());
+            return Convert.ToBase64String(BitConverter.GetBytes(d));
         }
 
-        private static Guid decodeGuid(string s)
+        private static ushort decodeUShort(string s)
         {
-            return new Guid(Convert.FromBase64String(s));
+            return BitConverter.ToUInt16(Convert.FromBase64String(s), 0);
         }
 
         private static string encode(double d)
@@ -105,6 +109,16 @@ namespace LaserPewer.Model
         private static double decodeDouble(string s)
         {
             return BitConverter.ToDouble(Convert.FromBase64String(s), 0);
+        }
+
+        private static string encode(Guid g)
+        {
+            return Convert.ToBase64String(g.ToByteArray());
+        }
+
+        private static Guid decodeGuid(string s)
+        {
+            return new Guid(Convert.FromBase64String(s));
         }
 
         private static string encode(string s)

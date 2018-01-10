@@ -13,25 +13,6 @@ namespace LaserPewer.Model
             Paths = paths;
         }
 
-        public void Clip(Rect clip)
-        {
-            List<Path> paths = new List<Path>();
-
-            Clipper clipper = new Clipper() { Clip = clip };
-
-            foreach (Path path in Paths)
-            {
-                paths.AddRange(clipper.ClipPath(path));
-            }
-
-            Paths = paths;
-        }
-
-        public Drawing Clone()
-        {
-            return new Drawing(new List<Path>(Paths));
-        }
-
         public class Path
         {
             public readonly IReadOnlyList<Point> Points;
@@ -61,6 +42,18 @@ namespace LaserPewer.Model
                 }
 
                 return new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+            }
+
+            public static Path Offset(Path path, Vector offset)
+            {
+                List<Point> points = new List<Point>();
+
+                foreach (Point point in path.Points)
+                {
+                    points.Add(point + offset);
+                }
+
+                return new Path(points, path.Closed);
             }
         }
     }

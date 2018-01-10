@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Generation;
 using LaserPewer.Model;
+using LaserPewer.Utilities;
 using System;
 using System.Windows;
 
@@ -16,6 +17,8 @@ namespace LaserPewer.ViewModel
 
         public Size MachineSize { get { return AppCore.MachineList.Active.TableSize; } }
 
+        public Corner MachineOrigin { get { return AppCore.MachineList.Active.Origin; } }
+
         private Point _machinePosition;
         public Point MachinePosition
         {
@@ -23,7 +26,7 @@ namespace LaserPewer.ViewModel
             private set { _machinePosition = value; NotifyPropertyChanged(); }
         }
 
-        public Drawing Drawing { get { return AppCore.Document.Drawing; } }
+        public Document Document { get { return AppCore.Document; } }
 
         public MachinePath MachinePath { get { return AppCore.Generator.VectorPath; } }
 
@@ -45,41 +48,39 @@ namespace LaserPewer.ViewModel
         {
             if (AppCore.MachineList.Active != null)
             {
-                ViewCenter = new Point(
-                    AppCore.MachineList.Active.TableSize.Width / 2.0,
-                    -AppCore.MachineList.Active.TableSize.Height / 2.0);
                 AppCore.MachineList.Active.Modified += MachineProfile_Modified;
+                updateProfile(AppCore.MachineList.Active);
             }
 
             AppCore.MachineList.ActiveChanged += MachineProfiles_ActiveChanged;
             AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
 
-            AppCore.Document.Modified += Document_Modified;
-
             AppCore.Generator.Completed += Generator_Completed;
+        }
+
+        private void updateProfile(MachineList.IProfile profile)
+        {
+            NotifyPropertyChanged(nameof(MachineSize));
+            NotifyPropertyChanged(nameof(MachineOrigin));
+            Point extent = CoordinateMath.FarExtent(profile.TableSize, profile.Origin);
+            ViewCenter = new Point(extent.X / 2.0, extent.Y / 2.0);
         }
 
         private void MachineProfile_Modified(object sender, EventArgs e)
         {
-            NotifyPropertyChanged(nameof(MachineSize));
+            updateProfile(AppCore.MachineList.Active);
         }
 
         private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
         {
-            ViewCenter = new Point(profile.TableSize.Width / 2.0, profile.TableSize.Height / 2.0);
-            NotifyPropertyChanged(nameof(MachineSize));
-            profile.Modified += MachineProfile_Modified;
             if (old != null) old.Modified -= MachineProfile_Modified;
+            profile.Modified += MachineProfile_Modified;
+            updateProfile(profile);
         }
 
         private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)
         {
             MachinePosition = new Point(status.X, status.Y);
-        }
-
-        private void Document_Modified(object sender, EventArgs e)
-        {
-            NotifyPropertyChanged(nameof(Drawing));
         }
 
         private void Generator_Completed(object sender, EventArgs e)

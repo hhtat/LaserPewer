@@ -43,9 +43,9 @@ namespace LaserPewer.Model
             pathBuilder = new PathBuilder();
         }
 
-        public Drawing CreateDrawing()
+        public Drawing CreateDrawing(System.Windows.Rect clip)
         {
-            return new Drawing(pathBuilder.GetPaths());
+            return new Drawing(Clipper.ClipPaths(pathBuilder.GetPaths(), clip));
         }
 
         public double GetWidth(SvgDocument svgDocument)

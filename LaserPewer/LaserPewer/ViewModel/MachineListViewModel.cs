@@ -73,7 +73,11 @@ namespace LaserPewer.ViewModel
         {
             MachineProfileViewModel vm = parameter as MachineProfileViewModel;
             if (vm == null) return;
-            AppCore.MachineList.CreateProfile(vm.Model.FriendlyName + " (Duplicate)", vm.Model.TableSize, vm.Model.MaxFeedRate);
+            AppCore.MachineList.CreateProfile(
+                vm.Model.FriendlyName + " (Duplicate)",
+                vm.Model.TableSize,
+                vm.Model.Origin,
+                vm.Model.MaxFeedRate);
         }
 
         private void _deleteCommand_Execute(object parameter)

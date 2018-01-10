@@ -42,7 +42,7 @@ namespace LaserPewer.ViewModel
         public ProgramGeneratorViewModel()
         {
             _generateCommand = new RelayCommand(
-                parameter => AppCore.Generator.Generate(AppCore.Document.Drawing, AppCore.MachineList.Active),
+                parameter => AppCore.Generator.Generate(AppCore.Document.Drawing, AppCore.Document.Offset, AppCore.MachineList.Active),
                 parameter => AppCore.Document.Drawing != null);
 
             AppCore.Generator.SettingModified += ProgramGenerator_SettingModified;

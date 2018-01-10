@@ -14,6 +14,17 @@ namespace LaserPewer.Model
         public Drawing Drawing { get; private set; }
         public Size Size { get; private set; }
 
+        private Vector _offset;
+        public Vector Offset
+        {
+            get { return _offset; }
+            set
+            {
+                _offset = value;
+                Modified?.Invoke(this, null);
+            }
+        }
+
         public bool LoadSVG(string fileName)
         {
             SvgScraper svgScraper = new SvgScraper();
@@ -33,8 +44,7 @@ namespace LaserPewer.Model
                 return false;
             }
 
-            Drawing svgDrawing = svgScraper.CreateDrawing();
-            svgDrawing.Clip(new Rect(0.0, -svgSize.Height, svgSize.Width, svgSize.Height));
+            Drawing svgDrawing = svgScraper.CreateDrawing(new Rect(0.0, -svgSize.Height, svgSize.Width, svgSize.Height));
 
             FileName = fileName;
             Drawing = svgDrawing;

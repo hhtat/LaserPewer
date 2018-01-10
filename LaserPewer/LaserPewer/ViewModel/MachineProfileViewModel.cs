@@ -1,4 +1,5 @@
 ﻿using LaserPewer.Model;
+using LaserPewer.Utilities;
 using System;
 using System.Windows;
 
@@ -49,6 +50,19 @@ namespace LaserPewer.ViewModel
                 if (Model.TableSize.Height != value && value > 0.0 && value < 1000.0)
                 {
                     Model.TableSize = new Size(TableWidth, value);
+                }
+                NotifyPropertyChanged();
+            }
+        }
+
+        public Corner Origin
+        {
+            get { return Model.Origin; }
+            set
+            {
+                if (Model.Origin != value)
+                {
+                    Model.Origin = value;
                 }
                 NotifyPropertyChanged();
             }

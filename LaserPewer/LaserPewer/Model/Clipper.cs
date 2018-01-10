@@ -5,11 +5,21 @@ using LaserPewer.Utilities;
 
 namespace LaserPewer.Model
 {
-    public class Clipper
+    public static class Clipper
     {
-        public Rect Clip { get; set; }
+        public static List<Drawing.Path> ClipPaths(IEnumerable<Drawing.Path> paths, Rect clip)
+        {
+            List<Drawing.Path> clipped = new List<Drawing.Path>();
 
-        public List<Drawing.Path> ClipPath(Drawing.Path path)
+            foreach (Drawing.Path path in paths)
+            {
+                clipped.AddRange(ClipPath(path, clip));
+            }
+
+            return clipped;
+        }
+
+        public static List<Drawing.Path> ClipPath(Drawing.Path path, Rect clip)
         {
             PathBuilder pathBuilder = new PathBuilder();
 
@@ -23,7 +33,7 @@ namespace LaserPewer.Model
 
                 Point a = prev;
                 Point b = point;
-                if (ClipLine(ref a, ref b))
+                if (ClipLine(ref a, ref b, clip))
                 {
                     if (a != prev) { pathBuilder.StartPath(); pathBuilder.AddPoint(a); }
                     pathBuilder.AddPoint(b);
@@ -53,9 +63,9 @@ namespace LaserPewer.Model
             return paths;
         }
 
-        public bool ClipLine(ref Point a, ref Point b)
+        public static bool ClipLine(ref Point a, ref Point b, Rect clip)
         {
-            if (Clip.Contains(a) && Clip.Contains(b)) return true;
+            if (clip.Contains(a) && clip.Contains(b)) return true;
 
             double t0 = 0.0;
             double t1 = 1.0;
@@ -66,10 +76,10 @@ namespace LaserPewer.Model
 
             for (int edge = 0; edge < 4; edge++)
             {
-                if (edge == 0) { p = -delta.X; q = -(Clip.Left - a.X); }
-                if (edge == 1) { p = delta.X; q = (Clip.Right - a.X); }
-                if (edge == 2) { p = -delta.Y; q = -(Clip.Top - a.Y); }
-                if (edge == 3) { p = delta.Y; q = (Clip.Bottom - a.Y); }
+                if (edge == 0) { p = -delta.X; q = -(clip.Left - a.X); }
+                if (edge == 1) { p = delta.X; q = (clip.Right - a.X); }
+                if (edge == 2) { p = -delta.Y; q = -(clip.Top - a.Y); }
+                if (edge == 3) { p = delta.Y; q = (clip.Bottom - a.Y); }
 
                 if (p == 0 && q < 0) return false;
 

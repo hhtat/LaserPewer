@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LaserPewer.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -35,14 +36,14 @@ namespace LaserPewer.Model
             profiles = new List<IProfile>();
         }
 
-        public void CreateProfile(string friendlyName, Size tableSize, double maxFeedRate)
+        public void CreateProfile(string friendlyName, Size tableSize, Corner origin, double maxFeedRate)
         {
-            CreateProfile(Guid.NewGuid(), friendlyName, tableSize, maxFeedRate);
+            CreateProfile(Guid.NewGuid(), friendlyName, tableSize, origin, maxFeedRate);
         }
 
-        public void CreateProfile(Guid uniqueId, string friendlyName, Size tableSize, double maxFeedRate)
+        public void CreateProfile(Guid uniqueId, string friendlyName, Size tableSize, Corner origin, double maxFeedRate)
         {
-            Profile profile = new Profile(uniqueId, friendlyName, tableSize, maxFeedRate);
+            Profile profile = new Profile(uniqueId, friendlyName, tableSize, origin, maxFeedRate);
             profiles.Add(profile);
             profile.Modified += Profile_Modified;
             ProfileAdded?.Invoke(this, profile);
@@ -69,6 +70,7 @@ namespace LaserPewer.Model
 
             string FriendlyName { get; set; }
             Size TableSize { get; set; }
+            Corner Origin { get; set; }
             double MaxFeedRate { get; set; }
         }
 
@@ -92,6 +94,13 @@ namespace LaserPewer.Model
                 set { _tableSize = value; Modified?.Invoke(this, null); }
             }
 
+            private Corner _origin;
+            public Corner Origin
+            {
+                get { return _origin; }
+                set { _origin = value; Modified?.Invoke(this, null); }
+            }
+
             private double _maxFeedRate;
             public double MaxFeedRate
             {
@@ -99,11 +108,12 @@ namespace LaserPewer.Model
                 set { _maxFeedRate = value; Modified?.Invoke(this, null); }
             }
 
-            public Profile(Guid uniqueId, string friendlyName, Size tableSize, double maxFeedRate)
+            public Profile(Guid uniqueId, string friendlyName, Size tableSize, Corner origin, double maxFeedRate)
             {
                 UniqueId = uniqueId;
                 FriendlyName = friendlyName;
                 TableSize = tableSize;
+                Origin = origin;
                 MaxFeedRate = maxFeedRate;
             }
         }
