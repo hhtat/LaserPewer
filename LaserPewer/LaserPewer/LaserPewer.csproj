@@ -61,6 +61,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Grbl\GrblConnection.cs" />
+    <Compile Include="Grbl\GrblRequest.cs" />
+    <Compile Include="Grbl\GrblRequestQueue.cs" />
     <Compile Include="Utilities\CoordinateMath.cs" />
     <Compile Include="Utilities\DoubleToPercentConverter.cs" />
     <Compile Include="Generation\GCodeGenerator.cs" />
