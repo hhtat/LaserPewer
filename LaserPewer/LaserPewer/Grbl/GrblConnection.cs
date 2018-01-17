@@ -12,8 +12,16 @@ namespace LaserPewer.Grbl
     {
         private const int TxRxBufferSize = 128;
 
+        public delegate void ClosedEventHandler(GrblConnection sender);
+        public event ClosedEventHandler Closed;
+
+        public delegate void LineReceivedEventHandler(GrblConnection sender, string line);
+        public event LineReceivedEventHandler LineReceived;
+
         public delegate void UnsupportedVersionEventHandler(GrblConnection sender, string welcomeMessage);
         public event UnsupportedVersionEventHandler UnsupportedVersion;
+
+        public bool IsActive { get { return serialPort != null && serialPort.IsOpen; } }
 
         private readonly SynchronizationContext ownerContext;
 
@@ -33,7 +41,7 @@ namespace LaserPewer.Grbl
             pendingRequests = new GrblRequestQueue();
         }
 
-        public bool Connect(string portName)
+        public bool TryConnect(string portName)
         {
             if (serialPort != null)
             {
@@ -45,13 +53,6 @@ namespace LaserPewer.Grbl
                 serialPort = new SerialPort(portName, 115200, Parity.None, 8, StopBits.None);
                 serialPort.ReadTimeout = 1000;
                 serialPort.Open();
-
-                reader = new StreamReader(serialPort.BaseStream, Encoding.ASCII);
-                writer = new StreamWriter(serialPort.BaseStream, Encoding.ASCII);
-
-                receivingWorker = new BackgroundWorker();
-                receivingWorker.DoWork += receivingWorker_DoWork;
-                receivingWorker.RunWorkerAsync();
             }
             catch (Exception e)
             {
@@ -59,10 +60,17 @@ namespace LaserPewer.Grbl
                 return false;
             }
 
+            reader = new StreamReader(serialPort.BaseStream, Encoding.ASCII);
+            writer = new StreamWriter(serialPort.BaseStream, Encoding.ASCII);
+
+            receivingWorker = new BackgroundWorker();
+            receivingWorker.DoWork += receivingWorker_DoWork;
+            receivingWorker.RunWorkerAsync();
+
             return true;
         }
 
-        public bool Disconnect()
+        public void Disconnect()
         {
             try
             {
@@ -74,10 +82,7 @@ namespace LaserPewer.Grbl
             catch (Exception e)
             {
                 Debug.WriteLine(e);
-                return false;
             }
-
-            return true;
         }
 
         public bool Send(GrblRequest request)
@@ -119,6 +124,7 @@ namespace LaserPewer.Grbl
                 catch (Exception e)
                 {
                     Debug.WriteLine(e);
+                    serialPort.Close();
                     request.Complete(GrblResponseStatus.Failure);
                     return true;
                 }
@@ -178,6 +184,19 @@ namespace LaserPewer.Grbl
             }
         }
 
+        private void completeAll(GrblResponseStatus status)
+        {
+            lock (pendingRequests)
+            {
+                while (!pendingRequests.IsEmpty)
+                {
+                    completeQueuedRequest(status);
+                }
+
+                completeStatusQueryRequest(status);
+            }
+        }
+
         private void receiveLoop()
         {
             while (serialPort.IsOpen)
@@ -215,22 +234,20 @@ namespace LaserPewer.Grbl
                 }
                 else if (line.StartsWith("Grbl "))
                 {
+                    completeAll(GrblResponseStatus.Failure);
+
                     if (!line.StartsWith("Grbl 1.1"))
                     {
                         ownerContext.Send(state => UnsupportedVersion?.Invoke(this, line), null);
                     }
-
-                    lock (pendingRequests)
-                    {
-                        while (!pendingRequests.IsEmpty)
-                        {
-                            completeQueuedRequest(GrblResponseStatus.Error);
-                        }
-
-                        completeStatusQueryRequest(GrblResponseStatus.Error);
-                    }
                 }
+
+                ownerContext.Send(state => LineReceived?.Invoke(this, line), null);
             }
+
+            completeAll(GrblResponseStatus.Failure);
+
+            ownerContext.Send(state => Closed?.Invoke(this), null);
         }
 
         private void receivingWorker_DoWork(object sender, DoWorkEventArgs e)
