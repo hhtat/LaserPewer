@@ -23,8 +23,6 @@ namespace LaserPewer.Grbl
 
         public bool IsActive { get { return serialPort != null && serialPort.IsOpen; } }
 
-        private readonly SynchronizationContext ownerContext;
-
         private SerialPort serialPort;
         private StreamReader reader;
         private StreamWriter writer;
@@ -33,11 +31,10 @@ namespace LaserPewer.Grbl
         private GrblRequest pendingStatusQueryRequest;
         private bool pendingHomingRequest;
 
-        private BackgroundWorker receivingWorker;
+        private Thread receivingThread;
 
         public GrblConnection()
         {
-            ownerContext = SynchronizationContext.Current;
             pendingRequests = new GrblRequestQueue();
         }
 
@@ -63,11 +60,16 @@ namespace LaserPewer.Grbl
             reader = new StreamReader(serialPort.BaseStream, Encoding.ASCII);
             writer = new StreamWriter(serialPort.BaseStream, Encoding.ASCII);
 
-            receivingWorker = new BackgroundWorker();
-            receivingWorker.DoWork += receivingWorker_DoWork;
-            receivingWorker.RunWorkerAsync();
-
             return true;
+        }
+
+        public void StartReceiving()
+        {
+            if (receivingThread != null) return;
+
+            receivingThread = new Thread(receiveLoop);
+            receivingThread.Priority = ThreadPriority.AboveNormal;
+            receivingThread.Start();
         }
 
         public void Disconnect()
@@ -238,21 +240,16 @@ namespace LaserPewer.Grbl
 
                     if (!line.StartsWith("Grbl 1.1"))
                     {
-                        ownerContext.Send(state => UnsupportedVersion?.Invoke(this, line), null);
+                        UnsupportedVersion?.Invoke(this, line);
                     }
                 }
 
-                ownerContext.Send(state => LineReceived?.Invoke(this, line), null);
+                LineReceived?.Invoke(this, line);
             }
 
             completeAll(GrblResponseStatus.Failure);
 
-            ownerContext.Send(state => Closed?.Invoke(this), null);
-        }
-
-        private void receivingWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            receiveLoop();
+            Closed?.Invoke(this);
         }
     }
 }

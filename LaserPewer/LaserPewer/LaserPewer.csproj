@@ -63,6 +63,7 @@
     </ApplicationDefinition>
     <Compile Include="Grbl\GrblConnection.cs" />
     <Compile Include="Grbl\GrblMachine.cs" />
+    <Compile Include="Grbl\GrblStateMachine.cs" />
     <Compile Include="Grbl\GrblRequest.cs" />
     <Compile Include="Grbl\GrblRequestQueue.cs" />
     <Compile Include="Utilities\CoordinateMath.cs" />
