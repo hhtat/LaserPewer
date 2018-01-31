@@ -25,18 +25,6 @@
             return false;
         }
 
-        protected void handleRequest(GrblRequest request, StateBase target)
-        {
-            if (request.ResponseStatus == GrblResponseStatus.Unsent)
-            {
-                controller.Connection.Send(request);
-            }
-            else if (request.ResponseStatus != GrblResponseStatus.Pending)
-            {
-                controller.TransitionTo(target);
-            }
-        }
-
         public enum TriggerType
         {
             Connect,

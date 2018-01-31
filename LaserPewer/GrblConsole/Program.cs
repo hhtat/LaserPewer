@@ -34,6 +34,10 @@ namespace GrblConsole
                 {
                     controller.TriggerJog("G21 G90 X100 Y-100 F5000");
                 }
+                else if (line.StartsWith("g"))
+                {
+                    controller.TriggerJog("G21 G90 X0 Y0 F5000");
+                }
             }
         }
     }

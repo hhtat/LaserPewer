@@ -18,7 +18,14 @@
             if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
             if (handleTrigger(TriggerType.Reset, controller.ResettingState)) return;
 
-            handleRequest(request, controller.ReadyState);
+            if (request.ResponseStatus == GrblResponseStatus.Unsent)
+            {
+                controller.Connection.Send(request);
+            }
+            else if (request.ResponseStatus != GrblResponseStatus.Pending)
+            {
+                controller.TransitionTo(controller.ReadyState);
+            }
         }
     }
 }

@@ -37,11 +37,14 @@ namespace LaserPewer.Grbl.StateMachine
         }
 
         public bool ResetDetected { get; private set; }
+        public GrblStatus StatusReported { get; private set; }
 
         private readonly object queuedTriggerLock;
         private StateBase.Trigger queuedTrigger;
 
         private readonly Queue<string> receivedLines;
+
+        private GrblRequest pendingStatusQueryRequest;
 
         private StateBase currentState;
         private readonly Thread thread;
@@ -119,6 +122,11 @@ namespace LaserPewer.Grbl.StateMachine
             ResetDetected = false;
         }
 
+        public void ClearStatusReported()
+        {
+            StatusReported = null;
+        }
+
         private void connection_LineReceived(GrblConnection sender, string line)
         {
             queueReceivedLine(line);
@@ -143,7 +151,16 @@ namespace LaserPewer.Grbl.StateMachine
         {
             for (string line = dequeueReceivedLine(); line != null; line = dequeueReceivedLine())
             {
-                if (line.StartsWith("Grbl "))
+                if (line.StartsWith("<"))
+                {
+                    GrblStatus status = GrblStatus.Parse(line);
+                    if (status != null)
+                    {
+                        StatusReported = status;
+                        pendingStatusQueryRequest = null;
+                    }
+                }
+                else if (line.StartsWith("Grbl "))
                 {
                     ResetDetected = true;
                 }
@@ -152,17 +169,35 @@ namespace LaserPewer.Grbl.StateMachine
 
         private void resetConnectionState()
         {
-            ClearResetDetected();
             pushTrigger(null);
             clearReceivedLines();
+            pendingStatusQueryRequest = null;
+        }
+
+        private void maintainStatusReported()
+        {
+            if (StatusReported == null && pendingStatusQueryRequest == null)
+            {
+                GrblRequest request = GrblRequest.CreateStatusQueryRequest();
+                if (Connection.Send(request))
+                {
+                    pendingStatusQueryRequest = request;
+                }
+            }
         }
 
         private void threadStart()
         {
             while (true) // till when?
             {
-                processReceivedLines();
+                if (Connection != null)
+                {
+                    maintainStatusReported();
+                    processReceivedLines();
+                }
+
                 currentState.Step();
+
                 Thread.Sleep(1);
             }
         }
