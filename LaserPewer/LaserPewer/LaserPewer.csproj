@@ -61,11 +61,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Grbl\GrblConnection.cs" />
-    <Compile Include="Grbl\GrblMachine.cs" />
-    <Compile Include="Grbl\GrblStateMachine.cs" />
-    <Compile Include="Grbl\GrblRequest.cs" />
-    <Compile Include="Grbl\GrblRequestQueue.cs" />
     <Compile Include="Utilities\CoordinateMath.cs" />
     <Compile Include="Utilities\DoubleToPercentConverter.cs" />
     <Compile Include="Generation\GCodeGenerator.cs" />
@@ -95,7 +90,6 @@
     <Compile Include="Utilities\DoubleToStringConverter.cs" />
     <Compile Include="Generation\VectorGenerator.cs" />
     <Compile Include="Utilities\NullableToVisibilityConverter.cs" />
-    <Compile Include="Utilities\StopWatch.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\DocumentViewModel.cs" />
     <Compile Include="ViewModel\MachineListViewModel.cs" />
@@ -160,6 +154,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LaserPewer.Shared\LaserPewer.Shared.csproj">
+      <Project>{b2e3a27c-e103-4bbb-8da6-66c521f90500}</Project>
+      <Name>LaserPewer.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,5 +1,5 @@
 ﻿using LaserPewer.Model;
-using LaserPewer.Utilities;
+using LaserPewer.Shared;
 using System.Collections.Generic;
 using System.Windows;
 

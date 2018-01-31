@@ -20,14 +20,23 @@ namespace LaserPewer.Grbl
             Message = message;
             LineNumber = lineNumber;
 
-            ResponseStatus = GrblResponseStatus.Pending;
+            ResponseStatus = GrblResponseStatus.Unsent;
             ResponseErrorCode = 0;
+        }
+
+        public void Sent()
+        {
+            if (ResponseStatus != GrblResponseStatus.Unsent)
+            {
+                throw new InvalidOperationException();
+            }
+
+            ResponseStatus = GrblResponseStatus.Pending;
         }
 
         public void Complete(GrblResponseStatus status, int errorCode = 0)
         {
-            if (ResponseStatus != GrblResponseStatus.Pending ||
-                status == GrblResponseStatus.Pending)
+            if (ResponseStatus != GrblResponseStatus.Pending)
             {
                 throw new InvalidOperationException();
             }
@@ -91,6 +100,7 @@ namespace LaserPewer.Grbl
 
     public enum GrblResponseStatus
     {
+        Unsent,
         Pending,
         Silent,
         Ok,

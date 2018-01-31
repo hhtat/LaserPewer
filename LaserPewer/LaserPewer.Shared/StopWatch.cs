@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace LaserPewer.Utilities
+namespace LaserPewer.Shared
 {
     public class StopWatch
     {

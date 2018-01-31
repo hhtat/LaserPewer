@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
@@ -40,16 +39,15 @@ namespace LaserPewer.Grbl
 
         public bool TryConnect(string portName)
         {
-            if (serialPort != null)
-            {
-                throw new InvalidOperationException();
-            }
+            if (serialPort != null) throw new InvalidOperationException();
+
+            SerialPort newPort;
 
             try
             {
-                serialPort = new SerialPort(portName, 115200, Parity.None, 8, StopBits.None);
-                serialPort.ReadTimeout = 1000;
-                serialPort.Open();
+                newPort = new SerialPort(portName, 115200, Parity.None, 8, StopBits.One);
+                newPort.ReadTimeout = 1000;
+                newPort.Open();
             }
             catch (Exception e)
             {
@@ -57,6 +55,7 @@ namespace LaserPewer.Grbl
                 return false;
             }
 
+            serialPort = newPort;
             reader = new StreamReader(serialPort.BaseStream, Encoding.ASCII);
             writer = new StreamWriter(serialPort.BaseStream, Encoding.ASCII);
 
@@ -66,6 +65,7 @@ namespace LaserPewer.Grbl
         public void StartReceiving()
         {
             if (receivingThread != null) return;
+            if (reader == null) throw new InvalidOperationException();
 
             receivingThread = new Thread(receiveLoop);
             receivingThread.Priority = ThreadPriority.AboveNormal;
@@ -89,7 +89,7 @@ namespace LaserPewer.Grbl
 
         public bool Send(GrblRequest request)
         {
-            if (request.ResponseStatus != GrblResponseStatus.Pending)
+            if (request.ResponseStatus != GrblResponseStatus.Unsent)
             {
                 throw new InvalidOperationException();
             }
@@ -98,7 +98,10 @@ namespace LaserPewer.Grbl
             {
                 try
                 {
+                    request.Sent();
+                    Console.WriteLine("SENT: " + request.Message);
                     writer.Write(request.Message);
+                    writer.Flush();
                     request.Complete(GrblResponseStatus.Silent);
                 }
                 catch (Exception e)
@@ -121,7 +124,10 @@ namespace LaserPewer.Grbl
 
                 try
                 {
+                    request.Sent();
+                    Console.WriteLine("SENT: " + request.Message);
                     writer.Write(request.Message);
+                    writer.Flush();
                 }
                 catch (Exception e)
                 {
@@ -219,6 +225,8 @@ namespace LaserPewer.Grbl
                     serialPort.Close();
                     break;
                 }
+
+                Console.WriteLine("RECV: " + line);
 
                 if (line == "ok")
                 {
