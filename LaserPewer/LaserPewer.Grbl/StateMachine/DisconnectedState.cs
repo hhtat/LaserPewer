@@ -8,12 +8,9 @@
 
         public override void Step()
         {
-            Trigger trigger = controller.PopTrigger(TriggerType.Connect);
-            if (trigger != null)
-            {
-                controller.TransitionTo(controller.ConnectingState, trigger);
-            }
-            else if (controller.Connection != null)
+            if (handleTrigger(TriggerType.Connect, controller.ConnectingState)) return;
+
+            if (controller.Connection != null)
             {
                 controller.Connection = null;
             }

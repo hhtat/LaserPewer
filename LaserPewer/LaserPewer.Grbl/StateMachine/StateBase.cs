@@ -15,13 +15,26 @@
 
         protected bool handleTrigger(TriggerType type, StateBase target)
         {
-            if (controller.PopTrigger(type) != null)
+            Trigger trigger = controller.PopTrigger(type);
+            if (trigger != null)
             {
-                controller.TransitionTo(target);
+                controller.TransitionTo(target, trigger);
                 return true;
             }
 
             return false;
+        }
+
+        protected void handleRequest(GrblRequest request, StateBase target)
+        {
+            if (request.ResponseStatus == GrblResponseStatus.Unsent)
+            {
+                controller.Connection.Send(request);
+            }
+            else if (request.ResponseStatus != GrblResponseStatus.Pending)
+            {
+                controller.TransitionTo(target);
+            }
         }
 
         public enum TriggerType
@@ -30,6 +43,7 @@
             Disconnect,
             Reset,
             Home,
+            Jog,
         }
 
         public class Trigger

@@ -11,6 +11,7 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly StateBase ReadyState;
         public readonly StateBase ResettingState;
         public readonly StateBase HomingState;
+        public readonly StateBase JoggingState;
 
         private GrblConnection _connection;
         public GrblConnection Connection
@@ -52,6 +53,7 @@ namespace LaserPewer.Grbl.StateMachine
             ReadyState = new ReadyState(this);
             ResettingState = new ResettingState(this);
             HomingState = new HomingState(this);
+            JoggingState = new JoggingState(this);
 
             queuedTriggerLock = new object();
             receivedLines = new Queue<string>();
@@ -79,6 +81,11 @@ namespace LaserPewer.Grbl.StateMachine
         public void TriggerHome()
         {
             pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Home));
+        }
+
+        public void TriggerJog(string line)
+        {
+            pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Jog, line));
         }
 
         private void pushTrigger(StateBase.Trigger trigger)

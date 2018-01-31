@@ -1,16 +1,16 @@
 ﻿namespace LaserPewer.Grbl.StateMachine
 {
-    public class HomingState : StateBase
+    public class JoggingState : StateBase
     {
         private GrblRequest request;
 
-        public HomingState(Controller controller) : base(controller)
+        public JoggingState(Controller controller) : base(controller)
         {
         }
 
         public override void Enter(Trigger trigger)
         {
-            request = GrblRequest.CreateHomingRequest();
+            request = GrblRequest.CreateJoggingRequest(trigger.Parameter);
         }
 
         public override void Step()
