@@ -6,13 +6,11 @@
         {
         }
 
-        public override StateBase Step()
+        public override void Step()
         {
-            if (controller.DisconnectTriggered()) return controller.DisconnectedState;
-            if (controller.ResetTriggered()) return controller.ResettingState;
-            if (controller.HomeTriggered()) return controller.HomingState;
-
-            return this;
+            if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
+            if (handleTrigger(TriggerType.Reset, controller.ResettingState)) return;
+            if (handleTrigger(TriggerType.Home, controller.HomingState)) return;
         }
     }
 }

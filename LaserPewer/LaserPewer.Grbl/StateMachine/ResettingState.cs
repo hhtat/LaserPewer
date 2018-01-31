@@ -12,15 +12,15 @@ namespace LaserPewer.Grbl.StateMachine
             timeout = new StopWatch();
         }
 
-        public override void Enter()
+        public override void Enter(Trigger trigger)
         {
             timeout.Zero();
             controller.ClearResetDetected();
         }
 
-        public override StateBase Step()
+        public override void Step()
         {
-            if (controller.DisconnectTriggered()) return controller.DisconnectedState;
+            if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
 
             if (timeout.Expired(TimeSpan.FromSeconds(0.5)))
             {
@@ -29,16 +29,11 @@ namespace LaserPewer.Grbl.StateMachine
                 {
                     timeout.Reset();
                 }
-
-                return this;
             }
-
-            if (controller.ResetDetected)
+            else if (controller.ResetDetected)
             {
-                return controller.ReadyState;
+                controller.TransitionTo(controller.ReadyState);
             }
-
-            return this;
         }
     }
 }

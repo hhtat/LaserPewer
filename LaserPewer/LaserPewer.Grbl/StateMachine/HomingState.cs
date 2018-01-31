@@ -8,28 +8,24 @@
         {
         }
 
-        public override void Enter()
+        public override void Enter(Trigger trigger)
         {
             request = GrblRequest.CreateHomingRequest();
         }
 
-        public override StateBase Step()
+        public override void Step()
         {
-            if (controller.DisconnectTriggered()) return controller.DisconnectedState;
-            if (controller.ResetTriggered()) return controller.ResettingState;
+            if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
+            if (handleTrigger(TriggerType.Reset, controller.ResettingState)) return;
 
             if (request.ResponseStatus == GrblResponseStatus.Unsent)
             {
                 controller.Connection.Send(request);
-                return this;
             }
-
-            if (request.ResponseStatus != GrblResponseStatus.Pending)
+            else if (request.ResponseStatus != GrblResponseStatus.Pending)
             {
-                return controller.ReadyState;
+                controller.TransitionTo(controller.ReadyState);
             }
-
-            return this;
         }
     }
 }

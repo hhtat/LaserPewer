@@ -6,26 +6,17 @@
         {
         }
 
-        public override StateBase Step()
+        public override void Step()
         {
             Trigger trigger = controller.PopTrigger(TriggerType.Connect);
             if (trigger != null)
             {
-                GrblConnection connection = new GrblConnection();
-                if (connection.TryConnect(trigger.Parameter))
-                {
-                    controller.Connection = connection;
-                    return controller.ReadyState;
-                }
+                controller.TransitionTo(controller.ConnectingState, trigger);
             }
-
-            if (controller.Connection != null)
+            else if (controller.Connection != null)
             {
                 controller.Connection = null;
-                return this;
             }
-
-            return this;
         }
     }
 }

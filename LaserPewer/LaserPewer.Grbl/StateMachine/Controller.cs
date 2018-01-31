@@ -7,6 +7,7 @@ namespace LaserPewer.Grbl.StateMachine
     public class Controller
     {
         public readonly StateBase DisconnectedState;
+        public readonly StateBase ConnectingState;
         public readonly StateBase ReadyState;
         public readonly StateBase ResettingState;
         public readonly StateBase HomingState;
@@ -47,6 +48,7 @@ namespace LaserPewer.Grbl.StateMachine
         public Controller()
         {
             DisconnectedState = new DisconnectedState(this);
+            ConnectingState = new ConnectingState(this);
             ReadyState = new ReadyState(this);
             ResettingState = new ResettingState(this);
             HomingState = new HomingState(this);
@@ -69,29 +71,14 @@ namespace LaserPewer.Grbl.StateMachine
             pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Disconnect));
         }
 
-        public bool DisconnectTriggered()
-        {
-            return PopTrigger(StateBase.TriggerType.Disconnect) != null;
-        }
-
         public void TriggerReset()
         {
             pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Reset));
         }
 
-        public bool ResetTriggered()
-        {
-            return PopTrigger(StateBase.TriggerType.Reset) != null;
-        }
-
         public void TriggerHome()
         {
             pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Home));
-        }
-
-        public bool HomeTriggered()
-        {
-            return PopTrigger(StateBase.TriggerType.Home) != null;
         }
 
         private void pushTrigger(StateBase.Trigger trigger)
@@ -111,6 +98,13 @@ namespace LaserPewer.Grbl.StateMachine
                 }
             }
             return trigger;
+        }
+
+        public void TransitionTo(StateBase state, StateBase.Trigger trigger = null)
+        {
+            Console.WriteLine("NEW STATE: " + state.GetType().Name);
+            currentState = state;
+            currentState.Enter(trigger);
         }
 
         public void ClearResetDetected()
@@ -161,15 +155,7 @@ namespace LaserPewer.Grbl.StateMachine
             while (true) // till when?
             {
                 processReceivedLines();
-
-                StateBase newState = currentState.Step();
-                if (newState != currentState)
-                {
-                    Console.WriteLine("NEW STATE: " + newState.GetType().Name);
-                    currentState = newState;
-                    currentState.Enter();
-                }
-
+                currentState.Step();
                 Thread.Sleep(1);
             }
         }

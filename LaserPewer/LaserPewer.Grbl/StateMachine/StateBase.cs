@@ -9,9 +9,20 @@
             this.controller = controller;
         }
 
-        public virtual void Enter() { }
+        public virtual void Enter(Trigger trigger) { }
 
-        public abstract StateBase Step();
+        public abstract void Step();
+
+        protected bool handleTrigger(TriggerType type, StateBase target)
+        {
+            if (controller.PopTrigger(type) != null)
+            {
+                controller.TransitionTo(target);
+                return true;
+            }
+
+            return false;
+        }
 
         public enum TriggerType
         {
