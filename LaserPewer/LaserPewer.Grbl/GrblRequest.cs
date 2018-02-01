@@ -80,6 +80,11 @@ namespace LaserPewer.Grbl
             return new GrblRequest(GrblRequestType.FeedHold, true, "!");
         }
 
+        public static GrblRequest CreateJogCancelRequest()
+        {
+            return new GrblRequest(GrblRequestType.JogCancel, true, "\u0085");
+        }
+
         public static GrblRequest CreateGCodeRequest(string line, int lineNumber)
         {
             return new GrblRequest(GrblRequestType.FeedHold, false, line, lineNumber);
@@ -95,6 +100,7 @@ namespace LaserPewer.Grbl
         StatusQuery,
         CycleResume,
         FeedHold,
+        JogCancel,
         GCode,
     }
 

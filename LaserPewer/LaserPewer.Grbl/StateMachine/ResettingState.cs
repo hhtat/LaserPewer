@@ -22,7 +22,7 @@ namespace LaserPewer.Grbl.StateMachine
         {
             if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
 
-            if (timeout.Expired(TimeSpan.FromSeconds(0.5)))
+            if (timeout.Expired(TimeSpan.FromSeconds(RetryTimeoutSecs)))
             {
                 GrblRequest request = GrblRequest.CreateSoftResetRequest();
                 if (controller.Connection.Send(request))

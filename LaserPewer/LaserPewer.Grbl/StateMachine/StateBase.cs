@@ -2,6 +2,9 @@
 {
     public abstract class StateBase
     {
+        protected const double RetryTimeoutSecs = 0.5;
+        protected const double StateTimeoutSecs = 0.2;
+
         protected readonly Controller controller;
 
         protected StateBase(Controller controller)
@@ -30,6 +33,7 @@
             Connect,
             Disconnect,
             Reset,
+            Cancel,
             Home,
             Jog,
         }

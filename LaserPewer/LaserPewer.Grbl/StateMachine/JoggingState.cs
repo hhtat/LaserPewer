@@ -6,7 +6,7 @@ namespace LaserPewer.Grbl.StateMachine
     public class JoggingState : StateBase
     {
         private GrblRequest request;
-        private StopWatch stopWatch;
+        private StopWatch timeout;
 
         public JoggingState(Controller controller) : base(controller)
         {
@@ -15,13 +15,14 @@ namespace LaserPewer.Grbl.StateMachine
         public override void Enter(Trigger trigger)
         {
             request = GrblRequest.CreateJoggingRequest(trigger.Parameter);
-            stopWatch = null;
+            timeout = null;
         }
 
         public override void Step()
         {
             if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
             if (handleTrigger(TriggerType.Reset, controller.ResettingState)) return;
+            if (handleTrigger(TriggerType.Cancel, controller.JogCancellationState)) return;
 
             if (request.ResponseStatus == GrblResponseStatus.Unsent)
             {
@@ -30,17 +31,17 @@ namespace LaserPewer.Grbl.StateMachine
             else if (request.ResponseStatus == GrblResponseStatus.Pending)
             {
             }
-            else if (stopWatch == null)
+            else if (timeout == null)
             {
-                stopWatch = new StopWatch();
+                timeout = new StopWatch();
             }
-            else if (stopWatch.Expired(TimeSpan.FromSeconds(0.25)))
+            else if (timeout.Expired(TimeSpan.FromSeconds(StateTimeoutSecs)))
             {
                 controller.TransitionTo(controller.ReadyState);
             }
             else if (controller.StatusReported != null)
             {
-                if (controller.StatusReported.State == GrblStatus.MachineState.Jog) stopWatch.Reset();
+                if (controller.StatusReported.State == GrblStatus.MachineState.Jog) timeout.Reset();
                 controller.ClearStatusReported();
             }
         }

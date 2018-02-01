@@ -1,8 +1,7 @@
-﻿using System;
+﻿using LaserPewer.Shared;
+using System;
 using System.Diagnostics;
-using System.IO;
 using System.IO.Ports;
-using System.Text;
 using System.Threading;
 
 namespace LaserPewer.Grbl
@@ -23,8 +22,6 @@ namespace LaserPewer.Grbl
         public bool IsActive { get { return serialPort != null && serialPort.IsOpen; } }
 
         private SerialPort serialPort;
-        private StreamReader reader;
-        private StreamWriter writer;
 
         private readonly GrblRequestQueue pendingRequests;
         private GrblRequest pendingStatusQueryRequest;
@@ -56,8 +53,6 @@ namespace LaserPewer.Grbl
             }
 
             serialPort = newPort;
-            reader = new StreamReader(serialPort.BaseStream, Encoding.ASCII);
-            writer = new StreamWriter(serialPort.BaseStream, Encoding.ASCII);
 
             return true;
         }
@@ -65,7 +60,7 @@ namespace LaserPewer.Grbl
         public void StartReceiving()
         {
             if (receivingThread != null) return;
-            if (reader == null) throw new InvalidOperationException();
+            if (serialPort == null) throw new InvalidOperationException();
 
             receivingThread = new Thread(receiveLoop);
             receivingThread.Priority = ThreadPriority.AboveNormal;
@@ -100,8 +95,7 @@ namespace LaserPewer.Grbl
                 {
                     request.Sent();
                     Console.WriteLine("SENT: " + request.Message);
-                    writer.Write(request.Message);
-                    writer.Flush();
+                    serialWrite(request.Message);
                     request.Complete(GrblResponseStatus.Silent);
                 }
                 catch (Exception e)
@@ -126,8 +120,7 @@ namespace LaserPewer.Grbl
                 {
                     request.Sent();
                     Console.WriteLine("SENT: " + request.Message);
-                    writer.Write(request.Message);
-                    writer.Flush();
+                    serialWrite(request.Message);
                 }
                 catch (Exception e)
                 {
@@ -153,6 +146,16 @@ namespace LaserPewer.Grbl
             }
 
             return true;
+        }
+
+        private void serialWrite(string data)
+        {
+            byte[] buffer = new byte[data.Length];
+            for (int i = 0; i < data.Length; i++)
+            {
+                buffer[i] = (byte)data[i];
+            }
+            serialPort.Write(buffer, 0, buffer.Length);
         }
 
         private void completeQueuedRequest(GrblResponseStatus status, int? errorCode = null)
@@ -213,7 +216,7 @@ namespace LaserPewer.Grbl
 
                 try
                 {
-                    line = reader.ReadLine();
+                    line = serialPort.ReadLine();
                 }
                 catch (TimeoutException)
                 {
@@ -227,6 +230,7 @@ namespace LaserPewer.Grbl
                 }
 
                 Console.WriteLine("RECV: " + line);
+                line = line.Trim();
 
                 if (line == "ok")
                 {
