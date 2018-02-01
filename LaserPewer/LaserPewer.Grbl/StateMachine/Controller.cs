@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LaserPewer.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -6,6 +7,8 @@ namespace LaserPewer.Grbl.StateMachine
 {
     public class Controller
     {
+        private static readonly TimeSpan DefaultStatusQueryInterval = TimeSpan.FromSeconds(0.5);
+
         public readonly StateBase DisconnectedState;
         public readonly StateBase ConnectingState;
         public readonly StateBase ReadyState;
@@ -45,6 +48,8 @@ namespace LaserPewer.Grbl.StateMachine
 
         private readonly Queue<string> receivedLines;
 
+        private readonly StopWatch statusQueryTimeout;
+        private TimeSpan statusQueryInterval;
         private GrblRequest pendingStatusQueryRequest;
 
         private StateBase currentState;
@@ -62,8 +67,9 @@ namespace LaserPewer.Grbl.StateMachine
 
             queuedTriggerLock = new object();
             receivedLines = new Queue<string>();
+            statusQueryTimeout = new StopWatch();
+            statusQueryInterval = DefaultStatusQueryInterval;
 
-            currentState = DisconnectedState;
             thread = new Thread(threadStart);
             thread.Start();
         }
@@ -119,7 +125,10 @@ namespace LaserPewer.Grbl.StateMachine
 
         public void TransitionTo(StateBase state, StateBase.Trigger trigger = null)
         {
-            Console.WriteLine("NEW STATE: " + state.GetType().Name);
+            Console.WriteLine("STATE: " + state.GetType().Name);
+
+            statusQueryInterval = DefaultStatusQueryInterval;
+
             currentState = state;
             currentState.Enter(trigger);
         }
@@ -129,9 +138,9 @@ namespace LaserPewer.Grbl.StateMachine
             ResetDetected = false;
         }
 
-        public void ClearStatusReported()
+        public void RequestStatusQueryInterval(double secs)
         {
-            StatusReported = null;
+            statusQueryInterval = TimeSpan.FromSeconds(secs);
         }
 
         private void connection_LineReceived(GrblConnection sender, string line)
@@ -176,18 +185,22 @@ namespace LaserPewer.Grbl.StateMachine
 
         private void resetConnectionState()
         {
+            ClearResetDetected();
+            StatusReported = GrblStatus.Unknown;
             pushTrigger(null);
             clearReceivedLines();
+            statusQueryTimeout.Zero();
             pendingStatusQueryRequest = null;
         }
 
-        private void maintainStatusReported()
+        private void pollStatusReport()
         {
-            if (StatusReported == null && pendingStatusQueryRequest == null)
+            if (statusQueryTimeout.Expired(statusQueryInterval) && pendingStatusQueryRequest == null)
             {
                 GrblRequest request = GrblRequest.CreateStatusQueryRequest();
                 if (Connection.Send(request))
                 {
+                    statusQueryTimeout.Reset();
                     pendingStatusQueryRequest = request;
                 }
             }
@@ -195,11 +208,13 @@ namespace LaserPewer.Grbl.StateMachine
 
         private void threadStart()
         {
+            TransitionTo(DisconnectedState);
+
             while (true) // till when?
             {
                 if (Connection != null)
                 {
-                    maintainStatusReported();
+                    pollStatusReport();
                     processReceivedLines();
                 }
 

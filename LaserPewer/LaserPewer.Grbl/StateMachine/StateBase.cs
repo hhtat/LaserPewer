@@ -4,6 +4,7 @@
     {
         protected const double RetryTimeoutSecs = 0.5;
         protected const double StateTimeoutSecs = 0.2;
+        protected const double RapidStatusQueryIntervalSecs = 0.01;
 
         protected readonly Controller controller;
 

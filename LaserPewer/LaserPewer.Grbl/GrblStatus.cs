@@ -4,6 +4,8 @@ namespace LaserPewer.Grbl
 {
     public class GrblStatus
     {
+        public static readonly GrblStatus Unknown = new GrblStatus(MachineState.Unknown, double.NaN, double.NaN);
+
         public readonly MachineState State;
         public readonly double WPosX;
         public readonly double WPosY;

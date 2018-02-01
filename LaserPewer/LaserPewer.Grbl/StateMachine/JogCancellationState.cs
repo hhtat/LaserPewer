@@ -17,6 +17,8 @@ namespace LaserPewer.Grbl.StateMachine
         {
             retryTimeout.Zero();
             stateTimeout = null;
+
+            controller.RequestStatusQueryInterval(RapidStatusQueryIntervalSecs);
         }
 
         public override void Step()
@@ -40,10 +42,9 @@ namespace LaserPewer.Grbl.StateMachine
             {
                 controller.TransitionTo(controller.ReadyState);
             }
-            else if (controller.StatusReported != null)
+            else if (controller.StatusReported.State == GrblStatus.MachineState.Jog)
             {
-                if (controller.StatusReported.State == GrblStatus.MachineState.Jog) stateTimeout.Reset();
-                controller.ClearStatusReported();
+                stateTimeout.Reset();
             }
         }
     }
