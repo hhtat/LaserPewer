@@ -13,6 +13,8 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly StateBase ConnectingState;
         public readonly StateBase ReadyState;
         public readonly StateBase ResettingState;
+        public readonly StateBase AlarmedState;
+        public readonly StateBase AlarmKillState;
         public readonly StateBase HomingState;
         public readonly StateBase JoggingState;
         public readonly StateBase JogCancellationState;
@@ -61,6 +63,8 @@ namespace LaserPewer.Grbl.StateMachine
             ConnectingState = new ConnectingState(this);
             ReadyState = new ReadyState(this);
             ResettingState = new ResettingState(this);
+            AlarmedState = new AlarmedState(this);
+            AlarmKillState = new AlarmKillState(this);
             HomingState = new HomingState(this);
             JoggingState = new JoggingState(this);
             JogCancellationState = new JogCancellationState(this);
@@ -76,37 +80,52 @@ namespace LaserPewer.Grbl.StateMachine
 
         public void TriggerConnect(string portName)
         {
-            pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Connect, portName));
+            pushTrigger(StateBase.TriggerType.Connect, portName);
         }
 
         public void TriggerDisconnect()
         {
-            pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Disconnect));
+            pushTrigger(StateBase.TriggerType.Disconnect);
         }
 
         public void TriggerReset()
         {
-            pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Reset));
+            pushTrigger(StateBase.TriggerType.Reset);
         }
 
         public void TriggerCancel()
         {
-            pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Cancel));
+            pushTrigger(StateBase.TriggerType.Cancel);
+        }
+
+        public void TriggerUnlock()
+        {
+            pushTrigger(StateBase.TriggerType.Unlock);
         }
 
         public void TriggerHome()
         {
-            pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Home));
+            pushTrigger(StateBase.TriggerType.Home);
         }
 
         public void TriggerJog(string line)
         {
-            pushTrigger(new StateBase.Trigger(StateBase.TriggerType.Jog, line));
+            pushTrigger(StateBase.TriggerType.Jog, line);
         }
 
-        private void pushTrigger(StateBase.Trigger trigger)
+        private void clearTrigger()
         {
-            lock (queuedTriggerLock) queuedTrigger = trigger;
+            lock (queuedTriggerLock) queuedTrigger = null;
+        }
+
+        private void pushTrigger(StateBase.TriggerType type)
+        {
+            lock (queuedTriggerLock) queuedTrigger = new StateBase.Trigger(type);
+        }
+
+        private void pushTrigger(StateBase.TriggerType type, String parameter)
+        {
+            lock (queuedTriggerLock) queuedTrigger = new StateBase.Trigger(type, parameter);
         }
 
         public StateBase.Trigger PopTrigger(StateBase.TriggerType type)
@@ -187,7 +206,7 @@ namespace LaserPewer.Grbl.StateMachine
         {
             ClearResetDetected();
             StatusReported = GrblStatus.Unknown;
-            pushTrigger(null);
+            clearTrigger();
             clearReceivedLines();
             statusQueryTimeout.Zero();
             pendingStatusQueryRequest = null;

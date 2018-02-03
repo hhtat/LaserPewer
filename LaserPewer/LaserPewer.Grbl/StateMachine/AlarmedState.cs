@@ -1,18 +1,18 @@
 ﻿namespace LaserPewer.Grbl.StateMachine
 {
-    public class ReadyState : StateBase
+    public class AlarmedState : StateBase
     {
-        public ReadyState(Controller controller) : base(controller)
+        public AlarmedState(Controller controller) : base(controller)
         {
         }
 
         public override void Step()
         {
-            if (handleMachineState(GrblStatus.MachineState.Alarm, controller.AlarmedState)) return;
+            if (handleMachineStateNeg(GrblStatus.MachineState.Alarm, controller.ReadyState)) return;
             if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
             if (handleTrigger(TriggerType.Reset, controller.ResettingState)) return;
             if (handleTrigger(TriggerType.Home, controller.HomingState)) return;
-            if (handleTrigger(TriggerType.Jog, controller.JoggingState)) return;
+            if (handleTrigger(TriggerType.Unlock, controller.AlarmKillState)) return;
         }
     }
 }

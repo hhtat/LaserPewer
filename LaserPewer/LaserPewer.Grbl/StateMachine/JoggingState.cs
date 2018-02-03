@@ -33,17 +33,8 @@ namespace LaserPewer.Grbl.StateMachine
             else if (request.ResponseStatus == GrblResponseStatus.Pending)
             {
             }
-            else if (timeout == null)
+            else if (handleMachineStateNegTimeout(ref timeout, GrblStatus.MachineState.Jog, controller.ReadyState))
             {
-                timeout = new StopWatch();
-            }
-            else if (timeout.Expired(TimeSpan.FromSeconds(StateTimeoutSecs)))
-            {
-                controller.TransitionTo(controller.ReadyState);
-            }
-            else if (controller.StatusReported.State == GrblStatus.MachineState.Jog)
-            {
-                timeout.Reset();
             }
         }
     }

@@ -45,6 +45,7 @@
     <Compile Include="GrblRequestQueue.cs" />
     <Compile Include="GrblStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateMachine\AlarmedState.cs" />
     <Compile Include="StateMachine\ConnectingState.cs" />
     <Compile Include="StateMachine\Controller.cs" />
     <Compile Include="StateMachine\DisconnectedState.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="StateMachine\ReadyState.cs" />
     <Compile Include="StateMachine\ResettingState.cs" />
     <Compile Include="StateMachine\StateBase.cs" />
+    <Compile Include="StateMachine\AlarmKillState.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LaserPewer.Shared\LaserPewer.Shared.csproj">

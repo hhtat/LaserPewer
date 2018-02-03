@@ -3,33 +3,35 @@ using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public class JogCancellationState : StateBase
+    public class AlarmKillState : StateBase
     {
         private readonly StopWatch retryTimeout;
-        private StopWatch stateTimeout;
+        private readonly StopWatch abortTimeout;
 
-        public JogCancellationState(Controller controller) : base(controller)
+        public AlarmKillState(Controller controller) : base(controller)
         {
             retryTimeout = new StopWatch();
+            abortTimeout = new StopWatch();
         }
 
         public override void Enter(Trigger trigger)
         {
             retryTimeout.Zero();
-            stateTimeout = null;
+            abortTimeout.Reset();
 
             controller.RequestStatusQueryInterval(RapidStatusQueryIntervalSecs);
         }
 
         public override void Step()
         {
+            if (handleMachineStateNeg(GrblStatus.MachineState.Alarm, controller.ReadyState)) return;
             if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
             if (handleTrigger(TriggerType.Reset, controller.ResettingState)) return;
 
-            if (retrySend(retryTimeout, GrblRequest.CreateJogCancelRequest()))
+            if (retrySend(retryTimeout, GrblRequest.CreateKillAlarmRequest()))
             {
             }
-            else if (handleMachineStateNegTimeout(ref stateTimeout, GrblStatus.MachineState.Jog, controller.ReadyState))
+            else if (timeoutAbort(abortTimeout, controller.AlarmedState))
             {
             }
         }

@@ -26,6 +26,14 @@ namespace GrblConsole
                 {
                     controller.TriggerReset();
                 }
+                else if (line.StartsWith("z"))
+                {
+                    controller.TriggerCancel();
+                }
+                else if (line.StartsWith("u"))
+                {
+                    controller.TriggerUnlock();
+                }
                 else if (line.StartsWith("h"))
                 {
                     controller.TriggerHome();
@@ -37,10 +45,6 @@ namespace GrblConsole
                 else if (line.StartsWith("g"))
                 {
                     controller.TriggerJog("G21 G90 X0 Y0 F100");
-                }
-                else if (line.StartsWith("z"))
-                {
-                    controller.TriggerCancel();
                 }
             }
         }
