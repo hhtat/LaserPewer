@@ -19,7 +19,7 @@
             if (connection.TryConnect(portName))
             {
                 controller.Connection = connection;
-                controller.TransitionTo(controller.ReadyState);
+                controller.TransitionTo(controller.ResettingState);
             }
             else
             {

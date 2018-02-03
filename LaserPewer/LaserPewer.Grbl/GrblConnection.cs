@@ -1,4 +1,5 @@
-﻿using LaserPewer.Shared;
+﻿#define LOG_TRAFFIC_CONSOLE
+
 using System;
 using System.Diagnostics;
 using System.IO.Ports;
@@ -94,7 +95,9 @@ namespace LaserPewer.Grbl
                 try
                 {
                     request.Sent();
+#if LOG_TRAFFIC_CONSOLE
                     Console.WriteLine("SENT: " + request.Message);
+#endif
                     serialWrite(request.Message);
                     request.Complete(GrblResponseStatus.Silent);
                 }
@@ -119,7 +122,9 @@ namespace LaserPewer.Grbl
                 try
                 {
                     request.Sent();
+#if LOG_TRAFFIC_CONSOLE
                     Console.WriteLine("SENT: " + request.Message);
+#endif
                     serialWrite(request.Message);
                 }
                 catch (Exception e)
@@ -229,7 +234,9 @@ namespace LaserPewer.Grbl
                     break;
                 }
 
+#if LOG_TRAFFIC_CONSOLE
                 Console.WriteLine("RECV: " + line);
+#endif
                 line = line.Trim();
 
                 if (line == "ok")
