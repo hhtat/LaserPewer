@@ -197,6 +197,7 @@ namespace LaserPewer.Grbl.StateMachine
                 }
                 else if (line.StartsWith("Grbl "))
                 {
+                    resetConnectionState();
                     ResetDetected = true;
                 }
             }
