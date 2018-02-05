@@ -35,7 +35,7 @@ namespace LaserPewer.Grbl.StateMachine
         protected bool handleCommonStates()
         {
             if (this != controller.DisconnectedState && handleDisconnect(controller.DisconnectedState)) return true;
-            if (this != controller.AlarmedState && handleMachineState(GrblStatus.MachineState.Alarm, controller.AlarmedState)) return true;
+            if (this != controller.AlarmedState && this != controller.AlarmKillState && this != controller.HomingState && handleMachineState(GrblStatus.MachineState.Alarm, controller.AlarmedState)) return true;
             if (this != controller.DisconnectedState && handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return true;
             if (this != controller.ResettingState && handleTrigger(TriggerType.Reset, controller.ResettingState)) return true;
             return false;
