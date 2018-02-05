@@ -21,6 +21,17 @@ namespace LaserPewer.Grbl.StateMachine
 
         public abstract void Step();
 
+        protected bool handleDisconnect(StateBase target)
+        {
+            if (controller.Connection == null)
+            {
+                controller.TransitionTo(target);
+                return true;
+            }
+
+            return false;
+        }
+
         protected bool handleTrigger(TriggerType type, StateBase target)
         {
             Trigger trigger = controller.PopTrigger(type);
