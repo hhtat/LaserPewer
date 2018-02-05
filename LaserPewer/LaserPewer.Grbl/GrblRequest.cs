@@ -87,7 +87,7 @@ namespace LaserPewer.Grbl
 
         public static GrblRequest CreateGCodeRequest(string line, int lineNumber)
         {
-            return new GrblRequest(GrblRequestType.FeedHold, false, line, lineNumber);
+            return new GrblRequest(GrblRequestType.GCode, false, line + "\r", lineNumber);
         }
     }
 

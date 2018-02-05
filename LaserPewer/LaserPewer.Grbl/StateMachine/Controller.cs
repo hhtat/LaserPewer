@@ -44,7 +44,7 @@ namespace LaserPewer.Grbl.StateMachine
             }
         }
 
-        public GrblProgramState Program { get; private set; }
+        public GrblProgram Program { get; private set; }
 
         public bool ResetDetected { get; private set; }
         public GrblStatus StatusReported { get; private set; }
@@ -118,6 +118,11 @@ namespace LaserPewer.Grbl.StateMachine
             pushTrigger(StateBase.TriggerType.Jog, line);
         }
 
+        public void TriggerRun(string code)
+        {
+            pushTrigger(StateBase.TriggerType.Run, code);
+        }
+
         private void clearTrigger()
         {
             lock (queuedTriggerLock) queuedTrigger = null;
@@ -176,7 +181,7 @@ namespace LaserPewer.Grbl.StateMachine
 
         public void LoadProgram(string code)
         {
-            Program = new GrblProgramState(code);
+            Program = new GrblProgram(code);
         }
 
         public void ClearResetDetected()

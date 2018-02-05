@@ -46,7 +46,23 @@ namespace GrblConsole
                 {
                     controller.TriggerJog("G21 G90 X0 Y0 F100");
                 }
+                else if (line.StartsWith(">"))
+                {
+                    controller.TriggerRun(testProgram);
+                }
             }
         }
+
+        private const string testProgram =
+            "G21\n" +
+            "G90\n" +
+            "M4 S0\n" +
+            "G0 X110.00 Y-10.00\n" +
+            "G1 X10.00 Y-10.00 S1000.00 F1000\n" +
+            "G1 X10.00 Y-60.00\n" +
+            "G1 X110.00 Y-60.00\n" +
+            "G1 X110.00 Y-10.00\n" +
+            "G1 X110.00 Y-10.00\n" +
+            "M5";
     }
 }

@@ -3,10 +3,10 @@ using System.IO;
 
 namespace LaserPewer.Grbl
 {
-    public class GrblProgramState
+    public class GrblProgram
     {
         private readonly List<string> _lines;
-        public IReadOnlyList<string> Lines;
+        public IReadOnlyList<string> Lines { get { return _lines; } }
 
         public int CurrentLine { get; private set; }
         public bool EndOfProgram { get { return CurrentLine >= Lines.Count; } }
@@ -15,7 +15,7 @@ namespace LaserPewer.Grbl
         private int nextLine;
         private readonly Queue<GrblRequest> pendingRequests;
 
-        public GrblProgramState(string code)
+        public GrblProgram(string code)
         {
             _lines = new List<string>();
             StringReader reader = new StringReader(code);
@@ -53,7 +53,7 @@ namespace LaserPewer.Grbl
                 if (pendingRequests.Peek().ResponseStatus == GrblResponseStatus.Pending) break;
 
                 GrblRequest request = pendingRequests.Dequeue();
-                CurrentLine = request.LineNumber;
+                CurrentLine = request.LineNumber + 1;
                 if (request.ResponseStatus != GrblResponseStatus.Ok &&
                     request.ResponseStatus != GrblResponseStatus.Silent)
                 {
