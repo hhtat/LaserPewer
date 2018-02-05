@@ -15,10 +15,8 @@
 
         public override void Step()
         {
-            GrblConnection connection = new GrblConnection();
-            if (connection.TryConnect(portName))
+            if (controller.TryConnect(portName))
             {
-                controller.Connection = connection;
                 controller.TransitionTo(controller.ResettingState);
             }
             else

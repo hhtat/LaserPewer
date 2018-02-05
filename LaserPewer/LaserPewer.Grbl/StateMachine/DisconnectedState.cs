@@ -12,7 +12,7 @@
 
             if (controller.Connection != null)
             {
-                controller.Connection = null;
+                controller.Disconnect();
             }
         }
     }

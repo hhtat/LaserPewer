@@ -1,6 +1,7 @@
 ﻿using LaserPewer.Shared;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 
 namespace LaserPewer.Grbl.StateMachine
@@ -23,7 +24,7 @@ namespace LaserPewer.Grbl.StateMachine
         public GrblConnection Connection
         {
             get { return _connection; }
-            set
+            private set
             {
                 if (_connection != null)
                 {
@@ -150,6 +151,23 @@ namespace LaserPewer.Grbl.StateMachine
 
             currentState = state;
             currentState.Enter(trigger);
+        }
+
+        public bool TryConnect(string portName)
+        {
+            GrblConnection connection = new GrblConnection();
+            if (connection.TryConnect(portName))
+            {
+                Connection = connection;
+                return true;
+            }
+
+            return false;
+        }
+
+        public void Disconnect()
+        {
+            Connection = null;
         }
 
         public void ClearResetDetected()
