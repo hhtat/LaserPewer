@@ -20,7 +20,6 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly StateBase JoggingState;
         public readonly StateBase JogCancellationState;
         public readonly StateBase RunningState;
-        public readonly StateBase RunCancelState;
 
         private GrblConnection _connection;
         public GrblConnection Connection
@@ -74,7 +73,6 @@ namespace LaserPewer.Grbl.StateMachine
             JoggingState = new JoggingState(this);
             JogCancellationState = new JogCancellationState(this);
             RunningState = new RunningState(this);
-            RunCancelState = new RunCancelState(this);
 
             queuedTriggerLock = new object();
             receivedLines = new Queue<string>();

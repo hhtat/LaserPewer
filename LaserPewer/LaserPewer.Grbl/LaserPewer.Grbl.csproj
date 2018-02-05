@@ -55,7 +55,6 @@
     <Compile Include="StateMachine\JoggingState.cs" />
     <Compile Include="StateMachine\ReadyState.cs" />
     <Compile Include="StateMachine\ResettingState.cs" />
-    <Compile Include="StateMachine\RunCancelState.cs" />
     <Compile Include="StateMachine\RunningState.cs" />
     <Compile Include="StateMachine\StateBase.cs" />
     <Compile Include="StateMachine\AlarmKillState.cs" />

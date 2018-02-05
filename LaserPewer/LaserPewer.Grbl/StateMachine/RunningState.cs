@@ -19,7 +19,7 @@ namespace LaserPewer.Grbl.StateMachine
         public override void Step()
         {
             if (handleCommonStates()) return;
-            if (handleTrigger(TriggerType.Cancel, controller.RunCancelState)) return;
+            if (handleTrigger(TriggerType.Cancel, controller.ResettingState)) return;
 
             controller.Program.Poll(controller.Connection);
             if (controller.Program.EndOfProgram)
@@ -28,7 +28,7 @@ namespace LaserPewer.Grbl.StateMachine
             }
             else if (controller.Program.ErrorsDetected)
             {
-                controller.TransitionTo(controller.RunCancelState);
+                controller.TransitionTo(controller.ResettingState);
             }
         }
     }
