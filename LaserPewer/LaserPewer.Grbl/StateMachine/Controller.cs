@@ -261,8 +261,15 @@ namespace LaserPewer.Grbl.StateMachine
             {
                 if (Connection != null)
                 {
-                    pollStatusReport();
-                    processReceivedLines();
+                    if (Connection.IsActive)
+                    {
+                        pollStatusReport();
+                        processReceivedLines();
+                    }
+                    else
+                    {
+                        Disconnect();
+                    }
                 }
 
                 currentState.Step();
