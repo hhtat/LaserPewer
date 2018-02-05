@@ -23,9 +23,7 @@ namespace LaserPewer.Grbl.StateMachine
 
         public override void Step()
         {
-            if (handleDisconnect(controller.DisconnectedState)) return;
-            if (handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return;
-            if (handleTrigger(TriggerType.Reset, controller.ResettingState)) return;
+            if (handleCommonStates()) return;
 
             if (retrySend(retryTimeout, GrblRequest.CreateJogCancelRequest()))
             {

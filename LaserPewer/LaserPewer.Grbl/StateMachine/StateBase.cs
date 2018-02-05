@@ -32,6 +32,15 @@ namespace LaserPewer.Grbl.StateMachine
             return false;
         }
 
+        protected bool handleCommonStates()
+        {
+            if (this != controller.DisconnectedState && handleDisconnect(controller.DisconnectedState)) return true;
+            if (this != controller.AlarmedState && handleMachineState(GrblStatus.MachineState.Alarm, controller.AlarmedState)) return true;
+            if (this != controller.DisconnectedState && handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return true;
+            if (this != controller.ResettingState && handleTrigger(TriggerType.Reset, controller.ResettingState)) return true;
+            return false;
+        }
+
         protected bool handleTrigger(TriggerType type, StateBase target)
         {
             Trigger trigger = controller.PopTrigger(type);
@@ -124,6 +133,7 @@ namespace LaserPewer.Grbl.StateMachine
             Unlock,
             Home,
             Jog,
+            Run,
         }
 
         public class Trigger

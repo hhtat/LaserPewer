@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GrblConnection.cs" />
+    <Compile Include="GrblProgramState.cs" />
     <Compile Include="GrblRequest.cs" />
     <Compile Include="GrblRequestQueue.cs" />
     <Compile Include="GrblStatus.cs" />
@@ -54,6 +55,8 @@
     <Compile Include="StateMachine\JoggingState.cs" />
     <Compile Include="StateMachine\ReadyState.cs" />
     <Compile Include="StateMachine\ResettingState.cs" />
+    <Compile Include="StateMachine\RunCancelState.cs" />
+    <Compile Include="StateMachine\RunningState.cs" />
     <Compile Include="StateMachine\StateBase.cs" />
     <Compile Include="StateMachine\AlarmKillState.cs" />
   </ItemGroup>

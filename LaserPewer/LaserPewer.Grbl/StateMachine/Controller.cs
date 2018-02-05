@@ -19,6 +19,8 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly StateBase HomingState;
         public readonly StateBase JoggingState;
         public readonly StateBase JogCancellationState;
+        public readonly StateBase RunningState;
+        public readonly StateBase RunCancelState;
 
         private GrblConnection _connection;
         public GrblConnection Connection
@@ -42,6 +44,8 @@ namespace LaserPewer.Grbl.StateMachine
                 }
             }
         }
+
+        public GrblProgramState Program { get; private set; }
 
         public bool ResetDetected { get; private set; }
         public GrblStatus StatusReported { get; private set; }
@@ -69,6 +73,8 @@ namespace LaserPewer.Grbl.StateMachine
             HomingState = new HomingState(this);
             JoggingState = new JoggingState(this);
             JogCancellationState = new JogCancellationState(this);
+            RunningState = new RunningState(this);
+            RunCancelState = new RunCancelState(this);
 
             queuedTriggerLock = new object();
             receivedLines = new Queue<string>();
@@ -168,6 +174,11 @@ namespace LaserPewer.Grbl.StateMachine
         public void Disconnect()
         {
             Connection = null;
+        }
+
+        public void LoadProgram(string code)
+        {
+            Program = new GrblProgramState(code);
         }
 
         public void ClearResetDetected()
