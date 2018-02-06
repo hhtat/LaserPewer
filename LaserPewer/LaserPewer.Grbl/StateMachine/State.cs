@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Shared;
 using System;
+using System.Collections.Generic;
 
 namespace LaserPewer.Grbl.StateMachine
 {
@@ -10,76 +11,46 @@ namespace LaserPewer.Grbl.StateMachine
         protected const double StateTimeoutSecs = 0.2;
         protected const double RapidStatusQueryIntervalSecs = 0.01;
 
+        protected readonly List<Transition> _transitions;
+        public IReadOnlyList<Transition> Transitions { get { return _transitions; } }
+
         protected readonly Controller controller;
 
         protected State(Controller controller)
         {
             this.controller = controller;
+            _transitions = new List<Transition>();
         }
 
-        public virtual void Enter(Trigger trigger) { }
-
-        public abstract void Step();
-
-        protected bool handleDisconnect(State target)
+        public void Enter(Trigger trigger)
         {
-            if (controller.Connection == null)
+            if (Transitions.Count == 0)
             {
-                controller.TransitionTo(target);
-                return true;
+                addTransitions();
             }
 
-            return false;
+            onEnter(trigger);
         }
 
-        protected bool handleCommonStates()
-        {
-            if (this != controller.DisconnectedState &&
-                handleDisconnect(controller.DisconnectedState)) return true;
-            if (this != controller.AlarmedState &&
-                this != controller.AlarmKillState &&
-                this != controller.HomingState &&
-                handleMachineState(GrblStatus.MachineState.Alarm, controller.AlarmedState)) return true;
-            if (this != controller.DisconnectedState &&
-                handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return true;
-            if (this != controller.ResettingState &&
-                handleTrigger(TriggerType.Reset, controller.ResettingState)) return true;
+        protected virtual void onEnter(Trigger trigger) { }
 
-            return false;
-        }
-
-        protected bool handleTrigger(TriggerType type, State target)
+        public void Step()
         {
-            Trigger trigger = controller.PopTrigger(type);
-            if (trigger != null)
+            foreach (Transition transition in Transitions)
             {
-                controller.TransitionTo(target, trigger);
-                return true;
+                if (transition.TryStep(controller)) return;
             }
 
-            return false;
+            onStep();
         }
 
-        protected bool handleMachineState(GrblStatus.MachineState state, State target)
+        protected abstract void onStep();
+
+        protected virtual void addTransitions() { }
+
+        protected void addTransition(Transition transition)
         {
-            if (controller.StatusReported.State == state)
-            {
-                controller.TransitionTo(target);
-                return true;
-            }
-
-            return false;
-        }
-
-        protected bool handleMachineStateNeg(GrblStatus.MachineState state, State target)
-        {
-            if (controller.StatusReported.State != state)
-            {
-                controller.TransitionTo(target);
-                return true;
-            }
-
-            return false;
+            _transitions.Add(transition);
         }
 
         protected bool handleMachineStateNegTimeout(ref StopWatch timeout, GrblStatus.MachineState state, State target)

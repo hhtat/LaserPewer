@@ -6,10 +6,13 @@
         {
         }
 
-        public override void Step()
+        protected override void addTransitions()
         {
-            if (handleTrigger(TriggerType.Connect, controller.ConnectingState)) return;
+            addTransition(new TriggerTransition(controller.ConnectingState, TriggerType.Connect));
+        }
 
+        protected override void onStep()
+        {
             if (controller.Connection != null)
             {
                 controller.Disconnect();

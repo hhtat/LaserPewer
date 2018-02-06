@@ -8,15 +8,20 @@
         {
         }
 
-        public override void Enter(Trigger trigger)
+        protected override void addTransitions()
+        {
+            addTransition(new DisconnectedTransition(controller.DisconnectedState));
+            addTransition(new TriggerTransition(controller.DisconnectedState, TriggerType.Disconnect));
+            addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Reset));
+        }
+
+        protected override void onEnter(Trigger trigger)
         {
             request = GrblRequest.CreateHomingRequest();
         }
 
-        public override void Step()
+        protected override void onStep()
         {
-            if (handleCommonStates()) return;
-
             if (request.ResponseStatus == GrblResponseStatus.Unsent)
             {
                 controller.Connection.Send(request);

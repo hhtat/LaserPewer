@@ -8,12 +8,12 @@
         {
         }
 
-        public override void Enter(Trigger trigger)
+        protected override void onEnter(Trigger trigger)
         {
             portName = trigger.Parameter;
         }
 
-        public override void Step()
+        protected override void onStep()
         {
             if (controller.TryConnect(portName))
             {

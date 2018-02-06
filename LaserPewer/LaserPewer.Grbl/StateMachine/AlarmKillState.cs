@@ -13,7 +13,16 @@ namespace LaserPewer.Grbl.StateMachine
             abortTimeout = new StopWatch();
         }
 
-        public override void Enter(Trigger trigger)
+        protected override void addTransitions()
+        {
+            addTransition(new DisconnectedTransition(controller.DisconnectedState));
+            addTransition(new TriggerTransition(controller.DisconnectedState, TriggerType.Disconnect));
+            addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Reset));
+
+            addTransition(new MachineStateTransition(controller.ReadyState, GrblStatus.MachineState.Alarm, true));
+        }
+
+        protected override void onEnter(Trigger trigger)
         {
             retryTimeout.Zero();
             abortTimeout.Reset();
@@ -21,11 +30,8 @@ namespace LaserPewer.Grbl.StateMachine
             controller.RequestStatusQueryInterval(RapidStatusQueryIntervalSecs);
         }
 
-        public override void Step()
+        protected override void onStep()
         {
-            if (handleCommonStates()) return;
-            if (handleMachineStateNeg(GrblStatus.MachineState.Alarm, controller.ReadyState)) return;
-
             if (retrySend(retryTimeout, GrblRequest.CreateKillAlarmRequest()))
             {
             }

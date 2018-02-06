@@ -6,12 +6,20 @@
         {
         }
 
-        public override void Step()
+        protected override void addTransitions()
         {
-            if (handleCommonStates()) return;
-            if (handleTrigger(TriggerType.Home, controller.HomingState)) return;
-            if (handleTrigger(TriggerType.Jog, controller.JoggingState)) return;
-            if (handleTrigger(TriggerType.Run, controller.RunningState)) return;
+            addTransition(new DisconnectedTransition(controller.DisconnectedState));
+            addTransition(new TriggerTransition(controller.DisconnectedState, TriggerType.Disconnect));
+            addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Reset));
+            addTransition(new MachineStateTransition(controller.AlarmedState, GrblStatus.MachineState.Alarm));
+
+            addTransition(new TriggerTransition(controller.HomingState, TriggerType.Home));
+            addTransition(new TriggerTransition(controller.JoggingState, TriggerType.Jog));
+            addTransition(new TriggerTransition(controller.RunningState, TriggerType.Run));
+        }
+
+        protected override void onStep()
+        {
         }
     }
 }

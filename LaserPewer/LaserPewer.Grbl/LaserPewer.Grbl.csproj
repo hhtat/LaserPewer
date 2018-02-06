@@ -50,14 +50,18 @@
     <Compile Include="StateMachine\ConnectingState.cs" />
     <Compile Include="StateMachine\Controller.cs" />
     <Compile Include="StateMachine\DisconnectedState.cs" />
+    <Compile Include="StateMachine\DisconnectedTransition.cs" />
     <Compile Include="StateMachine\HomingState.cs" />
     <Compile Include="StateMachine\JogCancellationState.cs" />
     <Compile Include="StateMachine\JoggingState.cs" />
+    <Compile Include="StateMachine\MachineStateTransition.cs" />
     <Compile Include="StateMachine\ReadyState.cs" />
     <Compile Include="StateMachine\ResettingState.cs" />
     <Compile Include="StateMachine\RunningState.cs" />
     <Compile Include="StateMachine\State.cs" />
     <Compile Include="StateMachine\AlarmKillState.cs" />
+    <Compile Include="StateMachine\Transition.cs" />
+    <Compile Include="StateMachine\TriggerTransition.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LaserPewer.Shared\LaserPewer.Shared.csproj">

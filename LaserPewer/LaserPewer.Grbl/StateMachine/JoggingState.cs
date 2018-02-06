@@ -12,7 +12,17 @@ namespace LaserPewer.Grbl.StateMachine
         {
         }
 
-        public override void Enter(Trigger trigger)
+        protected override void addTransitions()
+        {
+            addTransition(new DisconnectedTransition(controller.DisconnectedState));
+            addTransition(new TriggerTransition(controller.DisconnectedState, TriggerType.Disconnect));
+            addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Reset));
+            addTransition(new MachineStateTransition(controller.AlarmedState, GrblStatus.MachineState.Alarm));
+
+            addTransition(new TriggerTransition(controller.JogCancellationState, TriggerType.Cancel));
+        }
+
+        protected override void onEnter(Trigger trigger)
         {
             request = GrblRequest.CreateJoggingRequest(trigger.Parameter);
             timeout = null;
@@ -20,11 +30,8 @@ namespace LaserPewer.Grbl.StateMachine
             controller.RequestStatusQueryInterval(RapidStatusQueryIntervalSecs);
         }
 
-        public override void Step()
+        protected override void onStep()
         {
-            if (handleCommonStates()) return;
-            if (handleTrigger(TriggerType.Cancel, controller.JogCancellationState)) return;
-
             if (request.ResponseStatus == GrblResponseStatus.Unsent)
             {
                 controller.Connection.Send(request);
