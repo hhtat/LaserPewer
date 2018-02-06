@@ -5,12 +5,12 @@ using System.Windows;
 
 namespace LaserPewer.Model
 {
-    public class MachineList
+    public class MachineProfiles
     {
-        public delegate void MachineListEventHandler(object sender, IProfile profile);
-        public event MachineListEventHandler ProfileAdded;
-        public event MachineListEventHandler ProfileRemoved;
-        public event MachineListEventHandler ProfileModified;
+        public delegate void MachineProfilesEventHandler(object sender, IProfile profile);
+        public event MachineProfilesEventHandler ProfileAdded;
+        public event MachineProfilesEventHandler ProfileRemoved;
+        public event MachineProfilesEventHandler ProfileModified;
 
         public delegate void MachineSwapEventHandler(object sender, IProfile profile, IProfile old);
         public event MachineSwapEventHandler ActiveChanged;
@@ -31,7 +31,7 @@ namespace LaserPewer.Model
             }
         }
 
-        public MachineList()
+        public MachineProfiles()
         {
             profiles = new List<IProfile>();
         }

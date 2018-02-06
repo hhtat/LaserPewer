@@ -49,7 +49,7 @@ namespace LaserPewer.Model
             Completed?.Invoke(this, null);
         }
 
-        public void Generate(Drawing drawing, Vector offset, MachineList.IProfile machineProfile)
+        public void Generate(Drawing drawing, Vector offset, MachineProfiles.IProfile machineProfile)
         {
             if (drawing == null) return;
 

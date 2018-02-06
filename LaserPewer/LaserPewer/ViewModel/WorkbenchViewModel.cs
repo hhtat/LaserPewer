@@ -15,9 +15,9 @@ namespace LaserPewer.ViewModel
             private set { _viewCenter = value; NotifyPropertyChanged(); }
         }
 
-        public Size MachineSize { get { return AppCore.MachineList.Active.TableSize; } }
+        public Size MachineSize { get { return AppCore.MachineProfiles.Active.TableSize; } }
 
-        public Corner MachineOrigin { get { return AppCore.MachineList.Active.Origin; } }
+        public Corner MachineOrigin { get { return AppCore.MachineProfiles.Active.Origin; } }
 
         private Point _machinePosition;
         public Point MachinePosition
@@ -46,19 +46,19 @@ namespace LaserPewer.ViewModel
 
         public WorkbenchViewModel()
         {
-            if (AppCore.MachineList.Active != null)
+            if (AppCore.MachineProfiles.Active != null)
             {
-                AppCore.MachineList.Active.Modified += MachineProfile_Modified;
-                updateProfile(AppCore.MachineList.Active);
+                AppCore.MachineProfiles.Active.Modified += MachineProfile_Modified;
+                updateProfile(AppCore.MachineProfiles.Active);
             }
 
-            AppCore.MachineList.ActiveChanged += MachineProfiles_ActiveChanged;
+            AppCore.MachineProfiles.ActiveChanged += MachineProfiles_ActiveChanged;
             AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
 
             AppCore.Generator.Completed += Generator_Completed;
         }
 
-        private void updateProfile(MachineList.IProfile profile)
+        private void updateProfile(MachineProfiles.IProfile profile)
         {
             NotifyPropertyChanged(nameof(MachineSize));
             NotifyPropertyChanged(nameof(MachineOrigin));
@@ -68,10 +68,10 @@ namespace LaserPewer.ViewModel
 
         private void MachineProfile_Modified(object sender, EventArgs e)
         {
-            updateProfile(AppCore.MachineList.Active);
+            updateProfile(AppCore.MachineProfiles.Active);
         }
 
-        private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
+        private void MachineProfiles_ActiveChanged(object sender, MachineProfiles.IProfile profile, MachineProfiles.IProfile old)
         {
             if (old != null) old.Modified -= MachineProfile_Modified;
             profile.Modified += MachineProfile_Modified;

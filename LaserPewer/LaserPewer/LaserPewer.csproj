@@ -65,8 +65,8 @@
     <Compile Include="Utilities\DoubleToPercentConverter.cs" />
     <Compile Include="Generation\GCodeGenerator.cs" />
     <Compile Include="Generation\MachinePath.cs" />
-    <Compile Include="MachineListWindow.xaml.cs">
-      <DependentUpon>MachineListWindow.xaml</DependentUpon>
+    <Compile Include="MachineProfilesWindow.xaml.cs">
+      <DependentUpon>MachineProfilesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\AppCore.cs" />
     <Compile Include="Model\Clipper.cs" />
@@ -80,7 +80,7 @@
     <Compile Include="Utilities\Corner.cs" />
     <Compile Include="Utilities\Precision.cs" />
     <Compile Include="Model\PathBuilder.cs" />
-    <Compile Include="Model\MachineList.cs" />
+    <Compile Include="Model\MachineProfiles.cs" />
     <Compile Include="Model\PersistentSettings.cs" />
     <Compile Include="Model\SvgScraper.cs" />
     <Compile Include="ConnectionDialog.xaml.cs">
@@ -92,7 +92,7 @@
     <Compile Include="Utilities\NullableToVisibilityConverter.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\DocumentViewModel.cs" />
-    <Compile Include="ViewModel\MachineListViewModel.cs" />
+    <Compile Include="ViewModel\MachineProfilesViewModel.cs" />
     <Compile Include="ViewModel\MachineProfileViewModel.cs" />
     <Compile Include="ViewModel\MachineViewModel.cs" />
     <Compile Include="Model\ProgramGenerator.cs" />
@@ -105,7 +105,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MachineListWindow.xaml">
+    <Page Include="MachineProfilesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

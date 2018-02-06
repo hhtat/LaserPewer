@@ -13,7 +13,7 @@ namespace LaserPewer
 
         private void machineProfilesManageButton_Click(object sender, RoutedEventArgs e)
         {
-            MachineListWindow dialog = new MachineListWindow() { Owner = this };
+            MachineProfilesWindow dialog = new MachineProfilesWindow() { Owner = this };
             Opacity = 0.8;
             dialog.ShowDialog();
             Opacity = 1.0;
@@ -42,7 +42,7 @@ namespace LaserPewer
         private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Point point = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
-            AppCore.Machine.Jog(point.X, point.Y, AppCore.MachineList.Active.MaxFeedRate);
+            AppCore.Machine.Jog(point.X, point.Y, AppCore.MachineProfiles.Active.MaxFeedRate);
         }
 
         private void viewGCodeButton_Click(object sender, RoutedEventArgs e)

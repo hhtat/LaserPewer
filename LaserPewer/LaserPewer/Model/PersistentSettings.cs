@@ -26,7 +26,7 @@ namespace LaserPewer.Model
 
                     if (tokens[0] == "MACHINE")
                     {
-                        AppCore.MachineList.CreateProfile(
+                        AppCore.MachineProfiles.CreateProfile(
                             decodeGuid(tokens[1]),
                             decodeString(tokens[2]),
                             new Size(decodeDouble(tokens[3]), decodeDouble(tokens[4])),
@@ -37,8 +37,8 @@ namespace LaserPewer.Model
                     if (tokens[0] == "LAST_MACHINE")
                     {
                         Guid uniqueId = decodeGuid(tokens[1]);
-                        MachineList.IProfile lastActive = AppCore.MachineList.Profiles.First(profile => profile.UniqueId == uniqueId);
-                        AppCore.MachineList.Active = lastActive;
+                        MachineProfiles.IProfile lastActive = AppCore.MachineProfiles.Profiles.First(profile => profile.UniqueId == uniqueId);
+                        AppCore.MachineProfiles.Active = lastActive;
                     }
 
                     if (tokens[0] == "LAST_VECTOR")
@@ -54,7 +54,7 @@ namespace LaserPewer.Model
         {
             using (StreamWriter writer = new StreamWriter(getConfigPath()))
             {
-                foreach (MachineList.IProfile profile in AppCore.MachineList.Profiles)
+                foreach (MachineProfiles.IProfile profile in AppCore.MachineProfiles.Profiles)
                 {
                     writer.Write("MACHINE");
                     writer.Write(' ');
@@ -74,7 +74,7 @@ namespace LaserPewer.Model
 
                 writer.Write("LAST_MACHINE");
                 writer.Write(' ');
-                writer.Write(encode(AppCore.MachineList.Active.UniqueId));
+                writer.Write(encode(AppCore.MachineProfiles.Active.UniqueId));
                 writer.WriteLine();
 
                 writer.Write("LAST_VECTOR");

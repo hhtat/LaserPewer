@@ -54,7 +54,7 @@
                     </GroupBox>
 
                     <GroupBox Header="Machine">
-                        <Grid DataContext="{StaticResource MachineListViewModel}">
+                        <Grid DataContext="{StaticResource MachineProfilesViewModel}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />

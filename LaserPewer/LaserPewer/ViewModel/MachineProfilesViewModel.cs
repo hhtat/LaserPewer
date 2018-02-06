@@ -7,10 +7,10 @@ using System.Windows.Input;
 
 namespace LaserPewer.ViewModel
 {
-    public class MachineListViewModel : BaseViewModel
+    public class MachineProfilesViewModel : BaseViewModel
     {
         private readonly ObservableCollection<MachineProfileViewModel> profileViewModels;
-        private readonly Dictionary<MachineList.IProfile, MachineProfileViewModel> profileToViewModels;
+        private readonly Dictionary<MachineProfiles.IProfile, MachineProfileViewModel> profileToViewModels;
         public ICollectionView Profiles { get { return CollectionViewSource.GetDefaultView(profileViewModels); } }
 
         private MachineProfileViewModel _active;
@@ -19,7 +19,7 @@ namespace LaserPewer.ViewModel
             get { return _active; }
             set
             {
-                if (value.Model != AppCore.MachineList.Active) AppCore.MachineList.Active = value.Model;
+                if (value.Model != AppCore.MachineProfiles.Active) AppCore.MachineProfiles.Active = value.Model;
                 _active = value;
                 NotifyPropertyChanged();
             }
@@ -34,28 +34,28 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _deleteCommand;
         public ICommand DeleteCommand { get { return _deleteCommand; } }
 
-        public MachineListViewModel()
+        public MachineProfilesViewModel()
         {
             profileViewModels = new ObservableCollection<MachineProfileViewModel>();
-            profileToViewModels = new Dictionary<MachineList.IProfile, MachineProfileViewModel>();
+            profileToViewModels = new Dictionary<MachineProfiles.IProfile, MachineProfileViewModel>();
             Profiles.SortDescriptions.Add(new SortDescription("FriendlyName", ListSortDirection.Ascending));
 
-            foreach (MachineList.IProfile profile in AppCore.MachineList.Profiles)
+            foreach (MachineProfiles.IProfile profile in AppCore.MachineProfiles.Profiles)
             {
                 addProfile(profile);
             }
-            if (AppCore.MachineList.Active != null) Active = profileToViewModels[AppCore.MachineList.Active];
+            if (AppCore.MachineProfiles.Active != null) Active = profileToViewModels[AppCore.MachineProfiles.Active];
 
             _activateCommand = new RelayCommand(_activateCommand_Execute);
             _duplicateCommand = new RelayCommand(_duplicateCommand_Execute);
             _deleteCommand = new RelayCommand(_deleteCommand_Execute);
 
-            AppCore.MachineList.ProfileAdded += MachineProfiles_ProfileAdded;
-            AppCore.MachineList.ProfileRemoved += MachineProfiles_ProfileRemoved;
-            AppCore.MachineList.ActiveChanged += MachineProfiles_ActiveChanged;
+            AppCore.MachineProfiles.ProfileAdded += MachineProfiles_ProfileAdded;
+            AppCore.MachineProfiles.ProfileRemoved += MachineProfiles_ProfileRemoved;
+            AppCore.MachineProfiles.ActiveChanged += MachineProfiles_ActiveChanged;
         }
 
-        private void addProfile(MachineList.IProfile profile)
+        private void addProfile(MachineProfiles.IProfile profile)
         {
             MachineProfileViewModel vm = new MachineProfileViewModel(profile);
             profileViewModels.Add(vm);
@@ -73,7 +73,7 @@ namespace LaserPewer.ViewModel
         {
             MachineProfileViewModel vm = parameter as MachineProfileViewModel;
             if (vm == null) return;
-            AppCore.MachineList.CreateProfile(
+            AppCore.MachineProfiles.CreateProfile(
                 vm.Model.FriendlyName + " (Duplicate)",
                 vm.Model.TableSize,
                 vm.Model.Origin,
@@ -83,23 +83,23 @@ namespace LaserPewer.ViewModel
         private void _deleteCommand_Execute(object parameter)
         {
             MachineProfileViewModel vm = parameter as MachineProfileViewModel;
-            if (vm == null || vm.Model == AppCore.MachineList.Active) return;
-            AppCore.MachineList.RemoveProfile(vm.Model);
+            if (vm == null || vm.Model == AppCore.MachineProfiles.Active) return;
+            AppCore.MachineProfiles.RemoveProfile(vm.Model);
         }
 
-        private void MachineProfiles_ProfileAdded(object sender, MachineList.IProfile profile)
+        private void MachineProfiles_ProfileAdded(object sender, MachineProfiles.IProfile profile)
         {
             addProfile(profile);
         }
 
-        private void MachineProfiles_ProfileRemoved(object sender, MachineList.IProfile profile)
+        private void MachineProfiles_ProfileRemoved(object sender, MachineProfiles.IProfile profile)
         {
             MachineProfileViewModel vm = profileToViewModels[profile];
             profileViewModels.Remove(vm);
             profileToViewModels.Remove(profile);
         }
 
-        private void MachineProfiles_ActiveChanged(object sender, MachineList.IProfile profile, MachineList.IProfile old)
+        private void MachineProfiles_ActiveChanged(object sender, MachineProfiles.IProfile profile, MachineProfiles.IProfile old)
         {
             Active = profileToViewModels[profile];
         }

@@ -6,7 +6,7 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <vm:DocumentViewModel x:Key="DocumentViewModel" />
-        <vm:MachineListViewModel x:Key="MachineListViewModel" />
+        <vm:MachineProfilesViewModel x:Key="MachineProfilesViewModel" />
         <vm:MachineViewModel x:Key="MachineViewModel" />
         <vm:ProgramGeneratorViewModel x:Key="ProgramGeneratorViewModel" />
         <vm:WorkbenchViewModel x:Key="WorkbenchViewModel" />
