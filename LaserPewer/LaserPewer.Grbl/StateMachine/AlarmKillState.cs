@@ -1,9 +1,8 @@
 ﻿using LaserPewer.Shared;
-using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public class AlarmKillState : StateBase
+    public class AlarmKillState : State
     {
         private readonly StopWatch retryTimeout;
         private readonly StopWatch abortTimeout;

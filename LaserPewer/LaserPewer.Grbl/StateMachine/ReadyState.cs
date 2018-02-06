@@ -1,6 +1,6 @@
 ﻿namespace LaserPewer.Grbl.StateMachine
 {
-    public class ReadyState : StateBase
+    public class ReadyState : State
     {
         public ReadyState(Controller controller) : base(controller)
         {

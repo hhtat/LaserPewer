@@ -1,6 +1,6 @@
 ﻿namespace LaserPewer.Grbl.StateMachine
 {
-    public class HomingState : StateBase
+    public class HomingState : State
     {
         private GrblRequest request;
 

@@ -1,6 +1,6 @@
 ﻿namespace LaserPewer.Grbl.StateMachine
 {
-    public class DisconnectedState : StateBase
+    public class DisconnectedState : State
     {
         public DisconnectedState(Controller controller) : base(controller)
         {

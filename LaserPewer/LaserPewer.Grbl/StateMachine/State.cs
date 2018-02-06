@@ -3,7 +3,7 @@ using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public abstract class StateBase
+    public abstract class State
     {
         protected const double AbortTimeoutSecs = 2.0;
         protected const double RetryTimeoutSecs = 0.5;
@@ -12,7 +12,7 @@ namespace LaserPewer.Grbl.StateMachine
 
         protected readonly Controller controller;
 
-        protected StateBase(Controller controller)
+        protected State(Controller controller)
         {
             this.controller = controller;
         }
@@ -21,7 +21,7 @@ namespace LaserPewer.Grbl.StateMachine
 
         public abstract void Step();
 
-        protected bool handleDisconnect(StateBase target)
+        protected bool handleDisconnect(State target)
         {
             if (controller.Connection == null)
             {
@@ -34,14 +34,21 @@ namespace LaserPewer.Grbl.StateMachine
 
         protected bool handleCommonStates()
         {
-            if (this != controller.DisconnectedState && handleDisconnect(controller.DisconnectedState)) return true;
-            if (this != controller.AlarmedState && this != controller.AlarmKillState && this != controller.HomingState && handleMachineState(GrblStatus.MachineState.Alarm, controller.AlarmedState)) return true;
-            if (this != controller.DisconnectedState && handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return true;
-            if (this != controller.ResettingState && handleTrigger(TriggerType.Reset, controller.ResettingState)) return true;
+            if (this != controller.DisconnectedState &&
+                handleDisconnect(controller.DisconnectedState)) return true;
+            if (this != controller.AlarmedState &&
+                this != controller.AlarmKillState &&
+                this != controller.HomingState &&
+                handleMachineState(GrblStatus.MachineState.Alarm, controller.AlarmedState)) return true;
+            if (this != controller.DisconnectedState &&
+                handleTrigger(TriggerType.Disconnect, controller.DisconnectedState)) return true;
+            if (this != controller.ResettingState &&
+                handleTrigger(TriggerType.Reset, controller.ResettingState)) return true;
+
             return false;
         }
 
-        protected bool handleTrigger(TriggerType type, StateBase target)
+        protected bool handleTrigger(TriggerType type, State target)
         {
             Trigger trigger = controller.PopTrigger(type);
             if (trigger != null)
@@ -53,7 +60,7 @@ namespace LaserPewer.Grbl.StateMachine
             return false;
         }
 
-        protected bool handleMachineState(GrblStatus.MachineState state, StateBase target)
+        protected bool handleMachineState(GrblStatus.MachineState state, State target)
         {
             if (controller.StatusReported.State == state)
             {
@@ -64,7 +71,7 @@ namespace LaserPewer.Grbl.StateMachine
             return false;
         }
 
-        protected bool handleMachineStateNeg(GrblStatus.MachineState state, StateBase target)
+        protected bool handleMachineStateNeg(GrblStatus.MachineState state, State target)
         {
             if (controller.StatusReported.State != state)
             {
@@ -75,7 +82,7 @@ namespace LaserPewer.Grbl.StateMachine
             return false;
         }
 
-        protected bool handleMachineStateNegTimeout(ref StopWatch timeout, GrblStatus.MachineState state, StateBase target)
+        protected bool handleMachineStateNegTimeout(ref StopWatch timeout, GrblStatus.MachineState state, State target)
         {
             if (timeout == null)
             {
@@ -113,7 +120,7 @@ namespace LaserPewer.Grbl.StateMachine
             return false;
         }
 
-        protected bool timeoutAbort(StopWatch timeout, StateBase target)
+        protected bool timeoutAbort(StopWatch timeout, State target)
         {
             if (timeout.Expired(TimeSpan.FromSeconds(AbortTimeoutSecs)))
             {

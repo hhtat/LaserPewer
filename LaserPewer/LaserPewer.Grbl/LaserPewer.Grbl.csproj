@@ -56,7 +56,7 @@
     <Compile Include="StateMachine\ReadyState.cs" />
     <Compile Include="StateMachine\ResettingState.cs" />
     <Compile Include="StateMachine\RunningState.cs" />
-    <Compile Include="StateMachine\StateBase.cs" />
+    <Compile Include="StateMachine\State.cs" />
     <Compile Include="StateMachine\AlarmKillState.cs" />
   </ItemGroup>
   <ItemGroup>

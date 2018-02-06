@@ -1,6 +1,6 @@
 ﻿namespace LaserPewer.Grbl.StateMachine
 {
-    public class AlarmedState : StateBase
+    public class AlarmedState : State
     {
         public AlarmedState(Controller controller) : base(controller)
         {

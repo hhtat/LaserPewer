@@ -1,9 +1,8 @@
 ﻿using LaserPewer.Shared;
-using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public class RunningState : StateBase
+    public class RunningState : State
     {
         private StopWatch timeout;
 

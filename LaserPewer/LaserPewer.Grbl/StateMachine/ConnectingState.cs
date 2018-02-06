@@ -1,6 +1,6 @@
 ﻿namespace LaserPewer.Grbl.StateMachine
 {
-    public class ConnectingState : StateBase
+    public class ConnectingState : State
     {
         private string portName;
 

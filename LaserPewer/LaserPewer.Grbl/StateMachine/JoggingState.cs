@@ -3,7 +3,7 @@ using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public class JoggingState : StateBase
+    public class JoggingState : State
     {
         private GrblRequest request;
         private StopWatch timeout;

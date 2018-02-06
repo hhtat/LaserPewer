@@ -3,7 +3,7 @@ using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public class JogCancellationState : StateBase
+    public class JogCancellationState : State
     {
         private readonly StopWatch retryTimeout;
         private StopWatch stateTimeout;
