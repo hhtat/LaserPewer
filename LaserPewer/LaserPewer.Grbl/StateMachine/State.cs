@@ -8,7 +8,7 @@ namespace LaserPewer.Grbl.StateMachine
     {
         protected const double AbortTimeoutSecs = 2.0;
         protected const double RetryTimeoutSecs = 0.5;
-        protected const double StateTimeoutSecs = 0.2;
+        protected const double StateTimeoutSecs = 1.0;
         protected const double RapidStatusQueryIntervalSecs = 0.01;
 
         protected readonly List<Transition> _transitions;
@@ -53,29 +53,6 @@ namespace LaserPewer.Grbl.StateMachine
             _transitions.Add(transition);
         }
 
-        protected bool handleMachineStateNegTimeout(ref StopWatch timeout, GrblStatus.MachineState state, State target)
-        {
-            if (timeout == null)
-            {
-                timeout = new StopWatch();
-                return true;
-            }
-
-            if (timeout.Expired(TimeSpan.FromSeconds(StateTimeoutSecs)))
-            {
-                controller.TransitionTo(target);
-                return true;
-            }
-
-            if (controller.StatusReported.State == state)
-            {
-                timeout.Reset();
-                return true;
-            }
-
-            return false;
-        }
-
         protected bool retrySend(StopWatch timeout, GrblRequest request)
         {
             if (timeout.Expired(TimeSpan.FromSeconds(RetryTimeoutSecs)))
@@ -85,17 +62,6 @@ namespace LaserPewer.Grbl.StateMachine
                     timeout.Reset();
                 }
 
-                return true;
-            }
-
-            return false;
-        }
-
-        protected bool timeoutAbort(StopWatch timeout, State target)
-        {
-            if (timeout.Expired(TimeSpan.FromSeconds(AbortTimeoutSecs)))
-            {
-                controller.TransitionTo(target);
                 return true;
             }
 

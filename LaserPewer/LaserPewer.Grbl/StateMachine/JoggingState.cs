@@ -1,12 +1,11 @@
-﻿using LaserPewer.Shared;
-using System;
+﻿using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
     public class JoggingState : State
     {
+        private TimeoutTransition stateTimeoutTransition;
         private GrblRequest request;
-        private StopWatch timeout;
 
         public JoggingState(Controller controller) : base(controller)
         {
@@ -20,12 +19,14 @@ namespace LaserPewer.Grbl.StateMachine
             addTransition(new MachineStateTransition(controller.AlarmedState, GrblStatus.MachineState.Alarm));
 
             addTransition(new TriggerTransition(controller.JogCancellationState, TriggerType.Cancel));
+
+            stateTimeoutTransition = new TimeoutTransition(controller.ReadyState, TimeSpan.FromSeconds(StateTimeoutSecs));
         }
 
         protected override void onEnter(Trigger trigger)
         {
+            stateTimeoutTransition.Reset();
             request = GrblRequest.CreateJoggingRequest(trigger.Parameter);
-            timeout = null;
 
             controller.RequestStatusQueryInterval(RapidStatusQueryIntervalSecs);
         }
@@ -35,12 +36,15 @@ namespace LaserPewer.Grbl.StateMachine
             if (request.ResponseStatus == GrblResponseStatus.Unsent)
             {
                 controller.Connection.Send(request);
+                stateTimeoutTransition.Reset();
             }
             else if (request.ResponseStatus == GrblResponseStatus.Pending)
             {
+                stateTimeoutTransition.Reset();
             }
-            else if (handleMachineStateNegTimeout(ref timeout, GrblStatus.MachineState.Jog, controller.ReadyState))
+            else if (controller.StatusReported.State == GrblStatus.MachineState.Jog)
             {
+                stateTimeoutTransition.Reset();
             }
         }
     }

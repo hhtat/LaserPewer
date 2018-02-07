@@ -1,10 +1,10 @@
-﻿using LaserPewer.Shared;
+﻿using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
     public class RunningState : State
     {
-        private StopWatch timeout;
+        private TimeoutTransition stateTimeoutTransition;
 
         public RunningState(Controller controller) : base(controller)
         {
@@ -18,11 +18,13 @@ namespace LaserPewer.Grbl.StateMachine
             addTransition(new MachineStateTransition(controller.AlarmedState, GrblStatus.MachineState.Alarm));
 
             addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Cancel));
+
+            stateTimeoutTransition = new TimeoutTransition(controller.ReadyState, TimeSpan.FromSeconds(StateTimeoutSecs));
         }
 
         protected override void onEnter(Trigger trigger)
         {
-            timeout = null;
+            stateTimeoutTransition.Reset();
 
             if (trigger.Parameter != null)
             {
@@ -40,9 +42,11 @@ namespace LaserPewer.Grbl.StateMachine
             }
             else if (!controller.Program.EndOfProgram)
             {
+                stateTimeoutTransition.Reset();
             }
-            else if (handleMachineStateNegTimeout(ref timeout, GrblStatus.MachineState.Run, controller.ReadyState))
+            else if (controller.StatusReported.State == GrblStatus.MachineState.Run)
             {
+                stateTimeoutTransition.Reset();
             }
         }
     }

@@ -60,6 +60,7 @@
     <Compile Include="StateMachine\RunningState.cs" />
     <Compile Include="StateMachine\State.cs" />
     <Compile Include="StateMachine\AlarmKillState.cs" />
+    <Compile Include="StateMachine\TimeoutTransition.cs" />
     <Compile Include="StateMachine\Transition.cs" />
     <Compile Include="StateMachine\TriggerTransition.cs" />
   </ItemGroup>

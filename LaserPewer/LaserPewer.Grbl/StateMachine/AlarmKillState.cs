@@ -1,16 +1,16 @@
 ﻿using LaserPewer.Shared;
+using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
     public class AlarmKillState : State
     {
         private readonly StopWatch retryTimeout;
-        private readonly StopWatch abortTimeout;
+        private TimeoutTransition abortTimeoutTransition;
 
         public AlarmKillState(Controller controller) : base(controller)
         {
             retryTimeout = new StopWatch();
-            abortTimeout = new StopWatch();
         }
 
         protected override void addTransitions()
@@ -20,12 +20,15 @@ namespace LaserPewer.Grbl.StateMachine
             addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Reset));
 
             addTransition(new MachineStateTransition(controller.ReadyState, GrblStatus.MachineState.Alarm, true));
+
+            abortTimeoutTransition = new TimeoutTransition(controller.AlarmedState, TimeSpan.FromSeconds(AbortTimeoutSecs));
+            addTransition(abortTimeoutTransition);
         }
 
         protected override void onEnter(Trigger trigger)
         {
             retryTimeout.Zero();
-            abortTimeout.Reset();
+            abortTimeoutTransition.Reset();
 
             controller.RequestStatusQueryInterval(RapidStatusQueryIntervalSecs);
         }
@@ -33,9 +36,6 @@ namespace LaserPewer.Grbl.StateMachine
         protected override void onStep()
         {
             if (retrySend(retryTimeout, GrblRequest.CreateKillAlarmRequest()))
-            {
-            }
-            else if (timeoutAbort(abortTimeout, controller.AlarmedState))
             {
             }
         }
