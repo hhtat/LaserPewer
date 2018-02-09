@@ -8,7 +8,7 @@
 
         public override bool TryStep(Controller controller)
         {
-            if (controller.Connection == null)
+            if (controller.ActiveConnection == null)
             {
                 controller.TransitionTo(target);
                 return true;

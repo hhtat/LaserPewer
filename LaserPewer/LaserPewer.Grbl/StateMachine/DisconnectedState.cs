@@ -13,7 +13,7 @@
 
         protected override void onStep()
         {
-            if (controller.Connection != null)
+            if (controller.ActiveConnection != null)
             {
                 controller.Disconnect();
             }

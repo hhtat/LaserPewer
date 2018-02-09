@@ -35,7 +35,7 @@ namespace LaserPewer.Grbl.StateMachine
         {
             if (request.ResponseStatus == GrblResponseStatus.Unsent)
             {
-                controller.Connection.Send(request);
+                controller.ActiveConnection.Send(request);
                 stateTimeoutTransition.Reset();
             }
             else if (request.ResponseStatus == GrblResponseStatus.Pending)

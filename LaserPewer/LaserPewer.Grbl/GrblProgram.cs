@@ -8,9 +8,31 @@ namespace LaserPewer.Grbl
         private readonly List<string> _lines;
         public IReadOnlyList<string> Lines { get { return _lines; } }
 
-        public int CurrentLine { get; private set; }
         public bool EndOfProgram { get { return CurrentLine >= Lines.Count; } }
-        public bool ErrorsDetected { get; private set; }
+
+        private int _currentLine;
+        public int CurrentLine
+        {
+            get { return _currentLine; }
+            private set
+            {
+                _currentLine = value;
+                ProgressUpdated = true;
+            }
+        }
+
+        private bool _errorsDetected;
+        public bool ErrorsDetected
+        {
+            get { return _errorsDetected; }
+            private set
+            {
+                _errorsDetected = value;
+                ProgressUpdated = true;
+            }
+        }
+
+        public bool ProgressUpdated { get; private set; }
 
         private int nextLine;
         private readonly Queue<GrblRequest> pendingRequests;
@@ -25,6 +47,11 @@ namespace LaserPewer.Grbl
             }
 
             pendingRequests = new Queue<GrblRequest>();
+        }
+
+        public void ClearProgressUpdated()
+        {
+            ProgressUpdated = false;
         }
 
         public void Poll(GrblConnection connection)

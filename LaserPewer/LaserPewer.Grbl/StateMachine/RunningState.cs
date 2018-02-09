@@ -34,13 +34,13 @@ namespace LaserPewer.Grbl.StateMachine
 
         protected override void onStep()
         {
-            controller.Program.Poll(controller.Connection);
+            controller.LoadedProgram.Poll(controller.ActiveConnection);
 
-            if (controller.Program.ErrorsDetected)
+            if (controller.LoadedProgram.ErrorsDetected)
             {
                 controller.TransitionTo(controller.ResettingState);
             }
-            else if (!controller.Program.EndOfProgram)
+            else if (!controller.LoadedProgram.EndOfProgram)
             {
                 stateTimeoutTransition.Reset();
             }

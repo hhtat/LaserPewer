@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 
 namespace LaserPewer.Grbl
 {
@@ -15,6 +16,23 @@ namespace LaserPewer.Grbl
             State = state;
             WPosX = wPosX;
             WPosY = wPosY;
+        }
+
+        public override bool Equals(object obj)
+        {
+            GrblStatus other = obj as GrblStatus;
+            if (other == null) return false;
+
+            if (State != other.State) return false;
+            if (WPosX != other.WPosX) return false;
+            if (WPosY != other.WPosY) return false;
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return Tuple.Create(State, WPosX, WPosY).GetHashCode();
         }
 
         public static GrblStatus Parse(string report)

@@ -156,6 +156,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LaserPewer.Grbl\LaserPewer.Grbl.csproj">
+      <Project>{a6e3ae28-bfbd-431f-a1fc-77ee0484af1a}</Project>
+      <Name>LaserPewer.Grbl</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LaserPewer.Shared\LaserPewer.Shared.csproj">
       <Project>{b2e3a27c-e103-4bbb-8da6-66c521f90500}</Project>
       <Name>LaserPewer.Shared</Name>

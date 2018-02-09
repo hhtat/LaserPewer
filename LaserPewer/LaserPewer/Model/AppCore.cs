@@ -1,4 +1,6 @@
-﻿using LaserPewer.Utilities;
+﻿using LaserPewer.Grbl;
+using LaserPewer.Shared;
+using LaserPewer.Utilities;
 using System;
 using System.Windows;
 using System.Windows.Threading;
@@ -18,13 +20,13 @@ namespace LaserPewer.Model
         }
 
         public static MachineProfiles MachineProfiles { get { return Instance._machineProfiles; } }
-        public static GrblMachine Machine { get { return Instance._machine; } }
+        public static LaserMachine Machine { get { return Instance._machine; } }
         public static Document Document { get { return Instance._document; } }
         public static ProgramGenerator Generator { get { return Instance._generator; } }
         public static GrblSender Sender { get { return Instance._sender; } }
 
         private readonly MachineProfiles _machineProfiles;
-        private readonly GrblMachine _machine;
+        private readonly LaserMachine _machine;
         private readonly Document _document;
         private readonly ProgramGenerator _generator;
         private readonly GrblSender _sender;
@@ -35,10 +37,10 @@ namespace LaserPewer.Model
         private AppCore()
         {
             _machineProfiles = new MachineProfiles();
-            _machine = new GrblMachine();
+            _machine = new GrblMachine2();
             _document = new Document();
             _generator = new ProgramGenerator();
-            _sender = new GrblSender(_machine);
+            //_sender = new GrblSender(_machine);
 
             _machineProfiles.ProfileAdded += _machineProfiles_EventHandler;
             _machineProfiles.ProfileRemoved += _machineProfiles_EventHandler;

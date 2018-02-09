@@ -57,7 +57,7 @@ namespace LaserPewer.Grbl.StateMachine
         {
             if (timeout.Expired(TimeSpan.FromSeconds(RetryTimeoutSecs)))
             {
-                if (controller.Connection.Send(request))
+                if (controller.ActiveConnection.Send(request))
                 {
                     timeout.Reset();
                 }

@@ -9,8 +9,7 @@ namespace LaserPewer.Grbl.StateMachine
     {
         private static readonly TimeSpan DefaultStatusQueryInterval = TimeSpan.FromSeconds(0.5);
 
-        public delegate void StatusUpdatedEventHandler(Controller sender, GrblStatus status);
-        public event StatusUpdatedEventHandler StatusUpdated;
+        public event EventHandler PropertiesModified;
 
         public readonly State DisconnectedState;
         public readonly State ConnectingState;
@@ -23,43 +22,75 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly State JogCancellationState;
         public readonly State RunningState;
 
-        private GrblConnection _connection;
-        public GrblConnection Connection
+        private State _currentState;
+        public State CurrentState
         {
-            get { return _connection; }
+            get { return _currentState; }
             private set
             {
-                if (_connection != null)
+                _currentState = value;
+                propertiesModifiedFlag = true;
+            }
+        }
+
+        private GrblConnection _activeConnection;
+        public GrblConnection ActiveConnection
+        {
+            get { return _activeConnection; }
+            private set
+            {
+                if (_activeConnection != null)
                 {
-                    _connection.Disconnect();
-                    _connection.LineReceived -= connection_LineReceived;
+                    _activeConnection.Disconnect();
+                    _activeConnection.LineReceived -= connection_LineReceived;
                 }
 
-                _connection = value;
+                _activeConnection = value;
                 resetConnectionState();
+                propertiesModifiedFlag = true;
 
-                if (_connection != null)
+                if (_activeConnection != null)
                 {
-                    _connection.LineReceived += connection_LineReceived;
-                    _connection.StartReceiving();
+                    _activeConnection.LineReceived += connection_LineReceived;
+                    _activeConnection.StartReceiving();
                 }
             }
         }
 
-        public GrblProgram Program { get; private set; }
-
-        public bool ResetDetected { get; private set; }
+        private bool _resetDetected;
+        public bool ResetDetected
+        {
+            get { return _resetDetected; }
+            private set
+            {
+                _resetDetected = value;
+                propertiesModifiedFlag = true;
+            }
+        }
 
         private GrblStatus _latestStatus;
         public GrblStatus LatestStatus
         {
             get { return _latestStatus; }
-            set
+            private set
             {
                 _latestStatus = value;
-                StatusUpdated?.Invoke(this, value);
+                propertiesModifiedFlag = true;
             }
         }
+
+        private GrblProgram _loadedProgram;
+        public GrblProgram LoadedProgram
+        {
+            get { return _loadedProgram; }
+            private set
+            {
+                _loadedProgram = value;
+                propertiesModifiedFlag = true;
+            }
+        }
+
+        private bool propertiesModifiedFlag;
 
         private readonly object queuedTriggerLock;
         private State.Trigger queuedTrigger;
@@ -71,7 +102,6 @@ namespace LaserPewer.Grbl.StateMachine
         private GrblRequest pendingStatusQueryRequest;
 
         private Thread thread;
-        private State currentState;
 
         public Controller()
         {
@@ -175,8 +205,8 @@ namespace LaserPewer.Grbl.StateMachine
 
             statusQueryInterval = DefaultStatusQueryInterval;
 
-            currentState = state;
-            currentState.Enter(trigger);
+            CurrentState = state;
+            CurrentState.Enter(trigger);
         }
 
         public bool TryConnect(string portName)
@@ -184,7 +214,7 @@ namespace LaserPewer.Grbl.StateMachine
             GrblConnection connection = new GrblConnection();
             if (connection.TryConnect(portName))
             {
-                Connection = connection;
+                ActiveConnection = connection;
                 return true;
             }
 
@@ -193,12 +223,7 @@ namespace LaserPewer.Grbl.StateMachine
 
         public void Disconnect()
         {
-            Connection = null;
-        }
-
-        public void LoadProgram(string code)
-        {
-            Program = new GrblProgram(code);
+            ActiveConnection = null;
         }
 
         public void ClearResetDetected()
@@ -209,6 +234,11 @@ namespace LaserPewer.Grbl.StateMachine
         public void RequestStatusQueryInterval(double secs)
         {
             statusQueryInterval = TimeSpan.FromSeconds(secs);
+        }
+
+        public void LoadProgram(string code)
+        {
+            LoadedProgram = new GrblProgram(code);
         }
 
         private void connection_LineReceived(GrblConnection sender, string line)
@@ -240,7 +270,10 @@ namespace LaserPewer.Grbl.StateMachine
                     GrblStatus status = GrblStatus.Parse(line);
                     if (status != null)
                     {
-                        LatestStatus = status;
+                        if (!status.Equals(LatestStatus))
+                        {
+                            LatestStatus = status;
+                        }
                         pendingStatusQueryRequest = null;
                     }
                 }
@@ -267,7 +300,7 @@ namespace LaserPewer.Grbl.StateMachine
             if (statusQueryTimeout.Expired(statusQueryInterval) && pendingStatusQueryRequest == null)
             {
                 GrblRequest request = GrblRequest.CreateStatusQueryRequest();
-                if (Connection.Send(request))
+                if (ActiveConnection.Send(request))
                 {
                     statusQueryTimeout.Reset();
                     pendingStatusQueryRequest = request;
@@ -277,13 +310,14 @@ namespace LaserPewer.Grbl.StateMachine
 
         private void threadStart()
         {
+            resetConnectionState();
             TransitionTo(DisconnectedState);
 
             while (true) // till when?
             {
-                if (Connection != null)
+                if (ActiveConnection != null)
                 {
-                    if (Connection.IsActive)
+                    if (ActiveConnection.IsActive)
                     {
                         pollStatusReport();
                         processReceivedLines();
@@ -294,7 +328,15 @@ namespace LaserPewer.Grbl.StateMachine
                     }
                 }
 
-                currentState.Step();
+                CurrentState.Step();
+
+                if (propertiesModifiedFlag || (LoadedProgram?.ProgressUpdated ?? false))
+                {
+                    PropertiesModified?.Invoke(this, null);
+
+                    propertiesModifiedFlag = false;
+                    LoadedProgram?.ClearProgressUpdated();
+                }
 
                 Thread.Sleep(10);
             }

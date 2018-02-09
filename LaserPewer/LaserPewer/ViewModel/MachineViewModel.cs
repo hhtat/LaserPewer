@@ -1,8 +1,8 @@
 ﻿using LaserPewer.Model;
+using LaserPewer.Shared;
 using System;
 using System.Globalization;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace LaserPewer.ViewModel
 {
@@ -90,30 +90,19 @@ namespace LaserPewer.ViewModel
         {
             setDefaults();
 
-            _resetCommand = new RelayCommand(parameter => AppCore.Machine.Reset(), parameter => AppCore.Machine.Connected);
-            _homeCommand = new RelayCommand(parameter => AppCore.Machine.Home(), parameter => AppCore.Machine.Connected);
-            _unlockCommand = new RelayCommand(parameter => AppCore.Machine.Unlock(), parameter => AppCore.Machine.Connected);
-            _resumeCommand = new RelayCommand(parameter => AppCore.Machine.Resume(), parameter => AppCore.Machine.Connected);
-            _holdCommand = new RelayCommand(parameter => AppCore.Machine.Hold(), parameter => AppCore.Machine.Connected);
+            _resetCommand = new RelayCommand(parameter => AppCore.Machine.ResetAsync());
+            _homeCommand = new RelayCommand(parameter => AppCore.Machine.HomeAsync());
+            _unlockCommand = new RelayCommand(parameter => AppCore.Machine.UnlockAsync());
+            _resumeCommand = new RelayCommand(parameter => { });
+            _holdCommand = new RelayCommand(parameter => { });
             _startCommand = new RelayCommand(
-                parameter => AppCore.Sender.Start(AppCore.Generator.GCodeProgram),
-                parameter => AppCore.Machine.Connected && AppCore.Sender.State == GrblSender.SenderState.Idle && AppCore.Generator.GCodeProgram != null);
+                parameter => { },
+                parameter => AppCore.Generator.GCodeProgram != null);
             _stopCommand = new RelayCommand(
-                parameter => AppCore.Sender.Stop(),
-                parameter => AppCore.Sender.State != GrblSender.SenderState.Idle);
+                parameter => { });
 
-            AppCore.Machine.MachineConnecting += Machine_MachineConnecting;
-            AppCore.Machine.MachineConnected += Machine_MachineConnected;
-            AppCore.Machine.MachineDisconnected += Machine_MachineDisconnected;
-            AppCore.Machine.MachineReset += Machine_MachineReset;
             AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
-            AppCore.Machine.AlarmRaised += Machine_AlarmRaised;
-            AppCore.Machine.MessageFeedback += Machine_MessageFeedback;
-
             AppCore.Generator.Completed += Generator_Completed;
-
-            AppCore.Sender.StateChanged += Sender_StateChanged;
-            AppCore.Sender.Progress += Sender_Progress;
         }
 
         private void setDefaults()
@@ -125,60 +114,11 @@ namespace LaserPewer.ViewModel
             Message = "None";
         }
 
-        private void Machine_MachineConnecting(object sender, EventArgs e)
-        {
-            Status = "Connecting";
-        }
-
-        private void Machine_MachineConnected(object sender, EventArgs e)
-        {
-            Status = "Connected";
-
-            _resetCommand.NotifyCanExecuteChanged();
-            _homeCommand.NotifyCanExecuteChanged();
-            _unlockCommand.NotifyCanExecuteChanged();
-            _resumeCommand.NotifyCanExecuteChanged();
-            _holdCommand.NotifyCanExecuteChanged();
-            _startCommand.NotifyCanExecuteChanged();
-        }
-
-        private void Machine_MachineDisconnected(object sender, EventArgs e)
-        {
-            Status = "Disconnected";
-
-            _resetCommand.NotifyCanExecuteChanged();
-            _homeCommand.NotifyCanExecuteChanged();
-            _unlockCommand.NotifyCanExecuteChanged();
-            _resumeCommand.NotifyCanExecuteChanged();
-            _holdCommand.NotifyCanExecuteChanged();
-            _startCommand.NotifyCanExecuteChanged();
-        }
-
-        private void Machine_MachineReset(object sender, EventArgs e)
-        {
-            setDefaults();
-        }
-
-        private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)
+        private void Machine_StatusUpdated(object sender, LaserMachine.MachineStatus status)
         {
             PositionX = toDisplayString(status.X);
             PositionY = toDisplayString(status.Y);
-            Status = status.Status;
-
-            if (Alarm != string.Empty && status.Status != "Alarm")
-            {
-                Alarm = string.Empty;
-            }
-        }
-
-        private void Machine_AlarmRaised(object sender, int alarm)
-        {
-            Alarm = alarm.ToString();
-        }
-
-        private void Machine_MessageFeedback(object sender, string message)
-        {
-            Message = message;
+            Status = status.Message;
         }
 
         private void Generator_Completed(object sender, EventArgs e)
@@ -190,18 +130,6 @@ namespace LaserPewer.ViewModel
             }
 
             _startCommand.NotifyCanExecuteChanged();
-        }
-
-        private void Sender_StateChanged(object sender, EventArgs e)
-        {
-            _startCommand.NotifyCanExecuteChanged();
-            _stopCommand.NotifyCanExecuteChanged();
-        }
-
-        private void Sender_Progress(object sender, int lineAt)
-        {
-            ProgramStatus = lineAt + "/" + AppCore.Sender.LineCount;
-            ProgramProgress = AppCore.Sender.LineCount != 0 ? (double)lineAt / AppCore.Sender.LineCount : 0;
         }
 
         private static string toDisplayString(double value)

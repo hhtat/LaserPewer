@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Generation;
 using LaserPewer.Model;
+using LaserPewer.Shared;
 using LaserPewer.Utilities;
 using System;
 using System.Windows;
@@ -78,7 +79,7 @@ namespace LaserPewer.ViewModel
             updateProfile(profile);
         }
 
-        private void Machine_StatusUpdated(object sender, GrblMachine.MachineStatus status)
+        private void Machine_StatusUpdated(object sender, LaserMachine.MachineStatus status)
         {
             MachinePosition = new Point(status.X, status.Y);
         }

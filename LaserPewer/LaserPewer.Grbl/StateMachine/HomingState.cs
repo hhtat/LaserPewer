@@ -24,7 +24,7 @@
         {
             if (request.ResponseStatus == GrblResponseStatus.Unsent)
             {
-                controller.Connection.Send(request);
+                controller.ActiveConnection.Send(request);
             }
             else if (request.ResponseStatus != GrblResponseStatus.Pending)
             {

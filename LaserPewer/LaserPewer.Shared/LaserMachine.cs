@@ -49,12 +49,14 @@ namespace LaserPewer.Shared
 
         public class MachineStatus
         {
+            public readonly bool Connected;
             public readonly string Message;
             public readonly double X;
             public readonly double Y;
 
-            public MachineStatus(string message, double x, double y)
+            public MachineStatus(bool connected, string message, double x, double y)
             {
+                Connected = connected;
                 Message = message;
                 X = x;
                 Y = y;

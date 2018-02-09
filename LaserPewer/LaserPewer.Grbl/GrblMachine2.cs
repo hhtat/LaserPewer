@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Grbl.StateMachine;
 using LaserPewer.Shared;
+using System;
 
 namespace LaserPewer.Grbl
 {
@@ -10,12 +11,8 @@ namespace LaserPewer.Grbl
         public GrblMachine2()
         {
             controller = new Controller();
-            controller.StatusUpdated += Controller_StatusUpdated;
-        }
-
-        private void Controller_StatusUpdated(Controller sender, GrblStatus status)
-        {
-            invokeStatusUpdated(new MachineStatus(status.State.ToString(), status.WPosX, status.WPosY));
+            controller.PropertiesModified += Controller_PropertiesModified;
+            controller.Start();
         }
 
         protected override void doConnect(string portName)
@@ -41,6 +38,16 @@ namespace LaserPewer.Grbl
         protected override void doUnlock()
         {
             controller.TriggerUnlock();
+        }
+
+        private void Controller_PropertiesModified(object sender, EventArgs e)
+        {
+            bool connected = controller.ActiveConnection != null;
+            string message = controller.CurrentState.ToString();
+            double x = controller.LatestStatus.WPosX;
+            double y = controller.LatestStatus.WPosY;
+
+            invokeStatusUpdated(new MachineStatus(connected, message, x, y));
         }
     }
 }
