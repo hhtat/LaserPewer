@@ -9,6 +9,9 @@ namespace LaserPewer.Grbl.StateMachine
     {
         private static readonly TimeSpan DefaultStatusQueryInterval = TimeSpan.FromSeconds(0.5);
 
+        public delegate void StatusUpdatedEventHandler(Controller sender, GrblStatus status);
+        public event StatusUpdatedEventHandler StatusUpdated;
+
         public readonly State DisconnectedState;
         public readonly State ConnectingState;
         public readonly State ReadyState;
@@ -46,7 +49,17 @@ namespace LaserPewer.Grbl.StateMachine
         public GrblProgram Program { get; private set; }
 
         public bool ResetDetected { get; private set; }
-        public GrblStatus StatusReported { get; private set; }
+
+        private GrblStatus _latestStatus;
+        public GrblStatus LatestStatus
+        {
+            get { return _latestStatus; }
+            set
+            {
+                _latestStatus = value;
+                StatusUpdated?.Invoke(this, value);
+            }
+        }
 
         private readonly object queuedTriggerLock;
         private State.Trigger queuedTrigger;
@@ -57,8 +70,8 @@ namespace LaserPewer.Grbl.StateMachine
         private TimeSpan statusQueryInterval;
         private GrblRequest pendingStatusQueryRequest;
 
+        private Thread thread;
         private State currentState;
-        private readonly Thread thread;
 
         public Controller()
         {
@@ -77,6 +90,11 @@ namespace LaserPewer.Grbl.StateMachine
             receivedLines = new Queue<string>();
             statusQueryTimeout = new StopWatch();
             statusQueryInterval = DefaultStatusQueryInterval;
+        }
+
+        public void Start()
+        {
+            if (thread != null) return;
 
             thread = new Thread(threadStart);
             thread.Start();
@@ -222,7 +240,7 @@ namespace LaserPewer.Grbl.StateMachine
                     GrblStatus status = GrblStatus.Parse(line);
                     if (status != null)
                     {
-                        StatusReported = status;
+                        LatestStatus = status;
                         pendingStatusQueryRequest = null;
                     }
                 }
@@ -237,7 +255,7 @@ namespace LaserPewer.Grbl.StateMachine
         private void resetConnectionState()
         {
             ClearResetDetected();
-            StatusReported = GrblStatus.Unknown;
+            LatestStatus = GrblStatus.Unknown;
             clearTrigger();
             clearReceivedLines();
             statusQueryTimeout.Zero();

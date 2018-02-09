@@ -36,7 +36,7 @@ namespace LaserPewer.Grbl.StateMachine
         {
             retrySend(retryTimeout, GrblRequest.CreateJogCancelRequest());
 
-            if (controller.StatusReported.State == GrblStatus.MachineState.Jog)
+            if (controller.LatestStatus.State == GrblStatus.MachineState.Jog)
             {
                 stateTimeoutTransition.Reset();
             }

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GrblConnection.cs" />
+    <Compile Include="GrblMachine2.cs" />
     <Compile Include="GrblProgram.cs" />
     <Compile Include="GrblRequest.cs" />
     <Compile Include="GrblRequestQueue.cs" />

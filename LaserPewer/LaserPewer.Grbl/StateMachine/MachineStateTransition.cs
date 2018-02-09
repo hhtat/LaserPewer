@@ -13,7 +13,7 @@
 
         public override bool TryStep(Controller controller)
         {
-            bool stateCheck = controller.StatusReported.State == state;
+            bool stateCheck = controller.LatestStatus.State == state;
             if (negate) stateCheck = !stateCheck;
             if (stateCheck)
             {

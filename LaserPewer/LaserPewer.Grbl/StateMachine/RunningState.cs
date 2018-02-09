@@ -44,7 +44,7 @@ namespace LaserPewer.Grbl.StateMachine
             {
                 stateTimeoutTransition.Reset();
             }
-            else if (controller.StatusReported.State == GrblStatus.MachineState.Run)
+            else if (controller.LatestStatus.State == GrblStatus.MachineState.Run)
             {
                 stateTimeoutTransition.Reset();
             }
