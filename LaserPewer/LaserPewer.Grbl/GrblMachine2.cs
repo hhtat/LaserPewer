@@ -47,7 +47,7 @@ namespace LaserPewer.Grbl
             double x = controller.LatestStatus.WPosX;
             double y = controller.LatestStatus.WPosY;
 
-            invokeStatusUpdated(new MachineStatus(connected, message, x, y));
+            State = new MachineState(connected, message, x, y);
         }
     }
 }

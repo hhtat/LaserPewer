@@ -54,7 +54,7 @@ namespace LaserPewer.ViewModel
             }
 
             AppCore.MachineProfiles.ActiveChanged += MachineProfiles_ActiveChanged;
-            AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
+            AppCore.Machine.StateUpdated += Machine_StatusUpdated;
 
             AppCore.Generator.Completed += Generator_Completed;
         }
@@ -79,9 +79,9 @@ namespace LaserPewer.ViewModel
             updateProfile(profile);
         }
 
-        private void Machine_StatusUpdated(object sender, LaserMachine.MachineStatus status)
+        private void Machine_StatusUpdated(object sender, EventArgs e)
         {
-            MachinePosition = new Point(status.X, status.Y);
+            MachinePosition = new Point(AppCore.Machine.State.X, AppCore.Machine.State.Y);
         }
 
         private void Generator_Completed(object sender, EventArgs e)

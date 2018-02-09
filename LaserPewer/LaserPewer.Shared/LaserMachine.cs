@@ -1,15 +1,27 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace LaserPewer.Shared
 {
     public abstract class LaserMachine
     {
-        public delegate void StatusUpdatedEventHandler(LaserMachine sender, MachineStatus status);
-        public event StatusUpdatedEventHandler StatusUpdated;
+        public event EventHandler StateUpdated;
 
-        protected void invokeStatusUpdated(MachineStatus status)
+        private MachineState _state;
+        public MachineState State
         {
-            StatusUpdated?.Invoke(this, status);
+            get { return _state; }
+            protected set
+            {
+                if (value == null) throw new ArgumentNullException();
+                _state = value;
+                StateUpdated?.Invoke(this, null);
+            }
+        }
+
+        public LaserMachine()
+        {
+            State = new MachineState(false, string.Empty, double.NaN, double.NaN);
         }
 
         public void ConnectAsync(string portName)
@@ -47,17 +59,17 @@ namespace LaserPewer.Shared
 
         protected abstract void doUnlock();
 
-        public class MachineStatus
+        public class MachineState
         {
             public readonly bool Connected;
-            public readonly string Message;
+            public readonly string Status;
             public readonly double X;
             public readonly double Y;
 
-            public MachineStatus(bool connected, string message, double x, double y)
+            public MachineState(bool connected, string message, double x, double y)
             {
                 Connected = connected;
-                Message = message;
+                Status = message;
                 X = x;
                 Y = y;
             }

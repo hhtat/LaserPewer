@@ -88,7 +88,7 @@ namespace LaserPewer.ViewModel
 
         public MachineViewModel()
         {
-            setDefaults();
+            updateStatus(AppCore.Machine.State);
 
             _resetCommand = new RelayCommand(parameter => AppCore.Machine.ResetAsync());
             _homeCommand = new RelayCommand(parameter => AppCore.Machine.HomeAsync());
@@ -101,24 +101,22 @@ namespace LaserPewer.ViewModel
             _stopCommand = new RelayCommand(
                 parameter => { });
 
-            AppCore.Machine.StatusUpdated += Machine_StatusUpdated;
+            AppCore.Machine.StateUpdated += Machine_StatusUpdated;
             AppCore.Generator.Completed += Generator_Completed;
         }
 
-        private void setDefaults()
+        private void updateStatus(LaserMachine.MachineState state)
         {
-            PositionX = "000.000";
-            PositionY = "000.000";
-            Status = "Disconnected";
+            PositionX = toDisplayString(state.X);
+            PositionY = toDisplayString(state.Y);
+            Status = state.Status;
             Alarm = "None";
             Message = "None";
         }
 
-        private void Machine_StatusUpdated(object sender, LaserMachine.MachineStatus status)
+        private void Machine_StatusUpdated(object sender, EventArgs e)
         {
-            PositionX = toDisplayString(status.X);
-            PositionY = toDisplayString(status.Y);
-            Status = status.Message;
+            updateStatus(AppCore.Machine.State);
         }
 
         private void Generator_Completed(object sender, EventArgs e)
@@ -134,7 +132,7 @@ namespace LaserPewer.ViewModel
 
         private static string toDisplayString(double value)
         {
-            return value.ToString("F3", CultureInfo.InvariantCulture);
+            return double.IsNaN(value) ? FIELD_PLACEHOLDER : value.ToString("F3", CultureInfo.InvariantCulture);
         }
     }
 }
