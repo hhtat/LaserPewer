@@ -4,11 +4,11 @@ using System;
 
 namespace LaserPewer.Grbl
 {
-    public class GrblMachine2 : LaserMachine
+    public class GrblMachine : LaserMachine
     {
         private readonly Controller controller;
 
-        public GrblMachine2()
+        public GrblMachine()
         {
             controller = new Controller();
             controller.PropertiesModified += Controller_PropertiesModified;

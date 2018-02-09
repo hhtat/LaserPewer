@@ -64,6 +64,17 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _stopCommand;
         public ICommand StopCommand { get { return _stopCommand; } }
 
+        private bool _programRunning;
+        public bool ProgramRunning
+        {
+            get { return _programRunning; }
+            private set
+            {
+                _programRunning = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         private string _programStatus;
         public string ProgramStatus
         {
@@ -121,7 +132,7 @@ namespace LaserPewer.ViewModel
 
         private void Generator_Completed(object sender, EventArgs e)
         {
-            if (AppCore.Sender.State == GrblSender.SenderState.Idle)
+            if (!ProgramRunning)
             {
                 ProgramStatus = string.Empty;
                 ProgramProgress = 0.0;
