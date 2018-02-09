@@ -4,7 +4,7 @@
     {
         private GrblRequest request;
 
-        public HomingState(Controller controller) : base(controller)
+        public HomingState(Controller controller) : base(controller, "Homing")
         {
         }
 

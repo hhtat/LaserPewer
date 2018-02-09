@@ -7,7 +7,7 @@ namespace LaserPewer.Grbl.StateMachine
         private TimeoutTransition stateTimeoutTransition;
         private GrblRequest request;
 
-        public JoggingState(Controller controller) : base(controller)
+        public JoggingState(Controller controller) : base(controller, "Jogging")
         {
         }
 

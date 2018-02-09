@@ -8,7 +8,7 @@ namespace LaserPewer.Grbl.StateMachine
         private readonly StopWatch retryTimeout;
         private TimeoutTransition abortTimeoutTransition;
 
-        public AlarmKillState(Controller controller) : base(controller)
+        public AlarmKillState(Controller controller) : base(controller, "Unlocking")
         {
             retryTimeout = new StopWatch();
         }

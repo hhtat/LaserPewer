@@ -8,7 +8,7 @@ namespace LaserPewer.Grbl.StateMachine
         private readonly StopWatch retryTimeout;
         private TimeoutTransition stateTimeoutTransition;
 
-        public JogCancellationState(Controller controller) : base(controller)
+        public JogCancellationState(Controller controller) : base(controller, "Cancelling")
         {
             retryTimeout = new StopWatch();
         }

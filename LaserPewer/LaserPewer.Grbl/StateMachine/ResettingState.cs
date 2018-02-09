@@ -6,7 +6,7 @@ namespace LaserPewer.Grbl.StateMachine
     {
         private readonly StopWatch timeout;
 
-        public ResettingState(Controller controller) : base(controller)
+        public ResettingState(Controller controller) : base(controller, "Resetting")
         {
             timeout = new StopWatch();
         }

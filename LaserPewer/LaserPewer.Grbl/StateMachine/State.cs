@@ -11,14 +11,17 @@ namespace LaserPewer.Grbl.StateMachine
         protected const double StateTimeoutSecs = 1.0;
         protected const double RapidStatusQueryIntervalSecs = 0.01;
 
+        public readonly string FriendlyName;
+
         protected readonly List<Transition> _transitions;
         public IReadOnlyList<Transition> Transitions { get { return _transitions; } }
 
         protected readonly Controller controller;
 
-        protected State(Controller controller)
+        protected State(Controller controller, string friendlyName)
         {
             this.controller = controller;
+            FriendlyName = friendlyName;
             _transitions = new List<Transition>();
         }
 

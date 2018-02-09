@@ -4,7 +4,7 @@
     {
         private string portName;
 
-        public ConnectingState(Controller controller) : base(controller)
+        public ConnectingState(Controller controller) : base(controller, "Connecting")
         {
         }
 

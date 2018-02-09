@@ -6,7 +6,7 @@ namespace LaserPewer.Grbl.StateMachine
     {
         private TimeoutTransition stateTimeoutTransition;
 
-        public RunningState(Controller controller) : base(controller)
+        public RunningState(Controller controller) : base(controller, "Running")
         {
         }
 

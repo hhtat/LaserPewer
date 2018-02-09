@@ -2,7 +2,7 @@
 {
     public class ReadyState : State
     {
-        public ReadyState(Controller controller) : base(controller)
+        public ReadyState(Controller controller) : base(controller, "Ready")
         {
         }
 

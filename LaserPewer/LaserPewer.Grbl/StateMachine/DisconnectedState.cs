@@ -2,7 +2,7 @@
 {
     public class DisconnectedState : State
     {
-        public DisconnectedState(Controller controller) : base(controller)
+        public DisconnectedState(Controller controller) : base(controller, "Disconnected")
         {
         }
 

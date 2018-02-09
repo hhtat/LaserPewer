@@ -2,7 +2,7 @@
 {
     public class AlarmedState : State
     {
-        public AlarmedState(Controller controller) : base(controller)
+        public AlarmedState(Controller controller) : base(controller, "Alarm")
         {
         }
 

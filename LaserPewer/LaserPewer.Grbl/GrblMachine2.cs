@@ -43,7 +43,7 @@ namespace LaserPewer.Grbl
         private void Controller_PropertiesModified(object sender, EventArgs e)
         {
             bool connected = controller.ActiveConnection != null;
-            string message = controller.CurrentState.ToString();
+            string message = controller.CurrentState.FriendlyName;
             double x = controller.LatestStatus.WPosX;
             double y = controller.LatestStatus.WPosY;
 
