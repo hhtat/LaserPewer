@@ -31,7 +31,7 @@ namespace LaserPewer.ViewModel
 
         public MachinePath MachinePath { get { return AppCore.Generator.VectorPath; } }
 
-        public int MachinePathFrame { get { return MachinePath != null ? (int)Math.Round(MachinePathProgress * MachinePath.Travels.Count) : 0; } }
+        public int MachinePathFrame { get { return (int)Math.Round(MachinePathProgress * MachinePath?.Travels.Count ?? 0); } }
 
         private double _machinePathProgress;
         public double MachinePathProgress

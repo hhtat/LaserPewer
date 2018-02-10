@@ -100,17 +100,6 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _stopCommand;
         public ICommand StopCommand { get { return _stopCommand; } }
 
-        private bool _programRunning;
-        public bool ProgramRunning
-        {
-            get { return _programRunning; }
-            private set
-            {
-                _programRunning = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         private string _programStatus;
         public string ProgramStatus
         {
@@ -166,6 +155,12 @@ namespace LaserPewer.ViewModel
             Status = state.Status;
             Alarm = "None";
             Message = "None";
+
+            if (state.LineCount != 0)
+            {
+                ProgramStatus = state.LineAt + "/" + state.LineCount;
+                ProgramProgress = (double)state.LineAt / (double)state.LineCount;
+            }
         }
 
         private void Machine_StatusUpdated(LaserMachine sender, LaserMachine.MachineState state, bool invalidateCanDo)
@@ -189,11 +184,8 @@ namespace LaserPewer.ViewModel
 
         private void Generator_Completed(object sender, EventArgs e)
         {
-            if (!ProgramRunning)
-            {
-                ProgramStatus = string.Empty;
-                ProgramProgress = 0.0;
-            }
+            ProgramStatus = null;
+            ProgramProgress = 0.0;
 
             _startCommand.NotifyCanExecuteChanged();
         }

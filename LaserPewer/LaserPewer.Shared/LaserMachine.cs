@@ -14,7 +14,7 @@ namespace LaserPewer.Shared
 
         public LaserMachine()
         {
-            State = new MachineState(false, string.Empty, double.NaN, double.NaN);
+            State = new MachineState(false, string.Empty, double.NaN, double.NaN, 0, 0);
         }
 
         ~LaserMachine()
@@ -123,13 +123,17 @@ namespace LaserPewer.Shared
             public readonly string Status;
             public readonly double X;
             public readonly double Y;
+            public readonly int LineCount;
+            public readonly int LineAt;
 
-            public MachineState(bool connected, string status, double x, double y)
+            public MachineState(bool connected, string status, double x, double y, int lineCount, int lineAt)
             {
                 Connected = connected;
                 Status = status;
                 X = x;
                 Y = y;
+                LineCount = lineCount;
+                LineAt = lineAt;
             }
 
             public object TriggerType { get; set; }

@@ -108,7 +108,9 @@ namespace LaserPewer.Grbl
                     controller.ActiveConnection != null,
                     controller.StateName,
                     controller.LatestStatus.WPosX,
-                    controller.LatestStatus.WPosY),
+                    controller.LatestStatus.WPosY,
+                    controller.LoadedProgram?.Lines.Count ?? 0,
+                    controller.LoadedProgram?.CurrentLine ?? 0),
                 invalidateAcceptsTrigger);
         }
     }

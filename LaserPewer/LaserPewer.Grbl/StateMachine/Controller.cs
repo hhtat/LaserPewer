@@ -25,7 +25,7 @@ namespace LaserPewer.Grbl.StateMachine
 
         public string StateName
         {
-            get { return currentState != null ? currentState.FriendlyName : string.Empty; }
+            get { return currentState?.FriendlyName ?? string.Empty; }
         }
 
         private GrblConnection _activeConnection;
