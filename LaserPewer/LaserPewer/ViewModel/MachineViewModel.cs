@@ -88,14 +88,14 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _unlockCommand;
         public ICommand UnlockCommand { get { return _unlockCommand; } }
 
-        private readonly RelayCommand _resumeCommand;
-        public ICommand ResumeCommand { get { return _resumeCommand; } }
-
-        private readonly RelayCommand _holdCommand;
-        public ICommand HoldCommand { get { return _holdCommand; } }
-
         private readonly RelayCommand _startCommand;
         public ICommand StartCommand { get { return _startCommand; } }
+
+        private readonly RelayCommand _pauseCommand;
+        public ICommand PauseCommand { get { return _pauseCommand; } }
+
+        private readonly RelayCommand _resumeCommand;
+        public ICommand ResumeCommand { get { return _resumeCommand; } }
 
         private readonly RelayCommand _stopCommand;
         public ICommand StopCommand { get { return _stopCommand; } }
@@ -135,11 +135,15 @@ namespace LaserPewer.ViewModel
             _unlockCommand = new RelayCommand(
                 parameter => AppCore.Machine.UnlockAsync(),
                 parameter => AppCore.Machine.CanUnlock());
-            _resumeCommand = new RelayCommand(parameter => { });
-            _holdCommand = new RelayCommand(parameter => { });
             _startCommand = new RelayCommand(
                 parameter => AppCore.Machine.RunAsync(AppCore.Generator.GCodeProgram),
                 parameter => AppCore.Machine.CanRun() && AppCore.Generator.GCodeProgram != null);
+            _pauseCommand = new RelayCommand(
+                parameter => AppCore.Machine.PauseAsync(),
+                parameter => AppCore.Machine.CanPause());
+            _resumeCommand = new RelayCommand(
+                parameter => AppCore.Machine.ResumeAsync(),
+                parameter => AppCore.Machine.CanResume());
             _stopCommand = new RelayCommand(
                 parameter => AppCore.Machine.CancelAsync(),
                 parameter => AppCore.Machine.CanCancel());
@@ -174,9 +178,9 @@ namespace LaserPewer.ViewModel
                     _resetCommand.NotifyCanExecuteChanged();
                     _homeCommand.NotifyCanExecuteChanged();
                     _unlockCommand.NotifyCanExecuteChanged();
-                    _resumeCommand.NotifyCanExecuteChanged();
-                    _holdCommand.NotifyCanExecuteChanged();
                     _startCommand.NotifyCanExecuteChanged();
+                    _pauseCommand.NotifyCanExecuteChanged();
+                    _resumeCommand.NotifyCanExecuteChanged();
                     _stopCommand.NotifyCanExecuteChanged();
                 }
             });

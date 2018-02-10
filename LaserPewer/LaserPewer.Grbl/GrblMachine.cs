@@ -101,6 +101,26 @@ namespace LaserPewer.Grbl
             controller.TriggerRun(code);
         }
 
+        public override bool CanPause()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Pause);
+        }
+
+        protected override void doPause()
+        {
+            controller.TriggerPause();
+        }
+
+        public override bool CanResume()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Resume);
+        }
+
+        protected override void doResume()
+        {
+            controller.TriggerResume();
+        }
+
         private void Controller_PropertiesModified(Controller sender, bool invalidateAcceptsTrigger)
         {
             updateState(

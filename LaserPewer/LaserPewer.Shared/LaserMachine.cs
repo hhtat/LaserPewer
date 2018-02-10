@@ -117,6 +117,24 @@ namespace LaserPewer.Shared
 
         protected abstract void doRun(string code);
 
+        public abstract bool CanPause();
+
+        public void PauseAsync()
+        {
+            Task.Run(() => doPause());
+        }
+
+        protected abstract void doPause();
+
+        public abstract bool CanResume();
+
+        public void ResumeAsync()
+        {
+            Task.Run(() => doResume());
+        }
+
+        protected abstract void doResume();
+
         public class MachineState
         {
             public readonly bool Connected;

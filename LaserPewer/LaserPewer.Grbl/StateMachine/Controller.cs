@@ -22,6 +22,8 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly State JoggingState;
         public readonly State JogCancellationState;
         public readonly State RunningState;
+        public readonly State RunHoldState;
+        public readonly State RunResumeState;
 
         public string StateName
         {
@@ -114,6 +116,8 @@ namespace LaserPewer.Grbl.StateMachine
             JoggingState = new JoggingState(this);
             JogCancellationState = new JogCancellationState(this);
             RunningState = new RunningState(this);
+            RunHoldState = new RunHoldState(this);
+            RunResumeState = new RunResumeState(this);
 
             queuedTriggerLock = new object();
             receivedLines = new Queue<string>();
@@ -179,6 +183,16 @@ namespace LaserPewer.Grbl.StateMachine
             pushTrigger(State.TriggerType.Run, code);
         }
 
+        public void TriggerPause()
+        {
+            pushTrigger(State.TriggerType.Pause);
+        }
+
+        public void TriggerResume()
+        {
+            pushTrigger(State.TriggerType.Resume);
+        }
+
         private void clearTrigger()
         {
             lock (queuedTriggerLock) queuedTrigger = null;
@@ -191,6 +205,7 @@ namespace LaserPewer.Grbl.StateMachine
 
         private void pushTrigger(State.TriggerType type, String parameter)
         {
+            if (parameter == null) throw new ArgumentNullException();
             lock (queuedTriggerLock) queuedTrigger = new State.Trigger(type, parameter);
         }
 

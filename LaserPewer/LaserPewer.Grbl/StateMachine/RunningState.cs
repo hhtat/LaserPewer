@@ -17,6 +17,7 @@ namespace LaserPewer.Grbl.StateMachine
             addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Reset));
             addTransition(new MachineStateTransition(controller.AlarmedState, GrblStatus.MachineState.Alarm));
 
+            addTransition(new TriggerTransition(controller.RunHoldState, TriggerType.Pause));
             addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Cancel));
 
             stateTimeoutTransition = addTransition(new TimeoutTransition(controller.ReadyState, TimeSpan.FromSeconds(StateTimeoutSecs)));
@@ -26,12 +27,12 @@ namespace LaserPewer.Grbl.StateMachine
         {
             stateTimeoutTransition.Reset();
 
-            if (trigger.Parameter != null)
+            if (trigger != null)
             {
                 controller.LoadProgram(trigger.Parameter);
             }
 
-            controller.RequestStatusQueryInterval(MediumStatusQueryIntervalSecs);
+            controller.RequestStatusQueryInterval(FastStatusQueryIntervalSecs);
         }
 
         protected override void onStep()

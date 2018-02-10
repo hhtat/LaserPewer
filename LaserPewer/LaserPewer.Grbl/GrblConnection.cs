@@ -1,4 +1,4 @@
-﻿#define LOG_TRAFFIC_CONSOLE
+﻿//#define LOG_TRAFFIC_CONSOLE
 
 using System;
 using System.Diagnostics;
