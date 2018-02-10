@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace LaserPewer.Shared
 {
-    public abstract class LaserMachine
+    public abstract class LaserMachine : IDisposable
     {
         public event EventHandler StateUpdated;
 
@@ -19,10 +19,34 @@ namespace LaserPewer.Shared
             }
         }
 
+        private bool disposed = false;
+
         public LaserMachine()
         {
             State = new MachineState(false, string.Empty, double.NaN, double.NaN);
         }
+
+        ~LaserMachine()
+        {
+            dispose(false);
+        }
+
+        public void Dispose()
+        {
+            dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                doDispose(disposing);
+                disposed = true;
+            }
+        }
+
+        protected abstract void doDispose(bool disposing);
 
         public void ConnectAsync(string portName)
         {
@@ -45,6 +69,13 @@ namespace LaserPewer.Shared
 
         protected abstract void doReset();
 
+        public void CancelAsync()
+        {
+            Task.Run(() => doCancel());
+        }
+
+        protected abstract void doCancel();
+
         public void HomeAsync()
         {
             Task.Run(() => doHome());
@@ -58,6 +89,20 @@ namespace LaserPewer.Shared
         }
 
         protected abstract void doUnlock();
+
+        public void JogAsync(double x, double y, double rate)
+        {
+            Task.Run(() => doJog(x, y, rate));
+        }
+
+        protected abstract void doJog(double x, double y, double rate);
+
+        public void RunAsync(string code)
+        {
+            Task.Run(() => doRun(code));
+        }
+
+        protected abstract void doRun(string code);
 
         public class MachineState
         {

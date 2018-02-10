@@ -30,6 +30,8 @@ namespace LaserPewer.Grbl.StateMachine
             {
                 controller.LoadProgram(trigger.Parameter);
             }
+
+            controller.RequestStatusQueryInterval(MediumStatusQueryIntervalSecs);
         }
 
         protected override void onStep()

@@ -67,6 +67,7 @@ namespace LaserPewer.Model
         public void Deinitialize()
         {
             settings.Save();
+            _machine.Dispose();
         }
 
         private void _machineProfiles_EventHandler(object sender, MachineProfiles.IProfile profile)

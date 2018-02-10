@@ -101,6 +101,7 @@ namespace LaserPewer.Grbl.StateMachine
         private TimeSpan statusQueryInterval;
         private GrblRequest pendingStatusQueryRequest;
 
+        private bool stop;
         private Thread thread;
 
         public Controller()
@@ -128,6 +129,11 @@ namespace LaserPewer.Grbl.StateMachine
 
             thread = new Thread(threadStart);
             thread.Start();
+        }
+
+        public void Stop()
+        {
+            stop = true;
         }
 
         public void TriggerConnect(string portName)
@@ -313,7 +319,7 @@ namespace LaserPewer.Grbl.StateMachine
             resetConnectionState();
             TransitionTo(DisconnectedState);
 
-            while (true) // till when?
+            while (!stop) // till when?
             {
                 if (ActiveConnection != null)
                 {
@@ -340,6 +346,8 @@ namespace LaserPewer.Grbl.StateMachine
 
                 Thread.Sleep(10);
             }
+
+            Disconnect();
         }
     }
 }

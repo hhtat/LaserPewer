@@ -107,10 +107,10 @@ namespace LaserPewer.ViewModel
             _resumeCommand = new RelayCommand(parameter => { });
             _holdCommand = new RelayCommand(parameter => { });
             _startCommand = new RelayCommand(
-                parameter => { },
+                parameter => AppCore.Machine.RunAsync(AppCore.Generator.GCodeProgram),
                 parameter => AppCore.Generator.GCodeProgram != null);
             _stopCommand = new RelayCommand(
-                parameter => { });
+                parameter => AppCore.Machine.CancelAsync());
 
             AppCore.Machine.StateUpdated += Machine_StatusUpdated;
             AppCore.Generator.Completed += Generator_Completed;

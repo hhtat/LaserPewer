@@ -10,6 +10,7 @@ namespace LaserPewer.Grbl.StateMachine
         protected const double RetryTimeoutSecs = 0.5;
         protected const double StateTimeoutSecs = 1.0;
         protected const double RapidStatusQueryIntervalSecs = 0.01;
+        protected const double MediumStatusQueryIntervalSecs = 0.2;
 
         public readonly string FriendlyName;
 

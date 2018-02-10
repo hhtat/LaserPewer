@@ -42,7 +42,7 @@ namespace LaserPewer
         private void workbench_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Point point = workbench.GetPointMMAtOffset(e.GetPosition(workbench));
-            //AppCore.Machine.Jog(point.X, point.Y, AppCore.MachineProfiles.Active.MaxFeedRate);
+            AppCore.Machine.JogAsync(point.X, point.Y, AppCore.MachineProfiles.Active.MaxFeedRate);
         }
 
         private void viewGCodeButton_Click(object sender, RoutedEventArgs e)
