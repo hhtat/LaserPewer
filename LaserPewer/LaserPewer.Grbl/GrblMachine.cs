@@ -1,6 +1,5 @@
 ﻿using LaserPewer.Grbl.StateMachine;
 using LaserPewer.Shared;
-using System;
 using System.Globalization;
 
 namespace LaserPewer.Grbl
@@ -21,9 +20,19 @@ namespace LaserPewer.Grbl
             controller.Stop();
         }
 
+        public override bool CanConnect()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Connect);
+        }
+
         protected override void doConnect(string portName)
         {
             controller.TriggerConnect(portName);
+        }
+
+        public override bool CanDisconnect()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Disconnect);
         }
 
         protected override void doDisconnect()
@@ -31,9 +40,19 @@ namespace LaserPewer.Grbl
             controller.TriggerDisconnect();
         }
 
+        public override bool CanReset()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Reset);
+        }
+
         protected override void doReset()
         {
             controller.TriggerReset();
+        }
+
+        public override bool CanCancel()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Cancel);
         }
 
         protected override void doCancel()
@@ -41,14 +60,29 @@ namespace LaserPewer.Grbl
             controller.TriggerCancel();
         }
 
+        public override bool CanHome()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Home);
+        }
+
         protected override void doHome()
         {
             controller.TriggerHome();
         }
 
+        public override bool CanUnlock()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Unlock);
+        }
+
         protected override void doUnlock()
         {
             controller.TriggerUnlock();
+        }
+
+        public override bool CanJog()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Jog);
         }
 
         protected override void doJog(double x, double y, double rate)
@@ -57,19 +91,25 @@ namespace LaserPewer.Grbl
             controller.TriggerJog(line);
         }
 
+        public override bool CanRun()
+        {
+            return controller.AcceptsTrigger(StateMachine.State.TriggerType.Run);
+        }
+
         protected override void doRun(string code)
         {
             controller.TriggerRun(code);
         }
 
-        private void Controller_PropertiesModified(object sender, EventArgs e)
+        private void Controller_PropertiesModified(Controller sender, bool invalidateAcceptsTrigger)
         {
-            bool connected = controller.ActiveConnection != null;
-            string message = controller.CurrentState.FriendlyName;
-            double x = controller.LatestStatus.WPosX;
-            double y = controller.LatestStatus.WPosY;
-
-            State = new MachineState(connected, message, x, y);
+            updateState(
+                new MachineState(
+                    controller.ActiveConnection != null,
+                    controller.StateName,
+                    controller.LatestStatus.WPosX,
+                    controller.LatestStatus.WPosY),
+                invalidateAcceptsTrigger);
         }
     }
 }

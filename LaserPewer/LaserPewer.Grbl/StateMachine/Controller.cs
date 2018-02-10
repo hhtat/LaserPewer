@@ -9,7 +9,8 @@ namespace LaserPewer.Grbl.StateMachine
     {
         private static readonly TimeSpan DefaultStatusQueryInterval = TimeSpan.FromSeconds(0.5);
 
-        public event EventHandler PropertiesModified;
+        public delegate void PropertiesModifiedEventHandler(Controller sender, bool invalidateAcceptsTrigger);
+        public event PropertiesModifiedEventHandler PropertiesModified;
 
         public readonly State DisconnectedState;
         public readonly State ConnectingState;
@@ -22,15 +23,9 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly State JogCancellationState;
         public readonly State RunningState;
 
-        private State _currentState;
-        public State CurrentState
+        public string StateName
         {
-            get { return _currentState; }
-            private set
-            {
-                _currentState = value;
-                propertiesModifiedFlag = true;
-            }
+            get { return currentState != null ? currentState.FriendlyName : string.Empty; }
         }
 
         private GrblConnection _activeConnection;
@@ -91,6 +86,7 @@ namespace LaserPewer.Grbl.StateMachine
         }
 
         private bool propertiesModifiedFlag;
+        private bool stateChangedFlag;
 
         private readonly object queuedTriggerLock;
         private State.Trigger queuedTrigger;
@@ -100,6 +96,8 @@ namespace LaserPewer.Grbl.StateMachine
         private readonly StopWatch statusQueryTimeout;
         private TimeSpan statusQueryInterval;
         private GrblRequest pendingStatusQueryRequest;
+
+        private State currentState;
 
         private bool stop;
         private Thread thread;
@@ -134,6 +132,11 @@ namespace LaserPewer.Grbl.StateMachine
         public void Stop()
         {
             stop = true;
+        }
+
+        public bool AcceptsTrigger(State.TriggerType type)
+        {
+            return currentState != null && currentState.AcceptsTrigger(type);
         }
 
         public void TriggerConnect(string portName)
@@ -211,8 +214,9 @@ namespace LaserPewer.Grbl.StateMachine
 
             statusQueryInterval = DefaultStatusQueryInterval;
 
-            CurrentState = state;
-            CurrentState.Enter(trigger);
+            currentState = state;
+            currentState.Enter(trigger);
+            stateChangedFlag = true;
         }
 
         public bool TryConnect(string portName)
@@ -334,13 +338,14 @@ namespace LaserPewer.Grbl.StateMachine
                     }
                 }
 
-                CurrentState.Step();
+                currentState.Step();
 
-                if (propertiesModifiedFlag || (LoadedProgram?.ProgressUpdated ?? false))
+                if (propertiesModifiedFlag || stateChangedFlag || (LoadedProgram != null && LoadedProgram.ProgressUpdated))
                 {
-                    PropertiesModified?.Invoke(this, null);
+                    PropertiesModified?.Invoke(this, stateChangedFlag);
 
                     propertiesModifiedFlag = false;
+                    stateChangedFlag = false;
                     LoadedProgram?.ClearProgressUpdated();
                 }
 

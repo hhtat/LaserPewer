@@ -2,16 +2,16 @@
 {
     public class TriggerTransition : Transition
     {
-        private readonly State.TriggerType type;
+        public readonly State.TriggerType Type;
 
         public TriggerTransition(State target, State.TriggerType type) : base(target)
         {
-            this.type = type;
+            this.Type = type;
         }
 
         public override bool TryStep(Controller controller)
         {
-            State.Trigger trigger = controller.PopTrigger(type);
+            State.Trigger trigger = controller.PopTrigger(Type);
             if (trigger != null)
             {
                 controller.TransitionTo(target, trigger);

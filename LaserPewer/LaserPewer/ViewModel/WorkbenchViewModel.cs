@@ -79,9 +79,12 @@ namespace LaserPewer.ViewModel
             updateProfile(profile);
         }
 
-        private void Machine_StatusUpdated(object sender, EventArgs e)
+        private void Machine_StatusUpdated(LaserMachine sender, LaserMachine.MachineState state, bool invalidateCanDo)
         {
-            MachinePosition = new Point(AppCore.Machine.State.X, AppCore.Machine.State.Y);
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                MachinePosition = new Point(state.X, state.Y);
+            });
         }
 
         private void Generator_Completed(object sender, EventArgs e)

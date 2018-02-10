@@ -2,6 +2,7 @@
 using LaserPewer.Shared;
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Input;
 
 namespace LaserPewer.ViewModel
@@ -12,35 +13,70 @@ namespace LaserPewer.ViewModel
         public string PositionX
         {
             get { return _positionX; }
-            private set { _positionX = value; NotifyPropertyChanged(); }
+            private set
+            {
+                if (value != _positionX)
+                {
+                    _positionX = value;
+                    NotifyPropertyChanged();
+                }
+            }
         }
 
         private string _positionY;
         public string PositionY
         {
             get { return _positionY; }
-            private set { _positionY = value; NotifyPropertyChanged(); }
+            private set
+            {
+                if (value != _positionY)
+                {
+                    _positionY = value;
+                    NotifyPropertyChanged();
+                }
+            }
         }
 
         private string _status;
         public string Status
         {
             get { return _status; }
-            private set { _status = value; NotifyPropertyChanged(); }
+            private set
+            {
+                if (value != _status)
+                {
+                    _status = value;
+                    NotifyPropertyChanged();
+                }
+            }
         }
 
         private string _alarm;
         public string Alarm
         {
             get { return _alarm; }
-            private set { _alarm = value; NotifyPropertyChanged(); }
+            private set
+            {
+                if (value != _alarm)
+                {
+                    _alarm = value;
+                    NotifyPropertyChanged();
+                }
+            }
         }
 
         private string _message;
         public string Message
         {
             get { return _message; }
-            private set { _message = value; NotifyPropertyChanged(); }
+            private set
+            {
+                if (value != _message)
+                {
+                    _message = value;
+                    NotifyPropertyChanged();
+                }
+            }
         }
 
         private readonly RelayCommand _resetCommand;
@@ -101,16 +137,23 @@ namespace LaserPewer.ViewModel
         {
             updateStatus(AppCore.Machine.State);
 
-            _resetCommand = new RelayCommand(parameter => AppCore.Machine.ResetAsync());
-            _homeCommand = new RelayCommand(parameter => AppCore.Machine.HomeAsync());
-            _unlockCommand = new RelayCommand(parameter => AppCore.Machine.UnlockAsync());
+            _resetCommand = new RelayCommand(
+                parameter => AppCore.Machine.ResetAsync(),
+                parameter => AppCore.Machine.CanReset());
+            _homeCommand = new RelayCommand(
+                parameter => AppCore.Machine.HomeAsync(),
+                parameter => AppCore.Machine.CanHome());
+            _unlockCommand = new RelayCommand(
+                parameter => AppCore.Machine.UnlockAsync(),
+                parameter => AppCore.Machine.CanUnlock());
             _resumeCommand = new RelayCommand(parameter => { });
             _holdCommand = new RelayCommand(parameter => { });
             _startCommand = new RelayCommand(
                 parameter => AppCore.Machine.RunAsync(AppCore.Generator.GCodeProgram),
-                parameter => AppCore.Generator.GCodeProgram != null);
+                parameter => AppCore.Machine.CanRun() && AppCore.Generator.GCodeProgram != null);
             _stopCommand = new RelayCommand(
-                parameter => AppCore.Machine.CancelAsync());
+                parameter => AppCore.Machine.CancelAsync(),
+                parameter => AppCore.Machine.CanCancel());
 
             AppCore.Machine.StateUpdated += Machine_StatusUpdated;
             AppCore.Generator.Completed += Generator_Completed;
@@ -125,9 +168,23 @@ namespace LaserPewer.ViewModel
             Message = "None";
         }
 
-        private void Machine_StatusUpdated(object sender, EventArgs e)
+        private void Machine_StatusUpdated(LaserMachine sender, LaserMachine.MachineState state, bool invalidateCanDo)
         {
-            updateStatus(AppCore.Machine.State);
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                updateStatus(state);
+
+                if (invalidateCanDo)
+                {
+                    _resetCommand.NotifyCanExecuteChanged();
+                    _homeCommand.NotifyCanExecuteChanged();
+                    _unlockCommand.NotifyCanExecuteChanged();
+                    _resumeCommand.NotifyCanExecuteChanged();
+                    _holdCommand.NotifyCanExecuteChanged();
+                    _startCommand.NotifyCanExecuteChanged();
+                    _stopCommand.NotifyCanExecuteChanged();
+                }
+            });
         }
 
         private void Generator_Completed(object sender, EventArgs e)

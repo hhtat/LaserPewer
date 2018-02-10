@@ -5,19 +5,10 @@ namespace LaserPewer.Shared
 {
     public abstract class LaserMachine : IDisposable
     {
-        public event EventHandler StateUpdated;
+        public delegate void StateUpdatedEventHandler(LaserMachine sender, MachineState state, bool invalidateCanDo);
+        public event StateUpdatedEventHandler StateUpdated;
 
-        private MachineState _state;
-        public MachineState State
-        {
-            get { return _state; }
-            protected set
-            {
-                if (value == null) throw new ArgumentNullException();
-                _state = value;
-                StateUpdated?.Invoke(this, null);
-            }
-        }
+        public MachineState State { get; private set; }
 
         private bool disposed = false;
 
@@ -48,12 +39,22 @@ namespace LaserPewer.Shared
 
         protected abstract void doDispose(bool disposing);
 
+        protected void updateState(MachineState state, bool invalidateCanDos)
+        {
+            State = state ?? throw new ArgumentNullException();
+            StateUpdated?.Invoke(this, state, invalidateCanDos);
+        }
+
+        public abstract bool CanConnect();
+
         public void ConnectAsync(string portName)
         {
             Task.Run(() => doConnect(portName));
         }
 
         protected abstract void doConnect(string portName);
+
+        public abstract bool CanDisconnect();
 
         public Task DisconnectAsync()
         {
@@ -62,12 +63,16 @@ namespace LaserPewer.Shared
 
         protected abstract void doDisconnect();
 
+        public abstract bool CanReset();
+
         public void ResetAsync()
         {
             Task.Run(() => doReset());
         }
 
         protected abstract void doReset();
+
+        public abstract bool CanCancel();
 
         public void CancelAsync()
         {
@@ -76,12 +81,16 @@ namespace LaserPewer.Shared
 
         protected abstract void doCancel();
 
+        public abstract bool CanHome();
+
         public void HomeAsync()
         {
             Task.Run(() => doHome());
         }
 
         protected abstract void doHome();
+
+        public abstract bool CanUnlock();
 
         public void UnlockAsync()
         {
@@ -90,12 +99,16 @@ namespace LaserPewer.Shared
 
         protected abstract void doUnlock();
 
+        public abstract bool CanJog();
+
         public void JogAsync(double x, double y, double rate)
         {
             Task.Run(() => doJog(x, y, rate));
         }
 
         protected abstract void doJog(double x, double y, double rate);
+
+        public abstract bool CanRun();
 
         public void RunAsync(string code)
         {
@@ -111,13 +124,15 @@ namespace LaserPewer.Shared
             public readonly double X;
             public readonly double Y;
 
-            public MachineState(bool connected, string message, double x, double y)
+            public MachineState(bool connected, string status, double x, double y)
             {
                 Connected = connected;
-                Status = message;
+                Status = status;
                 X = x;
                 Y = y;
             }
+
+            public object TriggerType { get; set; }
         }
     }
 }

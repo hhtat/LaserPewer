@@ -18,12 +18,19 @@ namespace LaserPewer.Grbl.StateMachine
         public IReadOnlyList<Transition> Transitions { get { return _transitions; } }
 
         protected readonly Controller controller;
+        private readonly ISet<TriggerType> triggerTypes;
 
         protected State(Controller controller, string friendlyName)
         {
             this.controller = controller;
             FriendlyName = friendlyName;
             _transitions = new List<Transition>();
+            triggerTypes = new HashSet<TriggerType>();
+        }
+
+        public bool AcceptsTrigger(TriggerType type)
+        {
+            return triggerTypes.Contains(type);
         }
 
         public void Enter(Trigger trigger)
@@ -55,6 +62,13 @@ namespace LaserPewer.Grbl.StateMachine
         protected T addTransition<T>(T transition) where T : Transition
         {
             _transitions.Add(transition);
+
+            TriggerTransition triggerTransition = transition as TriggerTransition;
+            if (triggerTransition != null)
+            {
+                triggerTypes.Add(triggerTransition.Type);
+            }
+
             return transition;
         }
 
