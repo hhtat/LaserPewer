@@ -3,13 +3,12 @@ using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public class RunResumeState : State
+    public class RunCancelState : State
     {
         private readonly StopWatch retryTimeout;
-        private TimeoutTransition stateTimeoutTransition;
+        private TimeoutTransition abortTimeoutTransition;
 
-
-        public RunResumeState(Controller controller) : base(controller, "Resuming")
+        public RunCancelState(Controller controller) : base(controller, "Unlocking")
         {
             retryTimeout = new StopWatch();
         }
@@ -21,27 +20,23 @@ namespace LaserPewer.Grbl.StateMachine
             addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Reset));
             addTransition(new MachineStateTransition(controller.AlarmedState, GrblStatus.MachineState.Alarm));
 
-            addTransition(new TriggerTransition(controller.RunCancelState, TriggerType.Cancel));
-
-            stateTimeoutTransition = addTransition(new TimeoutTransition(controller.RunningState, TimeSpan.FromSeconds(StateTimeoutSecs)));
+            addTransition(new MachineStateTransition(controller.ResettingState, GrblStatus.MachineState.Hold));
+            addTransition(new MachineStateTransition(controller.ResettingState, GrblStatus.MachineState.Hold0));
+            abortTimeoutTransition = addTransition(new TimeoutTransition(controller.ResettingState, TimeSpan.FromSeconds(AbortTimeoutSecs)));
         }
 
         protected override void onEnter(Trigger trigger)
         {
             retryTimeout.Zero();
-            stateTimeoutTransition.Reset();
+            abortTimeoutTransition.Reset();
 
             controller.RequestStatusQueryInterval(RapidStatusQueryIntervalSecs);
         }
 
         protected override void onStep()
         {
-            if (controller.LatestStatus.State == GrblStatus.MachineState.Hold ||
-                controller.LatestStatus.State == GrblStatus.MachineState.Hold0 ||
-                controller.LatestStatus.State == GrblStatus.MachineState.Hold1)
+            if (retrySend(retryTimeout, GrblRequest.CreateFeedHoldRequest()))
             {
-                retrySend(retryTimeout, GrblRequest.CreateCycleResumeRequest());
-                stateTimeoutTransition.Reset();
             }
         }
     }

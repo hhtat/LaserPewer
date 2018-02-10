@@ -136,7 +136,7 @@ namespace LaserPewer.ViewModel
                 parameter => AppCore.Machine.UnlockAsync(),
                 parameter => AppCore.Machine.CanUnlock());
             _startCommand = new RelayCommand(
-                parameter => AppCore.Machine.RunAsync(AppCore.Generator.GCodeProgram),
+                parameter => AppCore.Machine.RunAsync(AppCore.Generator.GCodeProgram ?? string.Empty),
                 parameter => AppCore.Machine.CanRun() && AppCore.Generator.GCodeProgram != null);
             _pauseCommand = new RelayCommand(
                 parameter => AppCore.Machine.PauseAsync(),

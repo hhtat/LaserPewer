@@ -3,12 +3,12 @@ using System;
 
 namespace LaserPewer.Grbl.StateMachine
 {
-    public class JogCancellationState : State
+    public class JogCancelState : State
     {
         private readonly StopWatch retryTimeout;
         private TimeoutTransition stateTimeoutTransition;
 
-        public JogCancellationState(Controller controller) : base(controller, "Cancelling")
+        public JogCancelState(Controller controller) : base(controller, "Cancelling")
         {
             retryTimeout = new StopWatch();
         }

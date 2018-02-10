@@ -19,6 +19,7 @@ namespace LaserPewer.Grbl.StateMachine
             addTransition(new MachineStateTransition(controller.AlarmedState, GrblStatus.MachineState.Alarm));
 
             addTransition(new TriggerTransition(controller.RunResumeState, TriggerType.Resume));
+            addTransition(new TriggerTransition(controller.RunCancelState, TriggerType.Cancel));
         }
 
         protected override void onEnter(Trigger trigger)

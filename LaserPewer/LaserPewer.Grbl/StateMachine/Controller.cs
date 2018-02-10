@@ -20,10 +20,11 @@ namespace LaserPewer.Grbl.StateMachine
         public readonly State AlarmKillState;
         public readonly State HomingState;
         public readonly State JoggingState;
-        public readonly State JogCancellationState;
+        public readonly State JogCancelState;
         public readonly State RunningState;
         public readonly State RunHoldState;
         public readonly State RunResumeState;
+        public readonly State RunCancelState;
 
         public string StateName
         {
@@ -114,10 +115,11 @@ namespace LaserPewer.Grbl.StateMachine
             AlarmKillState = new AlarmKillState(this);
             HomingState = new HomingState(this);
             JoggingState = new JoggingState(this);
-            JogCancellationState = new JogCancellationState(this);
+            JogCancelState = new JogCancelState(this);
             RunningState = new RunningState(this);
             RunHoldState = new RunHoldState(this);
             RunResumeState = new RunResumeState(this);
+            RunCancelState = new RunCancelState(this);
 
             queuedTriggerLock = new object();
             receivedLines = new Queue<string>();

@@ -53,11 +53,12 @@
     <Compile Include="StateMachine\DisconnectedState.cs" />
     <Compile Include="StateMachine\DisconnectedTransition.cs" />
     <Compile Include="StateMachine\HomingState.cs" />
-    <Compile Include="StateMachine\JogCancellationState.cs" />
+    <Compile Include="StateMachine\JogCancelState.cs" />
     <Compile Include="StateMachine\JoggingState.cs" />
     <Compile Include="StateMachine\MachineStateTransition.cs" />
     <Compile Include="StateMachine\ReadyState.cs" />
     <Compile Include="StateMachine\ResettingState.cs" />
+    <Compile Include="StateMachine\RunCancelState.cs" />
     <Compile Include="StateMachine\RunResumeState.cs" />
     <Compile Include="StateMachine\RunHoldState.cs" />
     <Compile Include="StateMachine\RunningState.cs" />
