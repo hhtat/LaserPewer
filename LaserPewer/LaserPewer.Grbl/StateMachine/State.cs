@@ -52,9 +52,10 @@ namespace LaserPewer.Grbl.StateMachine
 
         protected virtual void addTransitions() { }
 
-        protected void addTransition(Transition transition)
+        protected T addTransition<T>(T transition) where T : Transition
         {
             _transitions.Add(transition);
+            return transition;
         }
 
         protected bool retrySend(StopWatch timeout, GrblRequest request)

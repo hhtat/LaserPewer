@@ -19,7 +19,7 @@ namespace LaserPewer.Grbl.StateMachine
 
             addTransition(new TriggerTransition(controller.ResettingState, TriggerType.Cancel));
 
-            stateTimeoutTransition = new TimeoutTransition(controller.ReadyState, TimeSpan.FromSeconds(StateTimeoutSecs));
+            stateTimeoutTransition = addTransition(new TimeoutTransition(controller.ReadyState, TimeSpan.FromSeconds(StateTimeoutSecs)));
         }
 
         protected override void onEnter(Trigger trigger)
