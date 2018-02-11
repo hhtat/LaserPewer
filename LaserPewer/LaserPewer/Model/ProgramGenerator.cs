@@ -1,4 +1,5 @@
 ﻿using LaserPewer.Generation;
+using LaserPewer.Geometry;
 using LaserPewer.Utilities;
 using System;
 using System.Collections.Generic;
@@ -53,13 +54,13 @@ namespace LaserPewer.Model
         {
             if (drawing == null) return;
 
-            List<Drawing.Path> paths = new List<Drawing.Path>();
-            foreach (Drawing.Path path in drawing.Paths)
+            List<Path> paths = new List<Path>();
+            foreach (Path path in drawing.Paths)
             {
-                paths.Add(Drawing.Path.Offset(path, offset));
+                paths.Add(Path.Offset(path, offset));
             }
             paths = Clipper.ClipPaths(paths, new Rect(new Point(0.0, 0.0),
-                CoordinateMath.FarExtent(machineProfile.TableSize, machineProfile.Origin)));
+                CornerMath.FarExtent(machineProfile.TableSize, machineProfile.Origin)));
 
             VectorPath = VectorGenerator.Generate(paths, VectorPower, VectorSpeed);
             GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, machineProfile.MaxFeedRate);

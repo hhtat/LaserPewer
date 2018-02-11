@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace LaserPewer.Utilities
 {
-    public static class CoordinateMath
+    public static class CornerMath
     {
         public static Point MinExtent(Size size, Corner origin)
         {

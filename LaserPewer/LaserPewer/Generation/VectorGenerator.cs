@@ -1,4 +1,5 @@
-﻿using LaserPewer.Model;
+﻿using LaserPewer.Geometry;
+using LaserPewer.Model;
 using LaserPewer.Shared;
 using System.Collections.Generic;
 using System.Windows;
@@ -7,12 +8,12 @@ namespace LaserPewer.Generation
 {
     public static class VectorGenerator
     {
-        public static MachinePath Generate(IReadOnlyList<Drawing.Path> inputPaths, double power, double speed)
+        public static MachinePath Generate(IReadOnlyList<Path> inputPaths, double power, double speed)
         {
             StopWatch stopWatch = new StopWatch();
 
             List<PathInfo> paths = new List<PathInfo>();
-            foreach (Drawing.Path path in inputPaths)
+            foreach (Path path in inputPaths)
             {
                 paths.Add(new PathInfo(path));
             }
@@ -121,7 +122,7 @@ namespace LaserPewer.Generation
 
         private class PathInfo
         {
-            public readonly Drawing.Path Path;
+            public readonly Path Path;
 
             public readonly Rect Bounds;
             public readonly double Area;
@@ -139,7 +140,7 @@ namespace LaserPewer.Generation
                 }
             }
 
-            public PathInfo(Drawing.Path path)
+            public PathInfo(Path path)
             {
                 Path = path;
 

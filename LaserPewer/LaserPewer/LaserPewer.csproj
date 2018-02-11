@@ -61,7 +61,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Utilities\CoordinateMath.cs" />
+    <Compile Include="Geometry\Clipper.cs" />
+    <Compile Include="Geometry\Path.cs" />
+    <Compile Include="Geometry\PathBuilder.cs" />
+    <Compile Include="Utilities\CornerMath.cs" />
     <Compile Include="Utilities\DoubleToPercentConverter.cs" />
     <Compile Include="Generation\GCodeGenerator.cs" />
     <Compile Include="Generation\MachinePath.cs" />
@@ -69,7 +72,6 @@
       <DependentUpon>MachineProfilesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\AppCore.cs" />
-    <Compile Include="Model\Clipper.cs" />
     <Compile Include="Model\Document.cs" />
     <Compile Include="Utilities\EnumToDescriptionStringConverter.cs" />
     <Compile Include="Utilities\NullableToBooleanConverter.cs" />
@@ -77,8 +79,6 @@
       <DependentUpon>ProgramViewerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Corner.cs" />
-    <Compile Include="Utilities\Precision.cs" />
-    <Compile Include="Model\PathBuilder.cs" />
     <Compile Include="Model\MachineProfiles.cs" />
     <Compile Include="Model\PersistentSettings.cs" />
     <Compile Include="Model\SvgScraper.cs" />

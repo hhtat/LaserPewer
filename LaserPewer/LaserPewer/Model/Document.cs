@@ -1,4 +1,5 @@
-﻿using LaserPewer.Utilities;
+﻿using LaserPewer.Shared;
+using LaserPewer.Utilities;
 using Svg;
 using System;
 using System.Diagnostics;

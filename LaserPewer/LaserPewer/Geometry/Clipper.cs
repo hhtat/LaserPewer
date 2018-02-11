@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using LaserPewer.Shared;
+using System.Collections.Generic;
 using System.Linq;
-using LaserPewer.Utilities;
+using System.Windows;
 
-namespace LaserPewer.Model
+namespace LaserPewer.Geometry
 {
     public static class Clipper
     {
-        public static List<Drawing.Path> ClipPaths(IEnumerable<Drawing.Path> paths, Rect clip)
+        public static List<Path> ClipPaths(IEnumerable<Path> paths, Rect clip)
         {
-            List<Drawing.Path> clipped = new List<Drawing.Path>();
+            List<Path> clipped = new List<Path>();
 
-            foreach (Drawing.Path path in paths)
+            foreach (Path path in paths)
             {
                 clipped.AddRange(ClipPath(path, clip));
             }
@@ -19,7 +19,7 @@ namespace LaserPewer.Model
             return clipped;
         }
 
-        public static List<Drawing.Path> ClipPath(Drawing.Path path, Rect clip)
+        public static List<Path> ClipPath(Path path, Rect clip)
         {
             PathBuilder pathBuilder = new PathBuilder();
 
@@ -43,19 +43,19 @@ namespace LaserPewer.Model
                 prev = point;
             }
 
-            List<Drawing.Path> paths = pathBuilder.GetPaths();
+            List<Path> paths = pathBuilder.GetPaths();
 
             if (paths.Count >= 2)
             {
-                Drawing.Path firstPath = paths.First();
-                Drawing.Path lastPath = paths.Last();
+                Path firstPath = paths.First();
+                Path lastPath = paths.Last();
 
                 if (firstPath.Points.First() == lastPath.Points.Last())
                 {
                     List<Point> points = new List<Point>();
                     for (int i = 0; i < lastPath.Points.Count; i++) points.Add(lastPath.Points[i]);
                     for (int i = 1; i < firstPath.Points.Count; i++) points.Add(firstPath.Points[i]);
-                    paths[0] = new Drawing.Path(points, false);
+                    paths[0] = new Path(points, false);
                     paths.RemoveAt(paths.Count - 1);
                 }
             }

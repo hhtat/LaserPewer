@@ -63,7 +63,7 @@ namespace LaserPewer.ViewModel
         {
             NotifyPropertyChanged(nameof(MachineSize));
             NotifyPropertyChanged(nameof(MachineOrigin));
-            Point extent = CoordinateMath.FarExtent(profile.TableSize, profile.Origin);
+            Point extent = CornerMath.FarExtent(profile.TableSize, profile.Origin);
             ViewCenter = new Point(extent.X / 2.0, extent.Y / 2.0);
         }
 

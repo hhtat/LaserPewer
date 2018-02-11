@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace LaserPewer.Utilities
+namespace LaserPewer.Shared
 {
     public class Precision
     {

@@ -2,16 +2,16 @@
 using System.Linq;
 using System.Windows;
 
-namespace LaserPewer.Model
+namespace LaserPewer.Geometry
 {
     public class PathBuilder
     {
-        private readonly List<Drawing.Path> paths;
+        private readonly List<Path> paths;
         private List<Point> points;
 
         public PathBuilder()
         {
-            paths = new List<Drawing.Path>();
+            paths = new List<Path>();
             points = new List<Point>();
         }
 
@@ -21,12 +21,12 @@ namespace LaserPewer.Model
             {
                 if (points.First() != points.Last())
                 {
-                    paths.Add(new Drawing.Path(points, false));
+                    paths.Add(new Path(points, false));
                 }
                 else if (points.Count > 2)
                 {
                     points.RemoveAt(points.Count - 1);
-                    paths.Add(new Drawing.Path(points, true));
+                    paths.Add(new Path(points, true));
                 }
             }
             points = new List<Point>();
@@ -44,7 +44,7 @@ namespace LaserPewer.Model
 
         public void ClosePath()
         {
-            if (points.Count >= 2) paths.Add(new Drawing.Path(points, true));
+            if (points.Count >= 2) paths.Add(new Path(points, true));
             points = new List<Point>();
         }
 
@@ -53,7 +53,7 @@ namespace LaserPewer.Model
             StartPath();
         }
 
-        public List<Drawing.Path> GetPaths()
+        public List<Path> GetPaths()
         {
             EndPath();
             return paths;

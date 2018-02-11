@@ -1,4 +1,5 @@
 ﻿using LaserPewer.Generation;
+using LaserPewer.Geometry;
 using LaserPewer.Model;
 using LaserPewer.Utilities;
 using System;
@@ -217,8 +218,8 @@ namespace LaserPewer
                 {
                     writeableBitmap.Clear();
 
-                    Point minExtent = CoordinateMath.MinExtent(TableSize, TableOrigin);
-                    Point maxExtent = CoordinateMath.MaxExtent(TableSize, TableOrigin);
+                    Point minExtent = CornerMath.MinExtent(TableSize, TableOrigin);
+                    Point maxExtent = CornerMath.MaxExtent(TableSize, TableOrigin);
 
                     fillRectMM(minExtent.X, minExtent.Y, maxExtent.X, maxExtent.Y, Colors.White);
 
@@ -242,7 +243,7 @@ namespace LaserPewer
                     {
                         Vector offset = Document.Offset;
 
-                        foreach (Model.Drawing.Path path in Document.Drawing.Paths)
+                        foreach (Path path in Document.Drawing.Paths)
                         {
                             if (path.Points.Count >= 2)
                             {
