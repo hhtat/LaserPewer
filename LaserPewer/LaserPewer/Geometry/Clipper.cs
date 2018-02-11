@@ -20,7 +20,7 @@ namespace LaserPewer.Geometry
 
         public static List<Path> ClipPath(Path path, Rect clip)
         {
-            PathBuilder pathBuilder = new PathBuilder();
+            Path.Builder pathBuilder = new Path.Builder();
 
             Point prev = path.Points[0];
             pathBuilder.AddPoint(prev);
@@ -51,10 +51,10 @@ namespace LaserPewer.Geometry
 
                 if (firstPath.Points.First() == lastPath.Points.Last())
                 {
-                    List<Point> points = new List<Point>();
-                    for (int i = 0; i < lastPath.Points.Count; i++) points.Add(lastPath.Points[i]);
-                    for (int i = 1; i < firstPath.Points.Count; i++) points.Add(firstPath.Points[i]);
-                    paths[0] = new Path(points, false);
+                    Path.Builder pathBuilder2 = new Path.Builder();
+                    foreach (Point point in lastPath.Points) pathBuilder2.AddPoint(point);
+                    foreach (Point point in firstPath.Points) pathBuilder2.AddPoint(point);
+                    paths[0] = pathBuilder2.GetPaths().First();
                     paths.RemoveAt(paths.Count - 1);
                 }
             }

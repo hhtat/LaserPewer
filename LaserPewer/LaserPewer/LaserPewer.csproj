@@ -63,7 +63,6 @@
     </ApplicationDefinition>
     <Compile Include="Geometry\Clipper.cs" />
     <Compile Include="Geometry\Path.cs" />
-    <Compile Include="Geometry\PathBuilder.cs" />
     <Compile Include="Utilities\CornerMath.cs" />
     <Compile Include="Utilities\DoubleToPercentConverter.cs" />
     <Compile Include="Generation\GCodeGenerator.cs" />

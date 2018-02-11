@@ -29,7 +29,7 @@ namespace LaserPewer.Model
         private Stack<ISvgBoundable> boundables;
         private Region clip;
 
-        private PathBuilder pathBuilder;
+        private Path.Builder pathBuilder;
 
 
         public SvgScraper()
@@ -41,7 +41,7 @@ namespace LaserPewer.Model
             boundables = new Stack<ISvgBoundable>();
             clip = new Region();
 
-            pathBuilder = new PathBuilder();
+            pathBuilder = new Path.Builder();
         }
 
         public Drawing CreateDrawing(System.Windows.Rect clip)
