@@ -51,12 +51,12 @@ namespace LaserPewer.Model
 
         public double GetWidth(SvgDocument svgDocument)
         {
-            return mmpd * svgDocument.Width.ToDeviceValue(this, UnitRenderingType.Other, svgDocument);
+            return round(mmpd * svgDocument.Width.ToDeviceValue(this, UnitRenderingType.Other, svgDocument));
         }
 
         public double GetHeight(SvgDocument svgDocument)
         {
-            return mmpd * svgDocument.Height.ToDeviceValue(this, UnitRenderingType.Other, svgDocument);
+            return round(mmpd * svgDocument.Height.ToDeviceValue(this, UnitRenderingType.Other, svgDocument));
         }
 
         public void Dispose()
@@ -89,11 +89,11 @@ namespace LaserPewer.Model
                 {
                     case POINT_TYPE_START:
                         pathBuilder.StartPath();
-                        pathBuilder.AddPoint(mmpd * point.X, mmpd * -point.Y);
+                        pathBuilder.AddPoint(round(mmpd * point.X), round(mmpd * -point.Y));
                         lastPoint = point;
                         break;
                     case POINT_TYPE_LINE:
-                        pathBuilder.AddPoint(mmpd * point.X, mmpd * -point.Y);
+                        pathBuilder.AddPoint(round(mmpd * point.X), round(mmpd * -point.Y));
                         lastPoint = point;
                         break;
                     case POINT_TYPE_BEZIER:
@@ -182,7 +182,7 @@ namespace LaserPewer.Model
             pathBuilder.AddPoint(mmpd * d.X, mmpd * -d.Y); ;
         }
 
-        void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, int depth)
+        private void adaptiveBezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, int depth)
         {
             double x12 = (x1 + x2) / 2.0;
             double y12 = (y1 + y2) / 2.0;
@@ -212,6 +212,11 @@ namespace LaserPewer.Model
 
             adaptiveBezier(x1, y1, x12, y12, x123, y123, x1234, y1234, depth + 1);
             adaptiveBezier(x1234, y1234, x234, y234, x34, y34, x4, y4, depth + 1);
+        }
+
+        private static double round(double value)
+        {
+            return Math.Round(value, 5);
         }
     }
 }

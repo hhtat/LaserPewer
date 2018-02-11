@@ -1,5 +1,4 @@
-﻿using LaserPewer.Shared;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
@@ -23,13 +22,13 @@ namespace LaserPewer.Geometry
         {
             PathBuilder pathBuilder = new PathBuilder();
 
-            Point prev = Precision.Round3(path.Points[0]);
+            Point prev = path.Points[0];
             pathBuilder.AddPoint(prev);
 
             for (int i = 1; i <= path.Points.Count; i++)
             {
                 if (i == path.Points.Count && !path.Closed) break;
-                Point point = Precision.Round3(path.Points[i % path.Points.Count]);
+                Point point = path.Points[i % path.Points.Count];
 
                 Point a = prev;
                 Point b = point;
@@ -81,28 +80,37 @@ namespace LaserPewer.Geometry
                 if (edge == 2) { p = -delta.Y; q = -(clip.Top - a.Y); }
                 if (edge == 3) { p = delta.Y; q = (clip.Bottom - a.Y); }
 
-                if (p == 0 && q < 0) return false;
+                if (p == 0 && q < 0)
+                {
+                    return false;
+                }
 
                 r = q / p;
 
                 if (p < 0)
                 {
-                    if (r > t1) return false;
+                    if (r > t1)
+                    {
+                        return false;
+                    }
                     if (r > t0) t0 = r;
                 }
                 else if (p > 0)
                 {
-                    if (r < t0) return false;
+                    if (r < t0)
+                    {
+                        return false;
+                    }
                     if (r < t1) t1 = r;
                 }
             }
 
             Point _a = a;
 
-            a.X = Precision.Round3(_a.X + t0 * delta.X);
-            a.Y = Precision.Round3(_a.Y + t0 * delta.Y);
-            b.X = Precision.Round3(_a.X + t1 * delta.X);
-            b.Y = Precision.Round3(_a.Y + t1 * delta.Y);
+            a.X = _a.X + t0 * delta.X;
+            a.Y = _a.Y + t0 * delta.Y;
+            b.X = _a.X + t1 * delta.X;
+            b.Y = _a.Y + t1 * delta.Y;
 
             return true;
         }

@@ -34,9 +34,7 @@ namespace LaserPewer.Model
             try
             {
                 SvgDocument svgDocument = SvgDocument.Open(fileName);
-                svgSize = new Size(
-                    Precision.Round3(svgScraper.GetWidth(svgDocument)),
-                    Precision.Round3(svgScraper.GetHeight(svgDocument)));
+                svgSize = new Size(svgScraper.GetWidth(svgDocument), svgScraper.GetHeight(svgDocument));
                 svgDocument.Draw(svgScraper);
             }
             catch (Exception e)
