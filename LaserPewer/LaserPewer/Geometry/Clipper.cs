@@ -107,10 +107,17 @@ namespace LaserPewer.Geometry
 
             Point _a = a;
 
-            a.X = _a.X + t0 * delta.X;
-            a.Y = _a.Y + t0 * delta.Y;
-            b.X = _a.X + t1 * delta.X;
-            b.Y = _a.Y + t1 * delta.Y;
+            if (t0 != 0.0)
+            {
+                a.X = _a.X + t0 * delta.X;
+                a.Y = _a.Y + t0 * delta.Y;
+            }
+
+            if (t1 != 1.0)
+            {
+                b.X = _a.X + t1 * delta.X;
+                b.Y = _a.Y + t1 * delta.Y;
+            }
 
             return true;
         }
