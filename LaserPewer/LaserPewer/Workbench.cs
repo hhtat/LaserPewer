@@ -252,7 +252,7 @@ namespace LaserPewer
                                 {
                                     if (i == path.Points.Count && !path.Closed) break;
                                     Point point = path.Points[i % path.Points.Count] + offset;
-                                    drawLineMM(prev.X, prev.Y, point.X, point.Y, i % 2 == 0 ? Colors.LightBlue : Colors.LightGreen);
+                                    drawLineMM(prev.X, prev.Y, point.X, point.Y, path.Closed ? Colors.Blue : Colors.Green);
                                     prev = point;
                                 }
                             }

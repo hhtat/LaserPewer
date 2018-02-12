@@ -2,6 +2,7 @@
 using LaserPewer.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
@@ -12,9 +13,55 @@ namespace LaserPewer.Generation
         public static MachinePath Generate(IReadOnlyList<Path> paths, double power, double speed)
         {
             PathTree precedenceTree = new PathTree(paths);
-            int[] priorities = new int[precedenceTree.Size];
-            IReadOnlyList<PathNode> schedule = precedenceTree.Traverse(priorities);
-            return toMachinePath(schedule, power, speed);
+
+            Random random = new Random();
+
+            int[] bestPriorities = new int[precedenceTree.Size];
+            for (int i = 0; i < bestPriorities.Length; i++)
+            {
+                bestPriorities[i] = random.Next();
+            }
+            IReadOnlyList<PathNode> bestSchedule = null;
+            double lowestCost = double.MaxValue;
+
+            for (int i = 0; i < 100000; i++)
+            {
+                if (i % 100000 == 0) Debug.WriteLine("GEN " + i);
+                int[] priorities = new int[precedenceTree.Size];
+                Array.Copy(bestPriorities, priorities, priorities.Length);
+                int mutations = 1 + random.Next(10);
+                for (int j = 0; j < mutations; j++)
+                {
+                    priorities[random.Next(priorities.Length)] = random.Next();
+                }
+
+                IReadOnlyList<PathNode> schedule = precedenceTree.Traverse(priorities);
+                double cost = calculateTravelCost(schedule);
+
+                if (cost < lowestCost)
+                {
+                    bestPriorities = priorities;
+                    bestSchedule = schedule;
+                    lowestCost = cost;
+                    Debug.WriteLine("COST: " + lowestCost);
+                }
+            }
+
+            return toMachinePath(bestSchedule, power, speed);
+        }
+
+        private static double calculateTravelCost(IReadOnlyList<PathNode> schedule)
+        {
+            double travelCost = 0.0;
+            Point lastEndPoint = new Point(0.0, 0.0);
+
+            foreach (PathNode node in schedule)
+            {
+                travelCost += node.LocateNearestStartPoint(lastEndPoint);
+                lastEndPoint = node.Path.Points[node.EndIndex];
+            }
+
+            return travelCost;
         }
 
         private static MachinePath toMachinePath(IReadOnlyList<PathNode> schedule, double power, double speed)
@@ -24,32 +71,34 @@ namespace LaserPewer.Generation
             machinePath.SetPowerAndSpeed(power, speed);
             Point lastEndPoint = new Point(0.0, 0.0);
 
-            foreach (PathNode path in schedule)
+            foreach (PathNode node in schedule)
             {
-                path.LocateNearestStartPoint(lastEndPoint);
-                if (path.Path.Closed)
+                node.LocateNearestStartPoint(lastEndPoint);
+
+                if (node.Path.Closed)
                 {
-                    for (int i = 0; i <= path.Path.Points.Count; i++)
+                    for (int i = 0; i <= node.Path.Points.Count; i++)
                     {
-                        machinePath.TravelTo(path.Path.Points[(path.StartIndex + i) % path.Path.Points.Count]);
+                        machinePath.TravelTo(node.Path.Points[(node.StartIndex + i) % node.Path.Points.Count]);
                     }
                 }
-                else if (path.StartIndex == 0)
+                else if (node.StartIndex == 0)
                 {
-                    for (int i = 0; i < path.Path.Points.Count; i++)
+                    for (int i = 0; i < node.Path.Points.Count; i++)
                     {
-                        machinePath.TravelTo(path.Path.Points[i]);
+                        machinePath.TravelTo(node.Path.Points[i]);
                     }
                 }
                 else
                 {
-                    for (int i = path.Path.Points.Count - 1; i >= 0; i--)
+                    for (int i = node.Path.Points.Count - 1; i >= 0; i--)
                     {
-                        machinePath.TravelTo(path.Path.Points[i]);
+                        machinePath.TravelTo(node.Path.Points[i]);
                     }
                 }
 
                 machinePath.EndCut();
+                lastEndPoint = node.Path.Points[node.EndIndex];
             }
 
             return machinePath;
@@ -102,8 +151,8 @@ namespace LaserPewer.Generation
                     traversal.Add(node);
                     foreach (PathNode parent in node.Parents)
                     {
-                        parent.Children.Remove(node);
-                        if (parent.Children.Count == 0) queue.Enqueue(parent);
+                        parent.PendingChildren.Remove(node);
+                        if (parent.PendingChildren.Count == 0) queue.Enqueue(parent);
                     }
                 }
 
@@ -115,14 +164,14 @@ namespace LaserPewer.Generation
         {
             public readonly Path Path;
 
-            public readonly HashSet<PathNode> Parents;
-            public readonly HashSet<PathNode> Children;
+            public readonly ISet<PathNode> Parents;
+            public readonly ISet<PathNode> Children;
 
-            public HashSet<PathNode> PendingChildren { get; private set; }
+            public ISet<PathNode> PendingChildren { get; private set; }
 
             public int Priority { get; private set; }
             public int StartIndex { get; private set; }
-            public int EndIndex { get { return Path.Closed ? StartIndex : ((StartIndex + Path.Points.Count - 1) % Path.Points.Count); } }
+            public int EndIndex { get { return Path.Closed ? StartIndex : (StartIndex == 0 ? Path.Points.Count - 1 : 0); } }
 
             public PathNode(Path path)
             {
@@ -136,7 +185,7 @@ namespace LaserPewer.Generation
             {
                 PendingChildren = new HashSet<PathNode>(Children);
 
-                Priority = 0;
+                Priority = priority;
                 StartIndex = 0;
             }
 
