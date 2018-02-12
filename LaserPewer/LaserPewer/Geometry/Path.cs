@@ -8,29 +8,15 @@ namespace LaserPewer.Geometry
     {
         public readonly IReadOnlyList<Point> Points;
         public readonly bool Closed;
+        public readonly Rect Bounds;
+        public readonly double BoundsArea;
 
-        private Path(List<Point> points, bool closed)
+        private Path(IReadOnlyList<Point> points, bool closed)
         {
             Points = points;
             Closed = closed;
-        }
-
-        public Rect CalculateBounds()
-        {
-            double xMin = double.MaxValue;
-            double xMax = double.MinValue;
-            double yMin = double.MaxValue;
-            double yMax = double.MinValue;
-
-            foreach (Point point in Points)
-            {
-                if (point.X < xMin) xMin = point.X;
-                if (point.X > xMax) xMax = point.X;
-                if (point.Y < yMin) yMin = point.Y;
-                if (point.Y > yMax) yMax = point.Y;
-            }
-
-            return new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+            Bounds = calculateBounds(points);
+            BoundsArea = Bounds.Width * Bounds.Height;
         }
 
         public static Path Offset(Path path, Vector offset)
@@ -43,6 +29,24 @@ namespace LaserPewer.Geometry
             }
 
             return new Path(points, path.Closed);
+        }
+
+        private static Rect calculateBounds(IReadOnlyList<Point> points)
+        {
+            double xMin = double.MaxValue;
+            double xMax = double.MinValue;
+            double yMin = double.MaxValue;
+            double yMax = double.MinValue;
+
+            foreach (Point point in points)
+            {
+                if (point.X < xMin) xMin = point.X;
+                if (point.X > xMax) xMax = point.X;
+                if (point.Y < yMin) yMin = point.Y;
+                if (point.Y > yMax) yMax = point.Y;
+            }
+
+            return new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
         }
 
         public class Builder

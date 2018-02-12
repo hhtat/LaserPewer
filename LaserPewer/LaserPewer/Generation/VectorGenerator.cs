@@ -1,97 +1,32 @@
 ﻿using LaserPewer.Geometry;
-using LaserPewer.Model;
-using LaserPewer.Shared;
+using LaserPewer.Utilities;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 namespace LaserPewer.Generation
 {
     public static class VectorGenerator
     {
-        public static MachinePath Generate(IReadOnlyList<Path> inputPaths, double power, double speed)
+        public static MachinePath Generate(IReadOnlyList<Path> paths, double power, double speed)
         {
-            StopWatch stopWatch = new StopWatch();
+            PathTree precedenceTree = new PathTree(paths);
+            int[] priorities = new int[precedenceTree.Size];
+            IReadOnlyList<PathNode> schedule = precedenceTree.Traverse(priorities);
+            return toMachinePath(schedule, power, speed);
+        }
 
-            List<PathInfo> paths = new List<PathInfo>();
-            foreach (Path path in inputPaths)
-            {
-                paths.Add(new PathInfo(path));
-            }
-
-            stopWatch.TraceLap("Calculate bounds & area");
-
-            paths.Sort((a, b) => a.Area.CompareTo(b.Area));
-
-            stopWatch.TraceLap("Sort by area");
-
-            for (int i = 0; i < paths.Count; i++)
-            {
-                PathInfo child = paths[i];
-                for (int j = i + 1; j < paths.Count; j++)
-                {
-                    PathInfo parent = paths[j];
-                    if (parent.Bounds.Contains(child.Bounds) && parent.Bounds != child.Bounds)
-                    {
-                        parent.Children.Add(child);
-                        child.Parents.Add(parent);
-                    }
-                }
-            }
-
-            stopWatch.TraceLap("Lineages calculated");
-
-            HashSet<PathInfo> readyPaths = new HashSet<PathInfo>();
-            foreach (PathInfo path in paths)
-            {
-                if (path.Children.Count == 0)
-                {
-                    readyPaths.Add(path);
-                }
-            }
-
-            stopWatch.TraceLap("Sets initialized");
-
-            paths.Clear();
-            Point lastEndPoint = new Point(0.0, 0.0);
-
-            while (readyPaths.Count > 0)
-            {
-                PathInfo nearestPath = null;
-                double nearestDistanceSquared = double.MaxValue;
-
-                foreach (PathInfo path in readyPaths)
-                {
-                    double distanceSquared = path.LocateNearestStartPoint(lastEndPoint);
-                    if (distanceSquared < nearestDistanceSquared)
-                    {
-                        nearestPath = path;
-                        nearestDistanceSquared = distanceSquared;
-                    }
-                }
-
-                paths.Add(nearestPath);
-                readyPaths.Remove(nearestPath);
-                foreach (PathInfo parent in nearestPath.Parents)
-                {
-                    parent.Children.Remove(nearestPath);
-                    if (parent.Children.Count == 0)
-                    {
-                        readyPaths.Add(parent);
-                    }
-                }
-                nearestPath.Parents.Clear();
-
-                lastEndPoint = nearestPath.EndPoint;
-            }
-
-            stopWatch.TraceLap("Paths sequenced");
-
+        private static MachinePath toMachinePath(IReadOnlyList<PathNode> schedule, double power, double speed)
+        {
             MachinePath machinePath = new MachinePath();
 
             machinePath.SetPowerAndSpeed(power, speed);
+            Point lastEndPoint = new Point(0.0, 0.0);
 
-            foreach (PathInfo path in paths)
+            foreach (PathNode path in schedule)
             {
+                path.LocateNearestStartPoint(lastEndPoint);
                 if (path.Path.Closed)
                 {
                     for (int i = 0; i <= path.Path.Points.Count; i++)
@@ -120,36 +55,88 @@ namespace LaserPewer.Generation
             return machinePath;
         }
 
-        private class PathInfo
+        private class PathTree
         {
-            public readonly Path Path;
+            public int Size { get { return nodes.Count; } }
 
-            public readonly Rect Bounds;
-            public readonly double Area;
+            private readonly List<PathNode> nodes;
 
-            public readonly HashSet<PathInfo> Parents;
-            public readonly HashSet<PathInfo> Children;
-
-            public int StartIndex;
-
-            public Point EndPoint
+            public PathTree(IReadOnlyList<Path> paths)
             {
-                get
+                nodes = paths.Select(path => new PathNode(path)).ToList();
+                nodes.Sort((a, b) => a.Path.BoundsArea.CompareTo(b.Path.BoundsArea));
+
+                for (int i = 0; i < nodes.Count; i++)
                 {
-                    return Path.Points[Path.Closed ? StartIndex : ((StartIndex + (Path.Points.Count - 1)) % Path.Points.Count)];
+                    PathNode nodeA = nodes[i];
+                    for (int j = i + 1; j < nodes.Count; j++)
+                    {
+                        PathNode nodeB = nodes[j];
+                        if (nodeB.Path.Bounds.Contains(nodeA.Path.Bounds) && nodeB.Path.Bounds != nodeA.Path.Bounds)
+                        {
+                            nodeB.Children.Add(nodeA);
+                            nodeA.Parents.Add(nodeB);
+                        }
+                    }
                 }
             }
 
-            public PathInfo(Path path)
+            public IReadOnlyList<PathNode> Traverse(int[] priorities)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    nodes[i].Reset(priorities[i]);
+                }
+
+                PriorityQueue<PathNode> queue = new PriorityQueue<PathNode>((a, b) => a.Priority.CompareTo(b.Priority));
+                foreach (PathNode node in nodes.Where(node => node.PendingChildren.Count == 0))
+                {
+                    queue.Enqueue(node);
+                }
+
+                List<PathNode> traversal = new List<PathNode>();
+
+                while (queue.Count > 0)
+                {
+                    PathNode node = queue.Dequeue();
+                    traversal.Add(node);
+                    foreach (PathNode parent in node.Parents)
+                    {
+                        parent.Children.Remove(node);
+                        if (parent.Children.Count == 0) queue.Enqueue(parent);
+                    }
+                }
+
+                return traversal;
+            }
+        }
+
+        private class PathNode
+        {
+            public readonly Path Path;
+
+            public readonly HashSet<PathNode> Parents;
+            public readonly HashSet<PathNode> Children;
+
+            public HashSet<PathNode> PendingChildren { get; private set; }
+
+            public int Priority { get; private set; }
+            public int StartIndex { get; private set; }
+            public int EndIndex { get { return Path.Closed ? StartIndex : ((StartIndex + Path.Points.Count - 1) % Path.Points.Count); } }
+
+            public PathNode(Path path)
             {
                 Path = path;
 
-                Bounds = path.CalculateBounds();
-                Area = Bounds.Width * Bounds.Height;
+                Parents = new HashSet<PathNode>();
+                Children = new HashSet<PathNode>();
+            }
 
-                Parents = new HashSet<PathInfo>();
-                Children = new HashSet<PathInfo>();
+            public void Reset(int priority)
+            {
+                PendingChildren = new HashSet<PathNode>(Children);
 
+                Priority = 0;
                 StartIndex = 0;
             }
 
@@ -159,10 +146,7 @@ namespace LaserPewer.Generation
 
                 for (int i = 0; i < Path.Points.Count; i++)
                 {
-                    if (!Path.Closed && i == 1)
-                    {
-                        i = Path.Points.Count - 1;
-                    }
+                    if (!Path.Closed && i == 1) i = Path.Points.Count - 1;
 
                     double distanceSquared = (Path.Points[i] - point).LengthSquared;
                     if (distanceSquared < nearestDistanceSquared)

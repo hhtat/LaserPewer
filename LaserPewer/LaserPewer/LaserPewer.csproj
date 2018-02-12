@@ -88,6 +88,7 @@
     <Compile Include="Utilities\DoubleToStringConverter.cs" />
     <Compile Include="Generation\VectorGenerator.cs" />
     <Compile Include="Utilities\NullableToVisibilityConverter.cs" />
+    <Compile Include="Utilities\PriorityQueue.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\DocumentViewModel.cs" />
     <Compile Include="ViewModel\MachineProfilesViewModel.cs" />
