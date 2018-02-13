@@ -35,7 +35,7 @@ namespace LaserPewer.Generation
 
             while (!stopWatch.Expired(timeout))
             {
-                int[] priorities = new int[precedenceTree.Size];
+                int[] priorities = new int[precedenceTree.Nodes.Count];
                 Array.Copy(bestPriorities, priorities, priorities.Length);
                 int mutations = 1 + random.Next(10);
                 for (int j = 0; j < mutations; j++)
@@ -43,7 +43,7 @@ namespace LaserPewer.Generation
                     priorities[random.Next(priorities.Length)] = random.Next();
                 }
 
-                IReadOnlyList<PathNode> schedule = precedenceTree.Traverse(priorities);
+                IReadOnlyList<PathNode> schedule = precedenceTree.PriorityOrderTraversal(priorities);
                 double cost = calculateTravelCost(schedule);
 
                 if (cost < lowestCost)
@@ -70,8 +70,18 @@ namespace LaserPewer.Generation
             {
                 precedenceTree = new PathTree(paths);
 
-                bestPriorities = new int[precedenceTree.Size];
-                for (int i = 0; i < bestPriorities.Length; i++) bestPriorities[i] = random.Next();
+                IReadOnlyList<PathNode> nodes = precedenceTree.NearestNeighborTraversal();
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    nodes[i].Reset(i);
+                }
+
+                bestPriorities = new int[precedenceTree.Nodes.Count];
+                for (int i = 0; i < bestPriorities.Length; i++)
+                {
+                    bestPriorities[i] = precedenceTree.Nodes[i].Priority;
+                }
+
                 bestSchedule = null;
                 lowestCost = double.MaxValue;
             }
@@ -133,21 +143,20 @@ namespace LaserPewer.Generation
 
         private class PathTree
         {
-            public int Size { get { return nodes.Count; } }
-
-            private readonly List<PathNode> nodes;
+            private readonly List<PathNode> _nodes;
+            public IReadOnlyList<PathNode> Nodes { get { return _nodes; } }
 
             public PathTree(IReadOnlyList<Path> paths)
             {
-                nodes = paths.Select(path => new PathNode(path)).ToList();
-                nodes.Sort((a, b) => a.Path.BoundsArea.CompareTo(b.Path.BoundsArea));
+                _nodes = paths.Select(path => new PathNode(path)).ToList();
+                _nodes.Sort((a, b) => a.Path.BoundsArea.CompareTo(b.Path.BoundsArea));
 
-                for (int i = 0; i < nodes.Count; i++)
+                for (int i = 0; i < _nodes.Count; i++)
                 {
-                    PathNode nodeA = nodes[i];
-                    for (int j = i + 1; j < nodes.Count; j++)
+                    PathNode nodeA = _nodes[i];
+                    for (int j = i + 1; j < _nodes.Count; j++)
                     {
-                        PathNode nodeB = nodes[j];
+                        PathNode nodeB = _nodes[j];
                         if (nodeB.Path.Bounds.Contains(nodeA.Path.Bounds) && nodeB.Path.Bounds != nodeA.Path.Bounds)
                         {
                             nodeB.Children.Add(nodeA);
@@ -157,15 +166,15 @@ namespace LaserPewer.Generation
                 }
             }
 
-            public IReadOnlyList<PathNode> Traverse(int[] priorities)
+            public IReadOnlyList<PathNode> PriorityOrderTraversal(int[] priorities)
             {
-                for (int i = 0; i < nodes.Count; i++)
+                for (int i = 0; i < _nodes.Count; i++)
                 {
-                    nodes[i].Reset(priorities[i]);
+                    _nodes[i].Reset(priorities[i]);
                 }
 
                 PriorityQueue<PathNode> queue = new PriorityQueue<PathNode>((a, b) => a.Priority.CompareTo(b.Priority));
-                foreach (PathNode node in nodes.Where(node => node.PendingChildren.Count == 0))
+                foreach (PathNode node in _nodes.Where(node => node.PendingChildren.Count == 0))
                 {
                     queue.Enqueue(node);
                 }
@@ -184,6 +193,54 @@ namespace LaserPewer.Generation
                 }
 
                 return traversal;
+            }
+
+            public IReadOnlyList<PathNode> NearestNeighborTraversal()
+            {
+                for (int i = 0; i < _nodes.Count; i++)
+                {
+                    _nodes[i].Reset(0);
+                }
+
+                HashSet<PathNode> readySet = new HashSet<PathNode>(_nodes.Where(node => node.PendingChildren.Count == 0));
+
+                List<PathNode> traversal = new List<PathNode>();
+                Point lastEndPoint = new Point(0.0, 0.0);
+
+                while (readySet.Count > 0)
+                {
+                    PathNode node = findNearest(lastEndPoint, readySet);
+                    readySet.Remove(node);
+
+                    traversal.Add(node);
+                    foreach (PathNode parent in node.Parents)
+                    {
+                        parent.PendingChildren.Remove(node);
+                        if (parent.PendingChildren.Count == 0) readySet.Add(parent);
+                    }
+
+                    lastEndPoint = node.Path.Points[node.EndIndex];
+                }
+
+                return traversal;
+            }
+
+            private static PathNode findNearest(Point point, IEnumerable<PathNode> nodes)
+            {
+                PathNode nearest = null;
+                double minDistanceSquared = double.MaxValue;
+
+                foreach (PathNode node in nodes)
+                {
+                    double distanceSquared = node.LocateNearestStartPoint(point);
+                    if (distanceSquared < minDistanceSquared)
+                    {
+                        nearest = node;
+                        minDistanceSquared = distanceSquared;
+                    }
+                }
+
+                return nearest;
             }
         }
 
