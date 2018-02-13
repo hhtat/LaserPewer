@@ -51,8 +51,6 @@ namespace LaserPewer.ViewModel
                 AppCore.Document.LoadSVG(dialog.FileName);
                 Point tableTopLeft = CornerMath.AtCorner(Corner.TopLeft, AppCore.MachineProfiles.Active.TableSize, AppCore.MachineProfiles.Active.Origin);
                 AppCore.Document.Offset = new Vector(tableTopLeft.X, tableTopLeft.Y);
-
-                AppCore.Generator.Clear();
             }
         }
 

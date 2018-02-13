@@ -56,7 +56,7 @@ namespace LaserPewer.ViewModel
             AppCore.MachineProfiles.ActiveChanged += MachineProfiles_ActiveChanged;
             AppCore.Machine.StateUpdated += Machine_StatusUpdated;
 
-            AppCore.Generator.Completed += Generator_Completed;
+            AppCore.Generator.Generated += Generator_Completed;
         }
 
         private void updateProfile(MachineProfiles.IProfile profile)
@@ -81,7 +81,7 @@ namespace LaserPewer.ViewModel
 
         private void Machine_StatusUpdated(LaserMachine sender, LaserMachine.MachineState state, bool invalidateCanDo)
         {
-            Application.Current.Dispatcher.InvokeAsync(() =>
+            ViewService.InvokeAsync(() =>
             {
                 MachinePosition = new Point(state.X, state.Y);
             });
@@ -89,8 +89,11 @@ namespace LaserPewer.ViewModel
 
         private void Generator_Completed(object sender, EventArgs e)
         {
-            NotifyPropertyChanged(nameof(MachinePath));
-            MachinePathProgress = 1.0;
+            ViewService.InvokeAsync(() =>
+            {
+                NotifyPropertyChanged(nameof(MachinePath));
+                MachinePathProgress = 1.0;
+            });
         }
     }
 }

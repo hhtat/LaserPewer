@@ -1,5 +1,6 @@
 ﻿using LaserPewer.Model;
 using System;
+using System.Windows;
 using System.Windows.Input;
 
 namespace LaserPewer.ViewModel
@@ -41,14 +42,21 @@ namespace LaserPewer.ViewModel
 
         public ProgramGeneratorViewModel()
         {
-            _generateCommand = new RelayCommand(
-                parameter => AppCore.Generator.Generate(AppCore.Document.Drawing, AppCore.Document.Offset, AppCore.MachineProfiles.Active),
-                parameter => AppCore.Document.Drawing != null);
+            _generateCommand = new RelayCommand(_generateCommand_Execute, parameter => AppCore.Document.Drawing != null);
 
             AppCore.Generator.SettingModified += ProgramGenerator_SettingModified;
-            AppCore.Generator.Completed += Generator_Completed;
+            AppCore.Generator.Generated += Generator_Completed;
 
             AppCore.Document.Modified += Document_Modified;
+        }
+
+        private void _generateCommand_Execute(object parameter)
+        {
+            if (AppCore.Generator.TryStart(AppCore.Document.Drawing, AppCore.Document.Offset, AppCore.MachineProfiles.Active))
+            {
+                ViewService.ShowGenerationDialog();
+                AppCore.Generator.Stop();
+            }
         }
 
         private void ProgramGenerator_SettingModified(object sender, EventArgs e)
@@ -59,7 +67,10 @@ namespace LaserPewer.ViewModel
 
         private void Generator_Completed(object sender, EventArgs e)
         {
-            NotifyPropertyChanged(nameof(GCode));
+            ViewService.InvokeAsync(() =>
+            {
+                NotifyPropertyChanged(nameof(GCode));
+            });
         }
 
         private void Document_Modified(object sender, EventArgs e)

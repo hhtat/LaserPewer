@@ -64,7 +64,6 @@ namespace LaserPewer.Grbl
             if (serialPort == null) throw new InvalidOperationException();
 
             receivingThread = new Thread(receiveLoop);
-            receivingThread.Priority = ThreadPriority.AboveNormal;
             receivingThread.Start();
         }
 

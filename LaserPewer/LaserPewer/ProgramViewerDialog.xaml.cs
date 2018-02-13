@@ -2,9 +2,9 @@
 
 namespace LaserPewer
 {
-    public partial class MachineProfilesWindow : Window
+    public partial class ProgramViewerDialog : Window
     {
-        public MachineProfilesWindow()
+        public ProgramViewerDialog()
         {
             InitializeComponent();
         }

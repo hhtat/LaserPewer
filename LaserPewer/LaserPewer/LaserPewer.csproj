@@ -61,21 +61,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewService.cs" />
+    <Compile Include="GenerationDialog.xaml.cs">
+      <DependentUpon>GenerationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Geometry\Clipper.cs" />
     <Compile Include="Geometry\Path.cs" />
     <Compile Include="Utilities\CornerMath.cs" />
     <Compile Include="Utilities\DoubleToPercentConverter.cs" />
     <Compile Include="Generation\GCodeGenerator.cs" />
     <Compile Include="Generation\MachinePath.cs" />
-    <Compile Include="MachineProfilesWindow.xaml.cs">
-      <DependentUpon>MachineProfilesWindow.xaml</DependentUpon>
+    <Compile Include="MachineProfilesDialog.xaml.cs">
+      <DependentUpon>MachineProfilesDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\AppCore.cs" />
     <Compile Include="Model\Document.cs" />
     <Compile Include="Utilities\EnumToDescriptionStringConverter.cs" />
     <Compile Include="Utilities\NullableToBooleanConverter.cs" />
-    <Compile Include="ProgramViewerWindow.xaml.cs">
-      <DependentUpon>ProgramViewerWindow.xaml</DependentUpon>
+    <Compile Include="ProgramViewerDialog.xaml.cs">
+      <DependentUpon>ProgramViewerDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Corner.cs" />
     <Compile Include="Model\MachineProfiles.cs" />
@@ -94,7 +98,7 @@
     <Compile Include="ViewModel\MachineProfilesViewModel.cs" />
     <Compile Include="ViewModel\MachineProfileViewModel.cs" />
     <Compile Include="ViewModel\MachineViewModel.cs" />
-    <Compile Include="Model\ProgramGenerator.cs" />
+    <Compile Include="Generation\ProgramGenerator.cs" />
     <Compile Include="ViewModel\ProgramGeneratorViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="ViewModel\WorkbenchViewModel.cs" />
@@ -104,7 +108,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MachineProfilesWindow.xaml">
+    <Page Include="GenerationDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MachineProfilesDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -120,7 +128,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ProgramViewerWindow.xaml">
+    <Page Include="ProgramViewerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

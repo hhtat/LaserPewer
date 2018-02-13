@@ -13,7 +13,7 @@ namespace LaserPewer
 
         private void machineProfilesManageButton_Click(object sender, RoutedEventArgs e)
         {
-            MachineProfilesWindow dialog = new MachineProfilesWindow() { Owner = this };
+            MachineProfilesDialog dialog = new MachineProfilesDialog() { Owner = this };
             Opacity = 0.8;
             dialog.ShowDialog();
             Opacity = 1.0;
@@ -47,7 +47,7 @@ namespace LaserPewer
 
         private void viewGCodeButton_Click(object sender, RoutedEventArgs e)
         {
-            ProgramViewerWindow dialog = new ProgramViewerWindow() { Owner = this };
+            ProgramViewerDialog dialog = new ProgramViewerDialog() { Owner = this };
             Opacity = 0.8;
             dialog.ShowDialog();
             Opacity = 1.0;

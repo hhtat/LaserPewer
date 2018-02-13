@@ -1,16 +1,17 @@
-﻿using LaserPewer.Generation;
-using LaserPewer.Geometry;
+﻿using LaserPewer.Geometry;
+using LaserPewer.Model;
 using LaserPewer.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 
-namespace LaserPewer.Model
+namespace LaserPewer.Generation
 {
     public class ProgramGenerator
     {
         public event EventHandler SettingModified;
-        public event EventHandler Completed;
+        public event EventHandler Generated;
 
         private double _vectorPower;
         public double VectorPower
@@ -37,40 +38,60 @@ namespace LaserPewer.Model
         public MachinePath VectorPath { get; private set; }
         public string GCodeProgram { get; private set; }
 
+        private List<Path> paths;
+        private double maxFeed;
+
+        private bool stop;
+        private Thread thread;
+
         public ProgramGenerator()
         {
             VectorPower = 1.0;
             VectorSpeed = 1.0;
         }
 
-        public void Clear()
+        public bool TryStart(Drawing drawing, Vector offset, MachineProfiles.IProfile machineProfile)
         {
-            VectorPath = null;
-            GCodeProgram = null;
-            Completed?.Invoke(this, null);
-        }
+            if (drawing == null) return false;
+            if (thread != null) return false;
 
-        public void Generate(Drawing drawing, Vector offset, MachineProfiles.IProfile machineProfile)
-        {
-            if (drawing == null) return;
-
-            List<Path> paths = new List<Path>();
+            paths = new List<Path>();
             foreach (Path path in drawing.Paths)
             {
                 paths.Add(Path.Offset(path, offset));
             }
             paths = Clipper.ClipPaths(paths, new Rect(new Point(0.0, 0.0),
                 CornerMath.FarExtent(machineProfile.TableSize, machineProfile.Origin)));
+            maxFeed = machineProfile.MaxFeedRate;
 
-            VectorPath = VectorGenerator.Generate(paths, VectorPower, VectorSpeed);
-            GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, machineProfile.MaxFeedRate);
+            stop = false;
+            thread = new Thread(threadStart);
+            thread.Start();
 
-            Completed?.Invoke(this, null);
+            return true;
         }
 
-        private void VectorGeneration_GenerationCompleted(object sender, EventArgs e)
+        public void Stop()
         {
-            Completed?.Invoke(this, null);
+            stop = true;
+        }
+
+        private void threadStart()
+        {
+            VectorGenerator vectorGenerator = new VectorGenerator(paths);
+
+            while (!stop)
+            {
+                if (vectorGenerator.Step(TimeSpan.FromSeconds(1.0)))
+                {
+                    VectorPath = vectorGenerator.Generate(VectorPower, VectorSpeed);
+                    GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, maxFeed);
+
+                    Generated?.Invoke(this, null);
+                }
+            }
+
+            thread = null;
         }
     }
 }

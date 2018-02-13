@@ -149,7 +149,7 @@ namespace LaserPewer.ViewModel
                 parameter => AppCore.Machine.CanCancel());
 
             AppCore.Machine.StateUpdated += Machine_StatusUpdated;
-            AppCore.Generator.Completed += Generator_Completed;
+            AppCore.Generator.Generated += Generator_Completed;
         }
 
         private void updateStatus(LaserMachine.MachineState state)
@@ -169,7 +169,7 @@ namespace LaserPewer.ViewModel
 
         private void Machine_StatusUpdated(LaserMachine sender, LaserMachine.MachineState state, bool invalidateCanDo)
         {
-            Application.Current.Dispatcher.InvokeAsync(() =>
+            ViewService.InvokeAsync(() =>
             {
                 updateStatus(state);
 
@@ -188,10 +188,13 @@ namespace LaserPewer.ViewModel
 
         private void Generator_Completed(object sender, EventArgs e)
         {
-            ProgramStatus = null;
-            ProgramProgress = 0.0;
+            ViewService.InvokeAsync(() =>
+            {
+                ProgramStatus = null;
+                ProgramProgress = 0.0;
 
-            _startCommand.NotifyCanExecuteChanged();
+                _startCommand.NotifyCanExecuteChanged();
+            });
         }
 
         private static string toDisplayString(double value)

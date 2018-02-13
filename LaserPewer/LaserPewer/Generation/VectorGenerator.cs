@@ -1,4 +1,5 @@
 ﻿using LaserPewer.Geometry;
+using LaserPewer.Shared;
 using LaserPewer.Utilities;
 using System;
 using System.Collections.Generic;
@@ -8,25 +9,32 @@ using System.Windows;
 
 namespace LaserPewer.Generation
 {
-    public static class VectorGenerator
+    public class VectorGenerator
     {
-        public static MachinePath Generate(IReadOnlyList<Path> paths, double power, double speed)
+        private readonly List<Path> paths;
+        private readonly Random random;
+
+        private PathTree precedenceTree;
+        private int[] bestPriorities;
+        private IReadOnlyList<PathNode> bestSchedule;
+        private double lowestCost;
+
+        public VectorGenerator(IReadOnlyList<Path> paths)
         {
-            PathTree precedenceTree = new PathTree(paths);
+            this.paths = paths.ToList();
+            random = new Random();
+        }
 
-            Random random = new Random();
+        public bool Step(TimeSpan timeout)
+        {
+            bool evolved = false;
 
-            int[] bestPriorities = new int[precedenceTree.Size];
-            for (int i = 0; i < bestPriorities.Length; i++)
+            StopWatch stopWatch = new StopWatch();
+
+            ensureInitialized();
+
+            while (!stopWatch.Expired(timeout))
             {
-                bestPriorities[i] = random.Next();
-            }
-            IReadOnlyList<PathNode> bestSchedule = null;
-            double lowestCost = double.MaxValue;
-
-            for (int i = 0; i < 100000; i++)
-            {
-                if (i % 100000 == 0) Debug.WriteLine("GEN " + i);
                 int[] priorities = new int[precedenceTree.Size];
                 Array.Copy(bestPriorities, priorities, priorities.Length);
                 int mutations = 1 + random.Next(10);
@@ -43,11 +51,30 @@ namespace LaserPewer.Generation
                     bestPriorities = priorities;
                     bestSchedule = schedule;
                     lowestCost = cost;
-                    Debug.WriteLine("COST: " + lowestCost);
+                    Debug.WriteLine("COST:" + lowestCost);
+                    evolved = true;
                 }
             }
 
+            return evolved;
+        }
+
+        public MachinePath Generate(double power, double speed)
+        {
             return toMachinePath(bestSchedule, power, speed);
+        }
+
+        private void ensureInitialized()
+        {
+            if (precedenceTree == null)
+            {
+                precedenceTree = new PathTree(paths);
+
+                bestPriorities = new int[precedenceTree.Size];
+                for (int i = 0; i < bestPriorities.Length; i++) bestPriorities[i] = random.Next();
+                bestSchedule = null;
+                lowestCost = double.MaxValue;
+            }
         }
 
         private static double calculateTravelCost(IReadOnlyList<PathNode> schedule)

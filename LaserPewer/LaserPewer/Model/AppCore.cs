@@ -1,4 +1,5 @@
-﻿using LaserPewer.Grbl;
+﻿using LaserPewer.Generation;
+using LaserPewer.Grbl;
 using LaserPewer.Shared;
 using LaserPewer.Utilities;
 using System;
@@ -67,6 +68,7 @@ namespace LaserPewer.Model
         public void Deinitialize()
         {
             settings.Save();
+            _generator.Stop();
             _machine.Dispose();
         }
 
