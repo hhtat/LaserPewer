@@ -61,6 +61,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GA\GeneticOptimizer.cs" />
+    <Compile Include="GA\IEvaluator.cs" />
+    <Compile Include="GA\IGenerator.cs" />
+    <Compile Include="GA\Individual.cs" />
+    <Compile Include="GA\ISelector.cs" />
+    <Compile Include="GA\Population.cs" />
     <Compile Include="ViewService.cs" />
     <Compile Include="GenerationDialog.xaml.cs">
       <DependentUpon>GenerationDialog.xaml</DependentUpon>
