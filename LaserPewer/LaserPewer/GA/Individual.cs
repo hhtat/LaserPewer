@@ -39,7 +39,7 @@ namespace LaserPewer.GA
 
         public int CompareTo(Individual other)
         {
-            return Fitness.CompareTo(other.Fitness);
+            return other.Fitness.CompareTo(Fitness);
         }
     }
 

@@ -63,7 +63,8 @@
     </ApplicationDefinition>
     <Compile Include="GA\GeneticOptimizer.cs" />
     <Compile Include="GA\IEvaluator.cs" />
-    <Compile Include="GA\IGenerator.cs" />
+    <Compile Include="GA\IMutator.cs" />
+    <Compile Include="GA\IProcreator.cs" />
     <Compile Include="GA\Individual.cs" />
     <Compile Include="GA\ISelector.cs" />
     <Compile Include="GA\Population.cs" />

@@ -1,4 +1,5 @@
-﻿using LaserPewer.Geometry;
+﻿using LaserPewer.GA;
+using LaserPewer.Geometry;
 using LaserPewer.Shared;
 using LaserPewer.Utilities;
 using System;
@@ -12,17 +13,21 @@ namespace LaserPewer.Generation
     public class VectorGenerator
     {
         private readonly List<Path> paths;
-        private readonly Random random;
 
         private PathTree precedenceTree;
-        private int[] bestPriorities;
-        private IReadOnlyList<PathNode> bestSchedule;
-        private double lowestCost;
+
+        private TravelCostEvaluator evaluator;
+        private FittestSelector selector;
+        private CloneProcreator procreator;
+        private RandomWriteMutator mutator;
+        private GeneticOptimizer optimizer;
+
+        private double maxFitness;
+        private List<int> optimalPriorities;
 
         public VectorGenerator(IReadOnlyList<Path> paths)
         {
             this.paths = paths.ToList();
-            random = new Random();
         }
 
         public bool Step(TimeSpan timeout)
@@ -35,23 +40,14 @@ namespace LaserPewer.Generation
 
             while (!stopWatch.Expired(timeout))
             {
-                int[] priorities = new int[precedenceTree.Nodes.Count];
-                Array.Copy(bestPriorities, priorities, priorities.Length);
-                int mutations = 1 + random.Next(10);
-                for (int j = 0; j < mutations; j++)
-                {
-                    priorities[random.Next(priorities.Length)] = random.Next();
-                }
+                optimizer.Step(1, selector, procreator, mutator, evaluator);
 
-                IReadOnlyList<PathNode> schedule = precedenceTree.PriorityOrderTraversal(priorities);
-                double cost = calculateTravelCost(schedule);
-
-                if (cost < lowestCost)
+                if (optimizer.CurrentPopulation.MaxFitness > maxFitness)
                 {
-                    bestPriorities = priorities;
-                    bestSchedule = schedule;
-                    lowestCost = cost;
-                    Debug.WriteLine("COST:" + lowestCost);
+                    maxFitness = optimizer.CurrentPopulation.MaxFitness;
+                    Debug.WriteLine("FITNESS:" + maxFitness);
+                    optimalPriorities.Clear();
+                    optimalPriorities.AddRange(optimizer.CurrentPopulation.ReadOnlyIndividuals[0].Chromosome);
                     evolved = true;
                 }
             }
@@ -61,7 +57,8 @@ namespace LaserPewer.Generation
 
         public MachinePath Generate(double power, double speed)
         {
-            return toMachinePath(bestSchedule, power, speed);
+            IReadOnlyList<PathNode> schedule = precedenceTree.PriorityOrderTraversal(optimalPriorities);
+            return toMachinePath(schedule, power, speed);
         }
 
         private void ensureInitialized()
@@ -70,20 +67,25 @@ namespace LaserPewer.Generation
             {
                 precedenceTree = new PathTree(paths);
 
+                evaluator = new TravelCostEvaluator(precedenceTree);
+                selector = new FittestSelector();
+                procreator = new CloneProcreator();
+                mutator = new RandomWriteMutator();
+
+                Population genesis = new Population();
+                Individual individual0 = genesis.Append();
                 IReadOnlyList<PathNode> nodes = precedenceTree.NearestNeighborTraversal();
-                for (int i = 0; i < nodes.Count; i++)
+                for (int i = 0; i < nodes.Count; i++) nodes[i].Reset(i);
+                individual0.GetChromosome().AddRange(precedenceTree.Nodes.Select(node => node.Priority));
+                for (int i = 1; i < 100; i++)
                 {
-                    nodes[i].Reset(i);
+                    genesis.Append().GetChromosome().AddRange(Enumerable.Range(0, precedenceTree.Nodes.Count));
                 }
+                genesis.Freeze(evaluator);
 
-                bestPriorities = new int[precedenceTree.Nodes.Count];
-                for (int i = 0; i < bestPriorities.Length; i++)
-                {
-                    bestPriorities[i] = precedenceTree.Nodes[i].Priority;
-                }
-
-                bestSchedule = null;
-                lowestCost = double.MaxValue;
+                optimizer = new GeneticOptimizer(genesis);
+                maxFitness = double.MinValue;
+                optimalPriorities = new List<int>();
             }
         }
 
@@ -166,7 +168,7 @@ namespace LaserPewer.Generation
                 }
             }
 
-            public IReadOnlyList<PathNode> PriorityOrderTraversal(int[] priorities)
+            public IReadOnlyList<PathNode> PriorityOrderTraversal(IReadOnlyList<int> priorities)
             {
                 for (int i = 0; i < _nodes.Count; i++)
                 {
@@ -290,6 +292,65 @@ namespace LaserPewer.Generation
                 }
 
                 return nearestDistanceSquared;
+            }
+        }
+
+        private class TravelCostEvaluator : IEvaluator
+        {
+            private readonly PathTree tree;
+
+            public TravelCostEvaluator(PathTree tree)
+            {
+                this.tree = tree;
+            }
+
+            public double Evaluate(IReadOnlyIndividual individual)
+            {
+                return -calculateTravelCost(tree.PriorityOrderTraversal(individual.Chromosome));
+            }
+        }
+
+        private class FittestSelector : ISelector
+        {
+            private IReadOnlyIndividual fittest;
+
+            public void Initialize(IReadOnlyPopulation population)
+            {
+                fittest = population.ReadOnlyIndividuals[0];
+            }
+
+            public IReadOnlyIndividual Select()
+            {
+                return fittest;
+            }
+        }
+
+        private class CloneProcreator : IProcreator
+        {
+            public List<int> Procreate(List<int> chromosome, ISelector selector)
+            {
+                chromosome.AddRange(selector.Select().Chromosome);
+                return chromosome;
+            }
+        }
+
+        private class RandomWriteMutator : IMutator
+        {
+            private readonly Random random;
+
+            public RandomWriteMutator()
+            {
+                random = new Random();
+            }
+
+            public List<int> Mutate(List<int> chromosome)
+            {
+                int mutations = 1 + random.Next(10);
+                for (int j = 0; j < mutations; j++)
+                {
+                    chromosome[random.Next(chromosome.Count)] = random.Next(chromosome.Count);
+                }
+                return chromosome;
             }
         }
     }

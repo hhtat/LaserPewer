@@ -1,41 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace LaserPewer.GA
 {
     public class GeneticOptimizer
     {
-        public IEvaluator Evaluator { get; set; }
         public IReadOnlyPopulation CurrentPopulation { get; private set; }
 
         private Population pooledPopulation;
 
-        public GeneticOptimizer(IEvaluator evaluator)
+        public GeneticOptimizer(Population genesis)
         {
-            Evaluator = evaluator;
-            CurrentPopulation = new Population();
+            if (!genesis.Frozen) throw new ArgumentException();
+
+            CurrentPopulation = genesis;
             pooledPopulation = new Population();
         }
 
-        public void Step(IEnumerable<IGenerator> generators)
+        public void Step(int survivors, ISelector selector, IProcreator procreator, IMutator mutator, IEvaluator evaluator)
         {
             pooledPopulation.Clear();
 
-            foreach (IGenerator generator in generators)
+            for (int i = 0; i < survivors; i++)
             {
-                generator.Initialize(CurrentPopulation);
-                while (generator.HasMore())
-                {
-                    Individual individual = pooledPopulation.CreateIndividual();
-                    generator.Generate(individual.GetChromosome());
-                    pooledPopulation.AddIndividual(individual);
-                }
+                pooledPopulation.Append().GetChromosome().AddRange(CurrentPopulation.ReadOnlyIndividuals[i].Chromosome);
             }
 
-            pooledPopulation.Freeze(Evaluator);
+            selector.Initialize(CurrentPopulation);
+            while (pooledPopulation.Individuals.Count < CurrentPopulation.ReadOnlyIndividuals.Count)
+            {
+                mutator.Mutate(procreator.Procreate(pooledPopulation.Append().GetChromosome(), selector));
+            }
 
-            IReadOnlyPopulation temp = CurrentPopulation;
+            pooledPopulation.Freeze(evaluator);
+
+            Population temp = (Population)CurrentPopulation;
             CurrentPopulation = pooledPopulation;
-            pooledPopulation = (Population)temp;
+            pooledPopulation = temp;
         }
     }
 }

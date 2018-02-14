@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LaserPewer.GA
 {
     public class Population : IReadOnlyPopulation
     {
+        public bool Frozen { get; private set; }
+
         private readonly List<Individual> _individuals;
         public IReadOnlyList<Individual> Individuals { get; private set; }
         public IReadOnlyList<IReadOnlyIndividual> ReadOnlyIndividuals { get; private set; }
 
-        private double _maxFitness;
-        public double MaxFitness { get { if (frozen) return _maxFitness; else throw new InvalidOperationException(); } }
+        public double MaxFitness { get { if (Frozen) return _individuals.First().Fitness; else throw new InvalidOperationException(); } }
+        public double MinFitness { get { if (Frozen) return _individuals.Last().Fitness; else throw new InvalidOperationException(); } }
 
-        private double _minFitness;
-        public double MinFitness { get { if (frozen) return _minFitness; else throw new InvalidOperationException(); } }
-
-        private bool frozen;
         private readonly Stack<Individual> pool;
 
         public Population()
         {
             _individuals = new List<Individual>();
+            Individuals = _individuals;
             ReadOnlyIndividuals = _individuals;
             pool = new Stack<Individual>();
         }
@@ -31,49 +31,44 @@ namespace LaserPewer.GA
             {
                 pool.Push(individual);
             }
+
             _individuals.Clear();
-            frozen = false;
+
+            Frozen = false;
         }
 
         public void Freeze(IEvaluator evaluator)
         {
-            if (frozen) throw new InvalidOperationException();
-
-            evaluator.Initialize(this);
-
-            _maxFitness = double.MinValue;
-            _minFitness = double.MaxValue;
+            if (Frozen) throw new InvalidOperationException();
 
             foreach (Individual individual in ReadOnlyIndividuals)
             {
                 individual.Freeze(evaluator);
-
-                if (individual.Fitness > _maxFitness) _maxFitness = individual.Fitness;
-                if (individual.Fitness < _minFitness) _minFitness = individual.Fitness;
             }
 
-            frozen = true;
+            _individuals.Sort();
+
+            Frozen = true;
         }
 
-        public Individual CreateIndividual()
+        public Individual Append()
         {
-            Individual individual;
-            if (pool.Count > 0)
-            {
-                individual = pool.Pop();
-                individual.Clear();
-            }
-            else
-            {
-                individual = new Individual();
-            }
+            if (Frozen) throw new InvalidOperationException();
+            Individual individual = createIndividual();
+            _individuals.Add(individual);
             return individual;
         }
 
-        public void AddIndividual(Individual individual)
+        private Individual createIndividual()
         {
-            if (frozen) throw new InvalidOperationException();
-            _individuals.Add(individual);
+            if (pool.Count > 0)
+            {
+                Individual individual = pool.Pop();
+                individual.Clear();
+                return individual;
+            }
+
+            return new Individual();
         }
     }
 
