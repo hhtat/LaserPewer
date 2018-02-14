@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LaserPewer.GA
 {
     public interface IMutator
     {
-        List<int> Mutate(List<int> chromosome);
+        List<int> Mutate(List<int> chromosome, Random random);
     }
 }

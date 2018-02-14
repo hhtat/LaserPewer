@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LaserPewer.GA
 {
     public interface IProcreator
     {
-        List<int> Procreate(List<int> chromosome, ISelector selector);
+        List<int> Procreate(List<int> chromosome, ISelector selector, Random random);
     }
 }

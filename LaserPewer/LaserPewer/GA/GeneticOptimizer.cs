@@ -16,7 +16,7 @@ namespace LaserPewer.GA
             pooledPopulation = new Population();
         }
 
-        public void Step(int survivors, ISelector selector, IProcreator procreator, IMutator mutator, IEvaluator evaluator)
+        public void Step(int survivors, ISelector selector, IProcreator procreator, IMutator mutator, IEvaluator evaluator, Random random)
         {
             pooledPopulation.Clear();
 
@@ -28,7 +28,7 @@ namespace LaserPewer.GA
             selector.Initialize(CurrentPopulation);
             while (pooledPopulation.Individuals.Count < CurrentPopulation.ReadOnlyIndividuals.Count)
             {
-                mutator.Mutate(procreator.Procreate(pooledPopulation.Append().GetChromosome(), selector));
+                mutator.Mutate(procreator.Procreate(pooledPopulation.Append().GetChromosome(), selector, random), random);
             }
 
             pooledPopulation.Freeze(evaluator);

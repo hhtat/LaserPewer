@@ -12,8 +12,11 @@ namespace LaserPewer.GA
         public IReadOnlyList<Individual> Individuals { get; private set; }
         public IReadOnlyList<IReadOnlyIndividual> ReadOnlyIndividuals { get; private set; }
 
-        public double MaxFitness { get { if (Frozen) return _individuals.First().Fitness; else throw new InvalidOperationException(); } }
-        public double MinFitness { get { if (Frozen) return _individuals.Last().Fitness; else throw new InvalidOperationException(); } }
+        private double _maxFitness;
+        public double MaxFitness { get { if (Frozen) return _maxFitness; else throw new InvalidOperationException(); } }
+
+        private double _totalFitness;
+        public double TotalFitness { get { if (Frozen) return _totalFitness; else throw new InvalidOperationException(); } }
 
         private readonly Stack<Individual> pool;
 
@@ -41,9 +44,13 @@ namespace LaserPewer.GA
         {
             if (Frozen) throw new InvalidOperationException();
 
+            _maxFitness = double.MinValue;
+            _totalFitness = 0.0;
             foreach (Individual individual in ReadOnlyIndividuals)
             {
                 individual.Freeze(evaluator);
+                if (individual.Fitness > _maxFitness) _maxFitness = individual.Fitness;
+                _totalFitness += individual.Fitness;
             }
 
             _individuals.Sort();
@@ -74,8 +81,9 @@ namespace LaserPewer.GA
 
     public interface IReadOnlyPopulation
     {
+        bool Frozen { get; }
         IReadOnlyList<IReadOnlyIndividual> ReadOnlyIndividuals { get; }
         double MaxFitness { get; }
-        double MinFitness { get; }
+        double TotalFitness { get; }
     }
 }

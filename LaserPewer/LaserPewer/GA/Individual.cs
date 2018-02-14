@@ -27,7 +27,13 @@ namespace LaserPewer.GA
         public void Freeze(IEvaluator evaluator)
         {
             if (frozen) throw new InvalidOperationException();
+
             Fitness = evaluator.Evaluate(this);
+            if (Fitness < 0.0 || double.IsNaN(Fitness) || double.IsInfinity(Fitness))
+            {
+                throw new NotSupportedException();
+            }
+
             frozen = true;
         }
 
