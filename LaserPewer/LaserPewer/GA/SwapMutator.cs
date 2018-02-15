@@ -12,9 +12,9 @@ namespace LaserPewer.GA
             Rounds = rounds;
         }
 
-        public List<int> Mutate(List<int> chromosome, Random random)
+        public void Mutate(List<int> chromosome, Random random)
         {
-            for (int i = 0; i < Rounds; i++)
+            for (int round = 0; round < Rounds; round++)
             {
                 int indexA = random.Next(chromosome.Count);
                 int indexB = random.Next(chromosome.Count);
@@ -22,8 +22,6 @@ namespace LaserPewer.GA
                 chromosome[indexA] = chromosome[indexB];
                 chromosome[indexB] = temp;
             }
-
-            return chromosome;
         }
     }
 }

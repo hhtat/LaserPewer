@@ -20,7 +20,6 @@ namespace LaserPewer.Generation
         private TravelCostEvaluator evaluator;
         private ISelector selector;
         private IProcreator procreator;
-        private IMutator mutator;
         private GeneticOptimizer optimizer;
 
         private double maxFitness;
@@ -42,7 +41,7 @@ namespace LaserPewer.Generation
 
             while (!stopWatch.Expired(timeout))
             {
-                optimizer.Step(1, selector, procreator, mutator, evaluator, random);
+                optimizer.Step(1, selector, procreator, evaluator, random);
 
                 if (optimizer.CurrentPopulation.MaxFitness > maxFitness)
                 {
@@ -71,16 +70,14 @@ namespace LaserPewer.Generation
 
                 evaluator = new TravelCostEvaluator(precedenceTree);
                 selector = new RouletteWheelSelector();
-                procreator = new CloneProcreator();
-                mutator = new SwapMutator(1);
+                procreator = new SexualProcreator(new NonWrappingOrderedCrossover(), new SwapMutator(1));
 
                 Population genesis = new Population();
 
                 Individual individual0 = genesis.Append();
                 IReadOnlyList<PathNode> nodes = precedenceTree.NearestNeighborTraversal();
-                for (int i = 0; i < nodes.Count; i++) nodes[i].Reset(i);
                 List<int> chromosome0 = individual0.GetChromosome();
-                chromosome0.AddRange(precedenceTree.Nodes.Select(node => node.Priority));
+                chromosome0.AddRange(nodes.Select(node => node.Priority));
                 evaluator.Baseline(chromosome0);
 
                 for (int i = 1; i < 100; i++)
@@ -175,11 +172,11 @@ namespace LaserPewer.Generation
                 }
             }
 
-            public IReadOnlyList<PathNode> PriorityOrderTraversal(IReadOnlyList<int> priorities)
+            public IReadOnlyList<PathNode> PriorityOrderTraversal(IReadOnlyList<int> ordering)
             {
-                for (int i = 0; i < _nodes.Count; i++)
+                for (int i = 0; i < ordering.Count; i++)
                 {
-                    _nodes[i].Reset(priorities[i]);
+                    _nodes[ordering[i]].Reset(i);
                 }
 
                 PriorityQueue<PathNode> queue = new PriorityQueue<PathNode>((a, b) => a.Priority.CompareTo(b.Priority));
@@ -208,7 +205,7 @@ namespace LaserPewer.Generation
             {
                 for (int i = 0; i < _nodes.Count; i++)
                 {
-                    _nodes[i].Reset(0);
+                    _nodes[i].Reset(i);
                 }
 
                 HashSet<PathNode> readySet = new HashSet<PathNode>(_nodes.Where(node => node.PendingChildren.Count == 0));
@@ -319,20 +316,8 @@ namespace LaserPewer.Generation
 
             public double Evaluate(IReadOnlyIndividual individual)
             {
-                return Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(individual.Chromosome)));
-            }
-        }
-
-        private class RandomWriteMutator : IMutator
-        {
-            public List<int> Mutate(List<int> chromosome, Random random)
-            {
-                int mutations = 1 + random.Next(10);
-                for (int j = 0; j < mutations; j++)
-                {
-                    chromosome[random.Next(chromosome.Count)] = random.Next(chromosome.Count);
-                }
-                return chromosome;
+                double normalized = Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(individual.Chromosome)));
+                return normalized * normalized;
             }
         }
     }

@@ -5,6 +5,6 @@ namespace LaserPewer.GA
 {
     public interface IMutator
     {
-        List<int> Mutate(List<int> chromosome, Random random);
+        void Mutate(List<int> chromosome, Random random);
     }
 }

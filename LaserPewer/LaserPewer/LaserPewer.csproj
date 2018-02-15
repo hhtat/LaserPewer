@@ -61,16 +61,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="GA\PassthroughMutator.cs" />
-    <Compile Include="GA\CloneProcreator.cs" />
+    <Compile Include="GA\ICrossover.cs" />
     <Compile Include="GA\GeneticOptimizer.cs" />
     <Compile Include="GA\IEvaluator.cs" />
     <Compile Include="GA\IMutator.cs" />
     <Compile Include="GA\IProcreator.cs" />
     <Compile Include="GA\Individual.cs" />
     <Compile Include="GA\ISelector.cs" />
+    <Compile Include="GA\NonWrappingOrderedCrossover.cs" />
     <Compile Include="GA\Population.cs" />
     <Compile Include="GA\RouletteWheelSelector.cs" />
+    <Compile Include="GA\SexualProcreator.cs" />
     <Compile Include="GA\SwapMutator.cs" />
     <Compile Include="ViewService.cs" />
     <Compile Include="GenerationDialog.xaml.cs">

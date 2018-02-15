@@ -5,6 +5,6 @@ namespace LaserPewer.GA
 {
     public interface IProcreator
     {
-        List<int> Procreate(List<int> chromosome, ISelector selector, Random random);
+        void Procreate(List<int> childA, List<int> childB, ISelector selector, Random random);
     }
 }
