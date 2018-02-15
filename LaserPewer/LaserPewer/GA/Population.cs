@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LaserPewer.GA
 {
@@ -14,6 +13,9 @@ namespace LaserPewer.GA
 
         private double _maxFitness;
         public double MaxFitness { get { if (Frozen) return _maxFitness; else throw new InvalidOperationException(); } }
+
+        private double _minFitness;
+        public double MinFitness { get { if (Frozen) return _minFitness; else throw new InvalidOperationException(); } }
 
         private double _totalFitness;
         public double TotalFitness { get { if (Frozen) return _totalFitness; else throw new InvalidOperationException(); } }
@@ -45,11 +47,13 @@ namespace LaserPewer.GA
             if (Frozen) throw new InvalidOperationException();
 
             _maxFitness = double.MinValue;
+            _minFitness = double.MaxValue;
             _totalFitness = 0.0;
             foreach (Individual individual in ReadOnlyIndividuals)
             {
                 individual.Freeze(evaluator);
                 if (individual.Fitness > _maxFitness) _maxFitness = individual.Fitness;
+                if (individual.Fitness < _minFitness) _minFitness = individual.Fitness;
                 _totalFitness += individual.Fitness;
             }
 
@@ -84,6 +88,7 @@ namespace LaserPewer.GA
         bool Frozen { get; }
         IReadOnlyList<IReadOnlyIndividual> ReadOnlyIndividuals { get; }
         double MaxFitness { get; }
+        double MinFitness { get; }
         double TotalFitness { get; }
     }
 }

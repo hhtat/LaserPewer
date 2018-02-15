@@ -70,9 +70,9 @@
     <Compile Include="GA\ISelector.cs" />
     <Compile Include="GA\NonWrappingOrderedCrossover.cs" />
     <Compile Include="GA\Population.cs" />
+    <Compile Include="GA\ReverseSequenceMutator.cs" />
     <Compile Include="GA\RouletteWheelSelector.cs" />
     <Compile Include="GA\SexualProcreator.cs" />
-    <Compile Include="GA\SwapMutator.cs" />
     <Compile Include="ViewService.cs" />
     <Compile Include="GenerationDialog.xaml.cs">
       <DependentUpon>GenerationDialog.xaml</DependentUpon>

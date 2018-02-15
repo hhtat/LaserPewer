@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 
 namespace LaserPewer.Generation
@@ -39,14 +40,15 @@ namespace LaserPewer.Generation
 
             ensureInitialized();
 
+
             while (!stopWatch.Expired(timeout))
             {
-                optimizer.Step(1, selector, procreator, evaluator, random);
+                optimizer.Step(10, selector, procreator, evaluator, random);
 
                 if (optimizer.CurrentPopulation.MaxFitness > maxFitness)
                 {
                     maxFitness = optimizer.CurrentPopulation.MaxFitness;
-                    Debug.WriteLine("FITNESS:" + maxFitness);
+                    Debug.WriteLine("FIT: " + maxFitness + "\tGEN:" + optimizer.GenerationCount);
                     optimalPriorities.Clear();
                     optimalPriorities.AddRange(optimizer.CurrentPopulation.ReadOnlyIndividuals[0].Chromosome);
                     evolved = true;
@@ -70,7 +72,8 @@ namespace LaserPewer.Generation
 
                 evaluator = new TravelCostEvaluator(precedenceTree);
                 selector = new RouletteWheelSelector();
-                procreator = new SexualProcreator(new NonWrappingOrderedCrossover(), new SwapMutator(1));
+                IMutator mutator = new ReverseSequenceMutator();
+                procreator = new SexualProcreator(new NonWrappingOrderedCrossover(), mutator, 0.5);
 
                 Population genesis = new Population();
 
@@ -78,11 +81,14 @@ namespace LaserPewer.Generation
                 IReadOnlyList<PathNode> nodes = precedenceTree.NearestNeighborTraversal();
                 List<int> chromosome0 = individual0.GetChromosome();
                 chromosome0.AddRange(nodes.Select(node => node.Priority));
+                //chromosome0.AddRange(Enumerable.Range(0, precedenceTree.Nodes.Count));
                 evaluator.Baseline(chromosome0);
 
-                for (int i = 1; i < 100; i++)
+                for (int i = 1; i < 30; i++)
                 {
-                    genesis.Append().GetChromosome().AddRange(Enumerable.Range(0, precedenceTree.Nodes.Count));
+                    List<int> chromosome = genesis.Append().GetChromosome();
+                    chromosome.AddRange(chromosome0);
+                    mutator.Mutate(chromosome, random);
                 }
 
                 genesis.Freeze(evaluator);
@@ -316,8 +322,7 @@ namespace LaserPewer.Generation
 
             public double Evaluate(IReadOnlyIndividual individual)
             {
-                double normalized = Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(individual.Chromosome)));
-                return normalized * normalized;
+                return Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(individual.Chromosome)));
             }
         }
     }

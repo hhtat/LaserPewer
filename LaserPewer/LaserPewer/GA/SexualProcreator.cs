@@ -7,18 +7,23 @@ namespace LaserPewer.GA
     {
         private readonly ICrossover crossover;
         private readonly IMutator mutator;
+        private readonly double mutationRate;
 
-        public SexualProcreator(ICrossover crossover, IMutator mutator)
+        public SexualProcreator(ICrossover crossover, IMutator mutator, double mutationRate)
         {
             this.crossover = crossover;
             this.mutator = mutator;
+            this.mutationRate = mutationRate;
         }
 
         public void Procreate(List<int> childA, List<int> childB, ISelector selector, Random random)
         {
             crossover.Crossover(childA, childB, selector.Select(random).Chromosome, selector.Select(random).Chromosome, random);
-            mutator.Mutate(childA, random);
-            mutator.Mutate(childB, random);
+            if (mutationRate == 1.0 || random.NextDouble() < mutationRate)
+            {
+                mutator.Mutate(childA, random);
+                mutator.Mutate(childB, random);
+            }
         }
     }
 }

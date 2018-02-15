@@ -5,6 +5,7 @@ namespace LaserPewer.GA
     public class GeneticOptimizer
     {
         public IReadOnlyPopulation CurrentPopulation { get; private set; }
+        public int GenerationCount { get; private set; }
 
         private Population pooledPopulation;
 
@@ -35,6 +36,7 @@ namespace LaserPewer.GA
 
             Population temp = (Population)CurrentPopulation;
             CurrentPopulation = pooledPopulation;
+            GenerationCount++;
             pooledPopulation = temp;
         }
     }

@@ -82,7 +82,7 @@ namespace LaserPewer.Generation
 
             while (!stop)
             {
-                if (vectorGenerator.Step(TimeSpan.FromSeconds(1.0)))
+                if (vectorGenerator.Step(TimeSpan.FromSeconds(0.1)))
                 {
                     VectorPath = vectorGenerator.Generate(VectorPower, VectorSpeed);
                     GCodeProgram = GCodeGenerator.Generate(VectorPath, 1000.0, maxFeed);

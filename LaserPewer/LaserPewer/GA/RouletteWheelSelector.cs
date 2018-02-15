@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LaserPewer.GA
 {
@@ -31,10 +30,11 @@ namespace LaserPewer.GA
 
             individuals = population.ReadOnlyIndividuals;
 
+            double adjustedTotalFitness = population.TotalFitness - individuals.Count * population.MinFitness;
             normalizedProbabilities.Clear();
             foreach (Individual individual in individuals)
             {
-                normalizedProbabilities.Add(individual.Fitness / population.TotalFitness);
+                normalizedProbabilities.Add((individual.Fitness - population.MinFitness) / adjustedTotalFitness);
             }
 
             buildAliasTables(normalizedProbabilities);

@@ -266,7 +266,7 @@ namespace LaserPewer
                         for (int i = 0; i < indexCap; i++)
                         {
                             MachinePath.Travel travel = MachinePath.Travels[i];
-                            drawLineMM(prev.X, prev.Y, travel.Destination.X, travel.Destination.Y, !travel.Rapid ? Colors.Red : Colors.Yellow);
+                            drawLineMM(prev.X, prev.Y, travel.Destination.X, travel.Destination.Y, !travel.Rapid ? Colors.Red : Colors.Purple);
                             prev = travel.Destination;
                         }
                     }
