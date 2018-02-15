@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 
 namespace LaserPewer.GA
 {
@@ -15,48 +15,45 @@ namespace LaserPewer.GA
 
         public void Crossover(List<int> childA, List<int> childB, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Random random)
         {
-            int minLength = Math.Min(parentA.Count, parentB.Count);
-            int startPoint = random.Next(minLength);
-            int endPoint = random.Next(minLength);
-            if (startPoint > endPoint)
-            {
-                int temp = startPoint;
-                startPoint = endPoint;
-                endPoint = temp;
-            }
+            Interval interval = new Interval(random, Math.Min(parentA.Count, parentB.Count));
 
-            buildChild(childA, parentA, parentB, startPoint, endPoint);
-            buildChild(childB, parentB, parentA, startPoint, endPoint);
+            buildChild(childA, parentA, parentB, interval);
+            buildChild(childB, parentB, parentA, interval);
         }
 
-        public void Crossover(List<int> childA, List<int> childB, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, int startPoint, int endPoint)
-        {
-            buildChild(childA, parentA, parentB, startPoint, endPoint);
-            buildChild(childB, parentB, parentA, startPoint, endPoint);
-        }
-
-        private void buildChild(List<int> childA, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, int startPoint, int endPoint)
+        private void buildChild(List<int> childA, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Interval interval)
         {
             setB.Clear();
-            for (int i = startPoint; i < endPoint; i++)
+            for (int i = interval.Start; i < interval.End; i++)
             {
                 setB.Add(parentB[i]);
             }
 
-            foreach (int gene in parentA)
+            int indexA = 0;
+
+            while (childA.Count < interval.Start && indexA < parentA.Count)
             {
-                if (childA.Count == startPoint)
+                if (!setB.Contains(parentA[indexA]))
                 {
-                    while (childA.Count < endPoint)
-                    {
-                        childA.Add(parentB[childA.Count]);
-                    }
+                    childA.Add(parentA[indexA]);
                 }
 
-                if (!setB.Contains(gene))
+                indexA++;
+            }
+
+            for (int i = interval.Start; i < interval.End; i++)
+            {
+                childA.Add(parentB[i]);
+            }
+
+            while (indexA < parentA.Count)
+            {
+                if (!setB.Contains(parentA[indexA]))
                 {
-                    childA.Add(gene);
+                    childA.Add(parentA[indexA]);
                 }
+
+                indexA++;
             }
         }
     }

@@ -28,7 +28,7 @@ namespace LaserPewer.GA
         {
             if (frozen) throw new InvalidOperationException();
 
-            Fitness = evaluator.Evaluate(this);
+            Fitness = evaluator.Evaluate(Chromosome);
             if (Fitness < 0.0 || double.IsNaN(Fitness) || double.IsInfinity(Fitness))
             {
                 throw new NotSupportedException();

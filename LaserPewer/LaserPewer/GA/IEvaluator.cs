@@ -1,7 +1,9 @@
-﻿namespace LaserPewer.GA
+﻿using System.Collections.Generic;
+
+namespace LaserPewer.GA
 {
     public interface IEvaluator
     {
-        double Evaluate(IReadOnlyIndividual individual);
+        double Evaluate(IReadOnlyList<int> chromosome);
     }
 }

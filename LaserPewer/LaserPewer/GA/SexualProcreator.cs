@@ -19,6 +19,8 @@ namespace LaserPewer.GA
         public void Procreate(List<int> childA, List<int> childB, ISelector selector, Random random)
         {
             crossover.Crossover(childA, childB, selector.Select(random).Chromosome, selector.Select(random).Chromosome, random);
+            //childA.AddRange(selector.Select(random).Chromosome);
+            //childB.AddRange(selector.Select(random).Chromosome);
             if (mutationRate == 1.0 || random.NextDouble() < mutationRate)
             {
                 mutator.Mutate(childA, random);

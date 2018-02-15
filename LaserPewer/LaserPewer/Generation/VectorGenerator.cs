@@ -315,14 +315,14 @@ namespace LaserPewer.Generation
                 this.tree = tree;
             }
 
-            public void Baseline(IReadOnlyList<int> priorities)
+            public void Baseline(IReadOnlyList<int> chromosome)
             {
-                baseline = calculateTravelCost(tree.PriorityOrderTraversal(priorities));
+                baseline = calculateTravelCost(tree.PriorityOrderTraversal(chromosome));
             }
 
-            public double Evaluate(IReadOnlyIndividual individual)
+            public double Evaluate(IReadOnlyList<int> chromosome)
             {
-                return Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(individual.Chromosome)));
+                return Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(chromosome)));
             }
         }
     }

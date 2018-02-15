@@ -7,9 +7,8 @@ namespace LaserPewer.GA
     {
         public void Mutate(List<int> chromosome, Random random)
         {
-            int pointA = random.Next(chromosome.Count);
-            int pointB = random.Next(chromosome.Count);
-            chromosome.Reverse(Math.Min(pointA, pointB), Math.Abs(pointA - pointB));
+            Interval interval = new Interval(random, chromosome.Count);
+            chromosome.Reverse(interval.Start, interval.Length);
         }
     }
 }
