@@ -74,6 +74,7 @@
     <Compile Include="GA\ReverseSequenceMutator.cs" />
     <Compile Include="GA\RouletteWheelSelector.cs" />
     <Compile Include="GA\SexualProcreator.cs" />
+    <Compile Include="Utilities\LinkedSet.cs" />
     <Compile Include="ViewService.cs" />
     <Compile Include="GenerationDialog.xaml.cs">
       <DependentUpon>GenerationDialog.xaml</DependentUpon>

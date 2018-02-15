@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace LaserPewer.GA
 {
@@ -13,16 +12,10 @@ namespace LaserPewer.GA
             setB = new HashSet<int>();
         }
 
-        public void Crossover(List<int> childA, List<int> childB, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Random random)
+        public void Crossover(List<int> child, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Random random)
         {
             Interval interval = new Interval(random, Math.Min(parentA.Count, parentB.Count));
 
-            buildChild(childA, parentA, parentB, interval);
-            buildChild(childB, parentB, parentA, interval);
-        }
-
-        private void buildChild(List<int> childA, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Interval interval)
-        {
             setB.Clear();
             for (int i = interval.Start; i < interval.End; i++)
             {
@@ -31,11 +24,11 @@ namespace LaserPewer.GA
 
             int indexA = 0;
 
-            while (childA.Count < interval.Start && indexA < parentA.Count)
+            while (child.Count < interval.Start && indexA < parentA.Count)
             {
                 if (!setB.Contains(parentA[indexA]))
                 {
-                    childA.Add(parentA[indexA]);
+                    child.Add(parentA[indexA]);
                 }
 
                 indexA++;
@@ -43,14 +36,14 @@ namespace LaserPewer.GA
 
             for (int i = interval.Start; i < interval.End; i++)
             {
-                childA.Add(parentB[i]);
+                child.Add(parentB[i]);
             }
 
             while (indexA < parentA.Count)
             {
                 if (!setB.Contains(parentA[indexA]))
                 {
-                    childA.Add(parentA[indexA]);
+                    child.Add(parentA[indexA]);
                 }
 
                 indexA++;

@@ -5,6 +5,6 @@ namespace LaserPewer.GA
 {
     public interface ICrossover
     {
-        void Crossover(List<int> childA, List<int> childB, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Random random);
+        void Crossover(List<int> child, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Random random);
     }
 }

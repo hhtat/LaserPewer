@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 
 namespace LaserPewer.Generation
@@ -48,9 +47,10 @@ namespace LaserPewer.Generation
                 if (optimizer.CurrentPopulation.MaxFitness > maxFitness)
                 {
                     maxFitness = optimizer.CurrentPopulation.MaxFitness;
-                    Debug.WriteLine("FIT: " + maxFitness + "\tGEN:" + optimizer.GenerationCount);
                     optimalPriorities.Clear();
                     optimalPriorities.AddRange(optimizer.CurrentPopulation.ReadOnlyIndividuals[0].Chromosome);
+                    Debug.WriteLine("FIT " + maxFitness + "\tGEN " + optimizer.GenerationCount + "\tCOST " + calculateTravelCost(precedenceTree.PriorityOrderTraversal(optimalPriorities)));
+                    //Debug.WriteLine("FIT " + maxFitness + "\tGEN " + optimizer.GenerationCount));
                     evolved = true;
                 }
             }
@@ -73,22 +73,25 @@ namespace LaserPewer.Generation
                 evaluator = new TravelCostEvaluator(precedenceTree);
                 selector = new RouletteWheelSelector();
                 IMutator mutator = new ReverseSequenceMutator();
-                procreator = new SexualProcreator(new NonWrappingOrderedCrossover(), mutator, 0.5);
+                procreator = new SexualProcreator(new ShortestTravelCrossover(precedenceTree), mutator, 0.5);
 
                 Population genesis = new Population();
 
                 Individual individual0 = genesis.Append();
                 IReadOnlyList<PathNode> nodes = precedenceTree.NearestNeighborTraversal();
                 List<int> chromosome0 = individual0.GetChromosome();
-                chromosome0.AddRange(nodes.Select(node => node.Priority));
+                chromosome0.AddRange(nodes.Select(node => node.Id));
                 //chromosome0.AddRange(Enumerable.Range(0, precedenceTree.Nodes.Count));
                 evaluator.Baseline(chromosome0);
 
-                for (int i = 1; i < 30; i++)
+                //List<int> lastChromosome = chromosome0;
+                for (int i = 1; i < 100; i++)
                 {
                     List<int> chromosome = genesis.Append().GetChromosome();
                     chromosome.AddRange(chromosome0);
+                    //chromosome.AddRange(lastChromosome);
                     mutator.Mutate(chromosome, random);
+                    //lastChromosome = chromosome;
                 }
 
                 genesis.Freeze(evaluator);
@@ -107,7 +110,7 @@ namespace LaserPewer.Generation
             foreach (PathNode node in schedule)
             {
                 travelCost += node.LocateNearestStartPoint(lastEndPoint);
-                lastEndPoint = node.Path.Points[node.EndIndex];
+                lastEndPoint = node.EndPoint;
             }
 
             return travelCost;
@@ -147,7 +150,7 @@ namespace LaserPewer.Generation
                 }
 
                 machinePath.EndCut();
-                lastEndPoint = node.Path.Points[node.EndIndex];
+                lastEndPoint = node.EndPoint;
             }
 
             return machinePath;
@@ -166,6 +169,7 @@ namespace LaserPewer.Generation
                 for (int i = 0; i < _nodes.Count; i++)
                 {
                     PathNode nodeA = _nodes[i];
+                    nodeA.Id = i;
                     for (int j = i + 1; j < _nodes.Count; j++)
                     {
                         PathNode nodeB = _nodes[j];
@@ -178,7 +182,7 @@ namespace LaserPewer.Generation
                 }
             }
 
-            public IReadOnlyList<PathNode> PriorityOrderTraversal(IReadOnlyList<int> ordering)
+            public IReadOnlyList<PathNode> PriorityOrderTraversal(IReadOnlyList<int> ordering, List<PathNode> traversal = null)
             {
                 for (int i = 0; i < ordering.Count; i++)
                 {
@@ -191,7 +195,8 @@ namespace LaserPewer.Generation
                     queue.Enqueue(node);
                 }
 
-                List<PathNode> traversal = new List<PathNode>();
+                if (traversal == null) traversal = new List<PathNode>();
+                else traversal.Clear();
 
                 while (queue.Count > 0)
                 {
@@ -211,7 +216,7 @@ namespace LaserPewer.Generation
             {
                 for (int i = 0; i < _nodes.Count; i++)
                 {
-                    _nodes[i].Reset(i);
+                    _nodes[i].Reset(0);
                 }
 
                 HashSet<PathNode> readySet = new HashSet<PathNode>(_nodes.Where(node => node.PendingChildren.Count == 0));
@@ -231,7 +236,7 @@ namespace LaserPewer.Generation
                         if (parent.PendingChildren.Count == 0) readySet.Add(parent);
                     }
 
-                    lastEndPoint = node.Path.Points[node.EndIndex];
+                    lastEndPoint = node.EndPoint;
                 }
 
                 return traversal;
@@ -263,11 +268,14 @@ namespace LaserPewer.Generation
             public readonly ISet<PathNode> Parents;
             public readonly ISet<PathNode> Children;
 
+            public int Id { get; set; }
             public ISet<PathNode> PendingChildren { get; private set; }
 
             public int Priority { get; private set; }
             public int StartIndex { get; private set; }
             public int EndIndex { get { return Path.Closed ? StartIndex : (StartIndex == 0 ? Path.Points.Count - 1 : 0); } }
+            public Point StartPoint { get { return Path.Points[StartIndex]; } }
+            public Point EndPoint { get { return Path.Points[EndIndex]; } }
 
             public PathNode(Path path)
             {
@@ -310,19 +318,79 @@ namespace LaserPewer.Generation
             private readonly PathTree tree;
             private double baseline;
 
+            private readonly List<PathNode> traversal;
+
             public TravelCostEvaluator(PathTree tree)
             {
                 this.tree = tree;
+                traversal = new List<PathNode>();
             }
 
             public void Baseline(IReadOnlyList<int> chromosome)
             {
-                baseline = calculateTravelCost(tree.PriorityOrderTraversal(chromosome));
+                baseline = calculateTravelCost(tree.PriorityOrderTraversal(chromosome, traversal));
             }
 
             public double Evaluate(IReadOnlyList<int> chromosome)
             {
-                return Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(chromosome)));
+                return Math.Max(0.0, baseline - calculateTravelCost(tree.PriorityOrderTraversal(chromosome, traversal)));
+            }
+        }
+
+        private class ShortestTravelCrossover : ICrossover
+        {
+            private readonly PathTree tree;
+
+            private readonly LinkedSet<int> orderingA;
+            private readonly LinkedSet<int> orderingB;
+
+            public ShortestTravelCrossover(PathTree tree)
+            {
+                this.tree = tree;
+                orderingA = new LinkedSet<int>();
+                orderingB = new LinkedSet<int>();
+            }
+
+            public void Crossover(List<int> child, IReadOnlyList<int> parentA, IReadOnlyList<int> parentB, Random random)
+            {
+                orderingA.Clear();
+                orderingB.Clear();
+
+                foreach (int id in parentA) orderingA.Add(id);
+                foreach (int id in parentB) orderingB.Add(id);
+
+                Point lastEndPoint = new Point(0.0, 0.0);
+                int last = pickShortestTravel(lastEndPoint, parentA[0], parentB[0]);
+                lastEndPoint = tree.Nodes[last].EndPoint;
+                child.Add(last);
+
+                while (orderingA.Count > 1 && orderingB.Count > 1)
+                {
+                    int nextA = nextWrapped(orderingA, last);
+                    int nextB = nextWrapped(orderingB, last);
+
+                    orderingA.Remove(last);
+                    orderingB.Remove(last);
+
+                    last = pickShortestTravel(lastEndPoint, nextA, nextB);
+                    lastEndPoint = tree.Nodes[last].EndPoint;
+                    child.Add(last);
+                }
+            }
+
+            private int pickShortestTravel(Point lastEndPoint, int nextA, int nextB)
+            {
+                double travelA = tree.Nodes[nextA].LocateNearestStartPoint(lastEndPoint);
+                double travelB = tree.Nodes[nextB].LocateNearestStartPoint(lastEndPoint);
+
+                return travelA < travelB ? nextA : nextB;
+            }
+
+            private static int nextWrapped(LinkedSet<int> ordering, int item)
+            {
+                LinkedListNode<int> node = ordering.Find(item);
+                if (node.Next != null) return node.Next.Value;
+                return ordering.First.Value;
             }
         }
     }

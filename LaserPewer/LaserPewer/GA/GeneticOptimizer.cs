@@ -29,7 +29,7 @@ namespace LaserPewer.GA
             selector.Initialize(CurrentPopulation);
             while (pooledPopulation.Individuals.Count < CurrentPopulation.ReadOnlyIndividuals.Count)
             {
-                procreator.Procreate(pooledPopulation.Append().GetChromosome(), pooledPopulation.Append().GetChromosome(), selector, random);
+                procreator.Procreate(pooledPopulation.Append().GetChromosome(), selector, random);
             }
 
             pooledPopulation.Freeze(evaluator);
