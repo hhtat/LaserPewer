@@ -88,7 +88,7 @@
                 <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.TableHeight,Converter={StaticResource DoubleToStringConverter}}"
                          Grid.Row="2" Grid.Column="2" />
 
-                <TextBlock Text="Origin corner (0, 0)"
+                <TextBlock Text="Origin (corner)"
                            Grid.Row="3" Grid.Column="0" />
                 <ComboBox ItemsSource="{Binding Source={StaticResource OriginCornerDataProvider}}"
                           SelectedItem="{Binding ElementName=profilesListBox,Path=SelectedItem.Origin}"
@@ -100,7 +100,7 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
-                <TextBlock Text="Max feed rate (mm/min)"
+                <TextBlock Text="Max speed (mm/min)"
                            Grid.Row="4" Grid.Column="0" />
                 <TextBox Text="{Binding ElementName=profilesListBox,Path=SelectedItem.MaxFeedRate,Converter={StaticResource DoubleToStringConverter}}"
                          Grid.Row="4" Grid.Column="3" />

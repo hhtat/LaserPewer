@@ -2,7 +2,6 @@
 using LaserPewer.Shared;
 using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Input;
 
 namespace LaserPewer.ViewModel
@@ -15,7 +14,7 @@ namespace LaserPewer.ViewModel
             get { return _positionX; }
             private set
             {
-                if (value != _positionX)
+                if (_positionX != value)
                 {
                     _positionX = value;
                     NotifyPropertyChanged();
@@ -29,7 +28,7 @@ namespace LaserPewer.ViewModel
             get { return _positionY; }
             private set
             {
-                if (value != _positionY)
+                if (_positionY != value)
                 {
                     _positionY = value;
                     NotifyPropertyChanged();
@@ -43,7 +42,7 @@ namespace LaserPewer.ViewModel
             get { return _status; }
             private set
             {
-                if (value != _status)
+                if (_status != value)
                 {
                     _status = value;
                     NotifyPropertyChanged();
@@ -57,7 +56,7 @@ namespace LaserPewer.ViewModel
             get { return _alarm; }
             private set
             {
-                if (value != _alarm)
+                if (_alarm != value)
                 {
                     _alarm = value;
                     NotifyPropertyChanged();
@@ -71,7 +70,7 @@ namespace LaserPewer.ViewModel
             get { return _message; }
             private set
             {
-                if (value != _message)
+                if (_message != value)
                 {
                     _message = value;
                     NotifyPropertyChanged();
@@ -106,8 +105,11 @@ namespace LaserPewer.ViewModel
             get { return _programStatus; }
             private set
             {
-                _programStatus = value;
-                NotifyPropertyChanged();
+                if (_programStatus != value)
+                {
+                    _programStatus = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
@@ -117,8 +119,11 @@ namespace LaserPewer.ViewModel
             get { return _programProgress; }
             private set
             {
-                _programProgress = value;
-                NotifyPropertyChanged();
+                if (_programProgress != value)
+                {
+                    _programProgress = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 

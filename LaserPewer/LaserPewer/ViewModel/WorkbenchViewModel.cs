@@ -24,7 +24,14 @@ namespace LaserPewer.ViewModel
         public Point MachinePosition
         {
             get { return _machinePosition; }
-            private set { _machinePosition = value; NotifyPropertyChanged(); }
+            private set
+            {
+                if (_machinePosition != value)
+                {
+                    _machinePosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
         }
 
         public Document Document { get { return AppCore.Document; } }

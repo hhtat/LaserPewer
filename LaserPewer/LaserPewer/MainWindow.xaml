@@ -27,8 +27,6 @@
                     <GroupBox Header="File"
                               DataContext="{StaticResource DocumentViewModel}">
                         <StackPanel>
-                            <Button Command="{Binding OpenCommand}"
-                                    Content="Open" />
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -50,6 +48,19 @@
                                 <TextBlock Text="{Binding Size}"
                                            TextAlignment="Right"
                                            Grid.Row="1" Grid.Column="1" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <Button Command="{Binding OpenCommand}"
+                                        Content="Open"
+                                        Grid.Column="0" />
+                                <Button Command="{Binding MoveCommand}"
+                                        Content="Move"
+                                        Grid.Column="1" />
                             </Grid>
                         </StackPanel>
                     </GroupBox>

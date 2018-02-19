@@ -20,8 +20,6 @@ namespace LaserPewer.ViewModel
             }
         }
 
-        public Drawing Drawing { get { return AppCore.Document.Drawing; } }
-
         public string Size
         {
             get
@@ -35,9 +33,15 @@ namespace LaserPewer.ViewModel
         private readonly RelayCommand _openCommand;
         public ICommand OpenCommand { get { return _openCommand; } }
 
+        private readonly RelayCommand _moveCommand;
+        public ICommand MoveCommand { get { return _moveCommand; } }
+
         public DocumentViewModel()
         {
             _openCommand = new RelayCommand(_openCommand_Execute);
+            _moveCommand = new RelayCommand(
+                _moveCommand_Execute,
+                parameter => AppCore.Document.Drawing != null);
 
             AppCore.Document.Modified += Document_Modified;
         }
@@ -54,11 +58,16 @@ namespace LaserPewer.ViewModel
             }
         }
 
+        private void _moveCommand_Execute(object parameter)
+        {
+        }
+
         private void Document_Modified(object sender, EventArgs e)
         {
             NotifyPropertyChanged(nameof(FriendlyName));
             NotifyPropertyChanged(nameof(Drawing));
             NotifyPropertyChanged(nameof(Size));
+            _moveCommand.NotifyCanExecuteChanged();
         }
     }
 }
