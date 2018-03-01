@@ -2,6 +2,10 @@
 
 Easy to use software for GRBL based laser cutters.
 
+**DISCLAIMER: Lasers are extremely dangerous devices. They can instantly cause fires and permanently damage your vision. We're not responsible for any damage or issues this software may cause!**
+
+Windows-only and pre-Beta but we're pushing on both fronts!
+
 ## Features
 
 * Grbl v1.1
